@@ -1,0 +1,39 @@
+#!/bin/bash
+# Check the status of the development environment
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+echo "=== Project Status ==="
+echo ""
+
+# Check for required files
+echo "Required Files:"
+if [ -f "$PROJECT_DIR/index.html" ]; then
+    echo "  ✓ index.html exists"
+else
+    echo "  ✗ index.html missing"
+fi
+
+if [ -f "$PROJECT_DIR/config.json" ]; then
+    echo "  ✓ config.json exists"
+else
+    echo "  ✗ config.json missing"
+fi
+
+echo ""
+echo "Project Structure:"
+echo "  Project directory: $PROJECT_DIR"
+
+# Check directories
+for dir in docs dist logs scripts data ref tests; do
+    if [ -d "$PROJECT_DIR/$dir" ]; then
+        echo "  ✓ $dir/ exists"
+    else
+        echo "  ✗ $dir/ missing"
+    fi
+done
+
+echo ""
+echo "=== Status Check Complete ==="
+

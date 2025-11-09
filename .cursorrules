@@ -1,0 +1,38 @@
+# Cursor Rules for Parallel & Perpendicular Lines Web Trainer
+
+## Tech Stack
+- Pure HTML, CSS, and vanilla JavaScript
+- No external dependencies or frameworks
+- Client-side only application
+- Use localStorage for persistence
+
+## Code Style
+- Use modern ES6+ JavaScript features
+- Follow clean code principles
+- Add comments for complex math logic
+- Use meaningful variable names
+
+## File Organization
+- Keep HTML structure in index.html
+- Separate CSS into styles.css
+- Organize JavaScript into logical modules
+- Use clear, descriptive function names
+
+## Testing
+- Write Playwright tests for UI interactions
+- Test all four problem types
+- Verify achievement unlocking logic
+- Test localStorage persistence
+
+## Math Logic
+- Validate all inputs before processing
+- Handle edge cases (vertical lines, identical points)
+- Round slopes appropriately
+- Provide clear error messages
+
+## UI/UX
+- Follow reference design from ./ref/html5up-ethereal/*
+- Ensure responsive design
+- Maintain accessibility standards
+- Use color-coded feedback (green/red/neutral)
+

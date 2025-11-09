@@ -1,0 +1,45 @@
+#!/bin/bash
+# Build the project for production
+# For a static HTML/CSS/JS app, this copies files to dist/
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
+DIST_DIR="$PROJECT_DIR/dist"
+
+echo "Building project for production..."
+
+# Create dist directory if it doesn't exist
+mkdir -p "$DIST_DIR"
+
+# Copy required files
+if [ -f "$PROJECT_DIR/index.html" ]; then
+    cp "$PROJECT_DIR/index.html" "$DIST_DIR/"
+    echo "  ✓ Copied index.html"
+else
+    echo "  ✗ index.html not found"
+fi
+
+# Copy CSS files
+if [ -f "$PROJECT_DIR/styles.css" ]; then
+    cp "$PROJECT_DIR/styles.css" "$DIST_DIR/"
+    echo "  ✓ Copied styles.css"
+fi
+
+# Copy JavaScript files
+for js_file in "$PROJECT_DIR"/*.js; do
+    if [ -f "$js_file" ]; then
+        cp "$js_file" "$DIST_DIR/"
+        echo "  ✓ Copied $(basename "$js_file")"
+    fi
+done
+
+# Copy config.json if it exists
+if [ -f "$PROJECT_DIR/config.json" ]; then
+    cp "$PROJECT_DIR/config.json" "$DIST_DIR/"
+    echo "  ✓ Copied config.json"
+fi
+
+echo ""
+echo "Build complete! Files are in: $DIST_DIR"
+echo "You can deploy the contents of the dist/ directory to your web server."
+

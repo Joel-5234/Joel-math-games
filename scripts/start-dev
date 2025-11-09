@@ -1,0 +1,31 @@
+#!/bin/bash
+# Start development environment
+# For a static HTML/CSS/JS app, this opens the app in a browser
+
+echo "Starting Parallel & Perpendicular Lines Web Trainer..."
+
+# Check if index.html exists
+if [ ! -f "index.html" ]; then
+    echo "Error: index.html not found. Please create index.html first."
+    exit 1
+fi
+
+# Get the absolute path
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+# Open in default browser (macOS)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    open "$PROJECT_DIR/index.html"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    xdg-open "$PROJECT_DIR/index.html"
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    start "$PROJECT_DIR/index.html"
+else
+    echo "Please open index.html in your browser manually."
+    echo "Path: $PROJECT_DIR/index.html"
+fi
+
+echo "Development server started. Open index.html in your browser."
+echo "To stop, simply close the browser tab."
+

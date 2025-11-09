@@ -1,0 +1,11 @@
+#!/bin/bash
+# Stop development environment
+# For a static HTML/CSS/JS app, there's no server to stop
+
+echo "This is a static HTML/CSS/JS application."
+echo "Simply close the browser tab to stop."
+echo ""
+echo "If you're running a local server, you may need to:"
+echo "  - Press Ctrl+C in the terminal where the server is running"
+echo "  - Or close the browser tab"
+

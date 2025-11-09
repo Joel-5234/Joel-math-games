@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "Parallel & Perpendicular Lines Web Trainer",
+    "version": "1.0.0"
+  },
+  "game": {
+    "baseScore": 10,
+    "timeBonusMultiplier": 0.5,
+    "challengeModeTimeLimit": 60,
+    "sessionModeDuration": 600
+  },
+  "achievements": {
+    "slopeStarter": 5,
+    "slopeMaster": 20,
+    "parallelPro": 10,
+    "perpendicularPro": 10,
+    "speedRunner": 10,
+    "focus10": 10,
+    "homeworkHero": 100
+  }
+}
+

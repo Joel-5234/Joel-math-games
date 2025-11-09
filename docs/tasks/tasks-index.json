@@ -1,0 +1,35 @@
+{
+  "milestones": [
+    {
+      "id": "milestone-1",
+      "name": "MVP - Core Functionality",
+      "status": "completed",
+      "description": "Basic app structure and all four problem types working"
+    },
+    {
+      "id": "milestone-2",
+      "name": "Gamification - Practice Mode",
+      "status": "completed",
+      "description": "Add scoring, timer, and basic achievements"
+    },
+    {
+      "id": "milestone-3",
+      "name": "Advanced Modes",
+      "status": "completed",
+      "description": "Challenge mode and Session mode"
+    },
+    {
+      "id": "milestone-4",
+      "name": "Polish & Enhancements",
+      "status": "completed",
+      "description": "UI improvements, extended achievements, visual hints"
+    },
+    {
+      "id": "milestone-5",
+      "name": "GitHub Pages Deployment",
+      "status": "pending",
+      "description": "Set up automated deployment to GitHub Pages using GitHub Actions"
+    }
+  ]
+}
+

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallel & Perpendicular Lines Web Trainer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Parallel & Perpendicular Lines Trainer</h1>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Mode:</span>
+                    <select id="modeSelector" class="mode-selector">
+                        <option value="practice">Practice</option>
+                        <option value="challenge">Challenge</option>
+                        <option value="session">Session</option>
+                    </select>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Score:</span>
+                    <span id="scoreDisplay" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Streak:</span>
+                    <span id="streakDisplay" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Best Streak:</span>
+                    <span id="bestStreakDisplay" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Timer:</span>
+                    <span id="timerDisplay" class="stat-value">0s</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Problem Type Tabs -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="slope">Slope & Description</button>
+                <button class="tab-button" data-tab="relationship">Line Relationship</button>
+                <button class="tab-button" data-tab="parallel">Parallel Line</button>
+                <button class="tab-button" data-tab="perpendicular">Perpendicular Line</button>
+            </div>
+
+            <!-- Problem Type 1: Slope and Line Description -->
+            <div id="slope-panel" class="problem-panel active">
+                <div class="problem-card">
+                    <h2>Slope and Line Description</h2>
+                    <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
+                    <div class="input-group">
+                        <label for="slopeInput">Points:</label>
+                        <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                    </div>
+                    <button id="slopeSubmit" class="submit-button">Calculate</button>
+                    <div id="slopeResult" class="result-area"></div>
+                </div>
+            </div>
+
+            <!-- Problem Type 2: Relationship Between Two Lines -->
+            <div id="relationship-panel" class="problem-panel">
+                <div class="problem-card">
+                    <h2>Relationship Between Two Lines</h2>
+                    <p class="instructions">Enter two equations. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
+                    <div class="input-group">
+                        <label for="equation1Input">Equation 1:</label>
+                        <input type="text" id="equation1Input" placeholder="y = 2x + 3" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="equation2Input">Equation 2:</label>
+                        <input type="text" id="equation2Input" placeholder="y = 2x - 5" class="input-field">
+                    </div>
+                    <button id="relationshipSubmit" class="submit-button">Check Relationship</button>
+                    <div id="relationshipResult" class="result-area"></div>
+                </div>
+            </div>
+
+            <!-- Problem Type 3: Parallel Line Through a Point -->
+            <div id="parallel-panel" class="problem-panel">
+                <div class="problem-card">
+                    <h2>Parallel Line Through a Point</h2>
+                    <p class="instructions">Enter a base equation and a point in format (x,y)</p>
+                    <div class="input-group">
+                        <label for="parallelEquationInput">Base Equation:</label>
+                        <input type="text" id="parallelEquationInput" placeholder="y = 2x + 3" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="parallelPointInput">Point:</label>
+                        <input type="text" id="parallelPointInput" placeholder="(4,5)" class="input-field">
+                    </div>
+                    <button id="parallelSubmit" class="submit-button">Calculate</button>
+                    <div id="parallelResult" class="result-area"></div>
+                </div>
+            </div>
+
+            <!-- Problem Type 4: Perpendicular Line Through a Point -->
+            <div id="perpendicular-panel" class="problem-panel">
+                <div class="problem-card">
+                    <h2>Perpendicular Line Through a Point</h2>
+                    <p class="instructions">Enter a base equation and a point in format (x,y)</p>
+                    <div class="input-group">
+                        <label for="perpendicularEquationInput">Base Equation:</label>
+                        <input type="text" id="perpendicularEquationInput" placeholder="y = 2x + 3" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label for="perpendicularPointInput">Point:</label>
+                        <input type="text" id="perpendicularPointInput" placeholder="(4,5)" class="input-field">
+                    </div>
+                    <button id="perpendicularSubmit" class="submit-button">Calculate</button>
+                    <div id="perpendicularResult" class="result-area"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>Session Info</h3>
+                <div id="sessionInfo" class="info-display">
+                    <p>Questions: <span id="totalQuestions">0</span></p>
+                    <p>Correct: <span id="correctQuestions">0</span></p>
+                    <p>Accuracy: <span id="accuracy">0%</span></p>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <h3>Achievements</h3>
+                <button id="viewAchievements" class="achievement-button">View All</button>
+                <div id="achievementsList" class="achievements-list"></div>
+            </div>
+            <div class="sidebar-section">
+                <h3>Help</h3>
+                <div class="help-text">
+                    <p><strong>Practice Mode:</strong> No time limit, track your time</p>
+                    <p><strong>Challenge Mode:</strong> 60 second countdown per question</p>
+                    <p><strong>Session Mode:</strong> 10 minute practice session</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Achievement Modal -->
+    <div id="achievementModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Achievements</h2>
+            <div id="allAchievements" class="all-achievements"></div>
+        </div>
+    </div>
+
+    <!-- Achievement Toast -->
+    <div id="achievementToast" class="toast">
+        <div class="toast-content">
+            <h3>🎉 Achievement Unlocked!</h3>
+            <p id="toastAchievementName"></p>
+            <p id="toastAchievementDesc"></p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

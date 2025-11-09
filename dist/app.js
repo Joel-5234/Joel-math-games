@@ -1,0 +1,633 @@
+// Application Configuration
+let config = {
+    baseScore: 10,
+    timeBonusMultiplier: 0.5,
+    challengeModeTimeLimit: 60,
+    sessionModeDuration: 600
+};
+
+// Load config from config.json if available
+fetch('config.json')
+    .then(response => response.json())
+    .then(data => {
+        if (data.game) {
+            config = { ...config, ...data.game };
+        }
+    })
+    .catch(() => {
+        console.log('Using default config');
+    });
+
+// Game State
+let gameState = {
+    score: 0,
+    streakCurrent: 0,
+    streakBest: 0,
+    totalQuestions: 0,
+    correctQuestions: 0,
+    achievementsUnlocked: [],
+    mode: 'practice',
+    questionStartTime: null,
+    questionTimer: null,
+    sessionStartTime: null,
+    sessionTimer: null,
+    challengeCountdown: null,
+    stats: {
+        slope: { correct: 0, total: 0, times: [] },
+        relationship: { correct: 0, total: 0, times: [] },
+        parallel: { correct: 0, total: 0, times: [] },
+        perpendicular: { correct: 0, total: 0, times: [] }
+    }
+};
+
+// Achievement Definitions
+const achievements = [
+    { id: 'firstSteps', name: 'First Steps', description: 'Get your first correct answer', condition: (state) => state.correctQuestions >= 1 },
+    { id: 'slopeStarter', name: 'Slope Starter', description: 'Answer 5 slope questions correctly', condition: (state) => state.stats.slope.correct >= 5 },
+    { id: 'slopeMaster', name: 'Slope Master', description: 'Answer 20 slope questions correctly with no mistakes', condition: (state) => state.stats.slope.correct >= 20 && state.stats.slope.total === state.stats.slope.correct },
+    { id: 'parallelPro', name: 'Parallel Pro', description: 'Answer 10 relationship questions correctly', condition: (state) => state.stats.relationship.correct >= 10 },
+    { id: 'perpendicularPro', name: 'Perpendicular Pro', description: 'Answer 10 perpendicular questions correctly', condition: (state) => state.stats.perpendicular.correct >= 10 },
+    { id: 'speedRunner', name: 'Speed Runner', description: 'Answer any question correctly in under 10 seconds', condition: () => false }, // Checked per question
+    { id: 'focus10', name: 'Focus 10', description: 'Answer 10 questions correctly in a row in one session', condition: (state) => state.streakCurrent >= 10 },
+    { id: 'homeworkHero', name: 'Homework Hero', description: 'Score 100 points in one session', condition: (state) => state.score >= 100 }
+];
+
+// Utility Functions
+function parsePoint(pointStr) {
+    const match = pointStr.trim().match(/\((-?\d+\.?\d*),\s*(-?\d+\.?\d*)\)/);
+    if (!match) throw new Error('Invalid point format. Use (x,y)');
+    return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
+}
+
+function parseEquation(eqStr) {
+    const eq = eqStr.trim().replace(/\s+/g, '');
+    
+    // Vertical line: x = c
+    const verticalMatch = eq.match(/^x\s*=\s*(-?\d+\.?\d*)$/);
+    if (verticalMatch) {
+        return { kind: 'vertical', x0: parseFloat(verticalMatch[1]) };
+    }
+    
+    // Horizontal line: y = c
+    const horizontalMatch = eq.match(/^y\s*=\s*(-?\d+\.?\d*)$/);
+    if (horizontalMatch) {
+        return { kind: 'slope', m: 0, b: parseFloat(horizontalMatch[1]) };
+    }
+    
+    // Slope-intercept: y = mx + b
+    const slopeInterceptMatch = eq.match(/^y\s*=\s*(-?\d+\.?\d*)x\s*([+-]?\d+\.?\d*)$/);
+    if (slopeInterceptMatch) {
+        return {
+            kind: 'slope',
+            m: parseFloat(slopeInterceptMatch[1]),
+            b: parseFloat(slopeInterceptMatch[2] || 0)
+        };
+    }
+    
+    // Standard form: Ax + By = C
+    const standardMatch = eq.match(/^(-?\d+\.?\d*)x\s*([+-]\d+\.?\d*)y\s*=\s*(-?\d+\.?\d*)$/);
+    if (standardMatch) {
+        const A = parseFloat(standardMatch[1]);
+        const B = parseFloat(standardMatch[2]);
+        const C = parseFloat(standardMatch[3]);
+        
+        if (B === 0) {
+            return { kind: 'vertical', x0: C / A };
+        }
+        
+        return {
+            kind: 'slope',
+            m: -A / B,
+            b: C / B
+        };
+    }
+    
+    throw new Error('Invalid equation format. Supported: y=mx+b, Ax+By=C, x=c, y=c');
+}
+
+function roundToDecimal(num, decimals = 2) {
+    return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
+}
+
+// Math Logic Functions
+function calculateSlope(p1, p2) {
+    if (p1.x === p2.x && p1.y === p2.y) {
+        throw new Error('Points cannot be identical');
+    }
+    
+    if (p1.x === p2.x) {
+        return { slope: Infinity, classification: 'vertical' };
+    }
+    
+    const slope = (p2.y - p1.y) / (p2.x - p1.x);
+    let classification;
+    
+    if (slope > 0) classification = 'rising';
+    else if (slope < 0) classification = 'falling';
+    else classification = 'horizontal';
+    
+    return { slope: roundToDecimal(slope), classification };
+}
+
+function determineRelationship(line1, line2) {
+    // Both vertical
+    if (line1.kind === 'vertical' && line2.kind === 'vertical') {
+        return line1.x0 === line2.x0 ? 'same' : 'parallel';
+    }
+    
+    // One vertical, one horizontal
+    if ((line1.kind === 'vertical' && line2.kind === 'slope' && line2.m === 0) ||
+        (line2.kind === 'vertical' && line1.kind === 'slope' && line1.m === 0)) {
+        return 'perpendicular';
+    }
+    
+    // Both have slopes
+    if (line1.kind === 'slope' && line2.kind === 'slope') {
+        // Same line check (same slope and intercept)
+        if (line1.m === line2.m && line1.b === line2.b) {
+            return 'same';
+        }
+        
+        // Parallel
+        if (line1.m === line2.m) {
+            return 'parallel';
+        }
+        
+        // Perpendicular
+        if (Math.abs(line1.m * line2.m + 1) < 0.001) {
+            return 'perpendicular';
+        }
+    }
+    
+    return 'neither';
+}
+
+function findParallelLine(baseLine, point) {
+    if (baseLine.kind === 'vertical') {
+        return { kind: 'vertical', x0: point.x };
+    }
+    
+    // Use same slope, find b from point
+    const b = point.y - baseLine.m * point.x;
+    return { kind: 'slope', m: baseLine.m, b: roundToDecimal(b) };
+}
+
+function findPerpendicularLine(baseLine, point) {
+    if (baseLine.kind === 'vertical') {
+        return { kind: 'slope', m: 0, b: point.y };
+    }
+    
+    if (baseLine.kind === 'slope' && baseLine.m === 0) {
+        return { kind: 'vertical', x0: point.x };
+    }
+    
+    // Negative reciprocal slope
+    const m = -1 / baseLine.m;
+    const b = point.y - m * point.x;
+    return { kind: 'slope', m: roundToDecimal(m), b: roundToDecimal(b) };
+}
+
+function formatEquation(line) {
+    if (line.kind === 'vertical') {
+        return `x = ${line.x0}`;
+    }
+    
+    let equation = 'y = ';
+    if (line.m === 0) {
+        equation += line.b;
+    } else if (line.m === 1) {
+        equation += `x`;
+    } else if (line.m === -1) {
+        equation += `-x`;
+    } else {
+        equation += `${line.m}x`;
+    }
+    
+    if (line.b !== 0) {
+        equation += line.b > 0 ? ` + ${line.b}` : ` ${line.b}`;
+    }
+    
+    return equation;
+}
+
+// UI Update Functions
+function updateUI() {
+    document.getElementById('scoreDisplay').textContent = gameState.score;
+    document.getElementById('streakDisplay').textContent = gameState.streakCurrent;
+    document.getElementById('bestStreakDisplay').textContent = gameState.streakBest;
+    document.getElementById('totalQuestions').textContent = gameState.totalQuestions;
+    document.getElementById('correctQuestions').textContent = gameState.correctQuestions;
+    
+    const accuracy = gameState.totalQuestions > 0 
+        ? Math.round((gameState.correctQuestions / gameState.totalQuestions) * 100) 
+        : 0;
+    document.getElementById('accuracy').textContent = accuracy + '%';
+    
+    updateAchievementsDisplay();
+}
+
+function updateTimer() {
+    if (!gameState.questionStartTime) return;
+    
+    const elapsed = Math.floor((Date.now() - gameState.questionStartTime) / 1000);
+    const timerDisplay = document.getElementById('timerDisplay');
+    
+    if (gameState.mode === 'challenge' && gameState.challengeCountdown !== null) {
+        const remaining = gameState.challengeCountdown - elapsed;
+        if (remaining <= 0) {
+            timerDisplay.textContent = '0s';
+            timerDisplay.classList.add('timer-warning');
+            handleTimeout();
+            return;
+        }
+        if (remaining <= 10) {
+            timerDisplay.classList.add('timer-warning');
+        } else {
+            timerDisplay.classList.remove('timer-warning');
+        }
+        timerDisplay.textContent = remaining + 's';
+    } else {
+        timerDisplay.textContent = elapsed + 's';
+        timerDisplay.classList.remove('timer-warning');
+    }
+}
+
+function handleTimeout() {
+    stopQuestionTimer();
+    showResult('Time\'s up! The question timed out.', 'error');
+    updateStats('', false);
+}
+
+function startQuestionTimer() {
+    if (gameState.questionTimer) return;
+    
+    gameState.questionStartTime = Date.now();
+    if (gameState.mode === 'challenge') {
+        gameState.challengeCountdown = config.challengeModeTimeLimit;
+    }
+    
+    gameState.questionTimer = setInterval(updateTimer, 100);
+}
+
+function stopQuestionTimer() {
+    if (gameState.questionTimer) {
+        clearInterval(gameState.questionTimer);
+        gameState.questionTimer = null;
+    }
+}
+
+function startSessionTimer() {
+    if (gameState.mode === 'session' && !gameState.sessionTimer) {
+        gameState.sessionStartTime = Date.now();
+        gameState.sessionTimer = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - gameState.sessionStartTime) / 1000);
+            if (elapsed >= config.sessionModeDuration) {
+                stopSessionTimer();
+                alert('Session complete! Great work!');
+            }
+        }, 1000);
+    }
+}
+
+function stopSessionTimer() {
+    if (gameState.sessionTimer) {
+        clearInterval(gameState.sessionTimer);
+        gameState.sessionTimer = null;
+    }
+}
+
+function showResult(message, type = 'neutral') {
+    const activePanel = document.querySelector('.problem-panel.active');
+    const resultArea = activePanel.querySelector('.result-area');
+    resultArea.textContent = message;
+    resultArea.className = `result-area ${type}`;
+}
+
+function updateStats(problemType, isCorrect) {
+    if (problemType) {
+        gameState.stats[problemType].total++;
+        if (isCorrect) {
+            gameState.stats[problemType].correct++;
+            const elapsed = gameState.questionStartTime 
+                ? Math.floor((Date.now() - gameState.questionStartTime) / 1000) 
+                : 0;
+            gameState.stats[problemType].times.push(elapsed);
+            
+            // Check for Speed Runner achievement
+            if (elapsed < 10 && !gameState.achievementsUnlocked.includes('speedRunner')) {
+                unlockAchievement('speedRunner');
+            }
+        }
+    }
+    
+    gameState.totalQuestions++;
+    if (isCorrect) {
+        gameState.correctQuestions++;
+        gameState.streakCurrent++;
+        if (gameState.streakCurrent > gameState.streakBest) {
+            gameState.streakBest = gameState.streakCurrent;
+        }
+        
+        // Calculate score
+        let points = config.baseScore;
+        if (gameState.mode === 'challenge' && gameState.challengeCountdown !== null) {
+            const timeBonus = Math.max(0, gameState.challengeCountdown - Math.floor((Date.now() - gameState.questionStartTime) / 1000));
+            points += Math.floor(timeBonus * config.timeBonusMultiplier);
+        }
+        gameState.score += points;
+    } else {
+        gameState.streakCurrent = 0;
+    }
+    
+    stopQuestionTimer();
+    updateUI();
+    checkAchievements();
+    saveGameState();
+}
+
+// Achievement Functions
+function checkAchievements() {
+    achievements.forEach(achievement => {
+        if (!gameState.achievementsUnlocked.includes(achievement.id)) {
+            if (achievement.condition(gameState)) {
+                unlockAchievement(achievement.id);
+            }
+        }
+    });
+}
+
+function unlockAchievement(achievementId) {
+    if (gameState.achievementsUnlocked.includes(achievementId)) return;
+    
+    gameState.achievementsUnlocked.push(achievementId);
+    const achievement = achievements.find(a => a.id === achievementId);
+    
+    if (achievement) {
+        showAchievementToast(achievement.name, achievement.description);
+        updateUI();
+        saveGameState();
+    }
+}
+
+function showAchievementToast(name, description) {
+    const toast = document.getElementById('achievementToast');
+    document.getElementById('toastAchievementName').textContent = name;
+    document.getElementById('toastAchievementDesc').textContent = description;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 4000);
+}
+
+function updateAchievementsDisplay() {
+    const list = document.getElementById('achievementsList');
+    list.innerHTML = '';
+    
+    const recentAchievements = gameState.achievementsUnlocked
+        .slice(-3)
+        .reverse()
+        .map(id => achievements.find(a => a.id === id))
+        .filter(a => a);
+    
+    recentAchievements.forEach(achievement => {
+        const item = document.createElement('div');
+        item.className = 'achievement-item';
+        item.innerHTML = `
+            <h4>${achievement.name}</h4>
+            <p>${achievement.description}</p>
+        `;
+        list.appendChild(item);
+    });
+}
+
+function showAllAchievements() {
+    const container = document.getElementById('allAchievements');
+    container.innerHTML = '';
+    
+    achievements.forEach(achievement => {
+        const isUnlocked = gameState.achievementsUnlocked.includes(achievement.id);
+        const item = document.createElement('div');
+        item.className = `achievement-item ${isUnlocked ? '' : 'locked'}`;
+        item.innerHTML = `
+            <h4>${isUnlocked ? '✓' : '🔒'} ${achievement.name}</h4>
+            <p>${achievement.description}</p>
+            ${isUnlocked ? '<p style="font-size: 0.7rem; color: #999;">Unlocked</p>' : ''}
+        `;
+        container.appendChild(item);
+    });
+    
+    document.getElementById('achievementModal').classList.add('active');
+}
+
+// Problem Type Handlers
+function handleSlopeProblem() {
+    const input = document.getElementById('slopeInput').value.trim();
+    
+    try {
+        const parts = input.split(',');
+        if (parts.length !== 2) {
+            throw new Error('Please enter two points separated by a comma');
+        }
+        
+        const p1 = parsePoint(parts[0]);
+        const p2 = parsePoint(parts[1]);
+        const result = calculateSlope(p1, p2);
+        
+        let message;
+        if (result.slope === Infinity) {
+            message = `Slope: Undefined (Vertical Line)\nClassification: ${result.classification}`;
+        } else {
+            message = `Slope: ${result.slope}\nClassification: ${result.classification}`;
+        }
+        
+        showResult(message, 'success');
+        updateStats('slope', true);
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+        updateStats('slope', false);
+    }
+}
+
+function handleRelationshipProblem() {
+    const eq1 = document.getElementById('equation1Input').value.trim();
+    const eq2 = document.getElementById('equation2Input').value.trim();
+    
+    try {
+        const line1 = parseEquation(eq1);
+        const line2 = parseEquation(eq2);
+        const relationship = determineRelationship(line1, line2);
+        
+        const line1Formatted = formatEquation(line1);
+        const line2Formatted = formatEquation(line2);
+        
+        let message = `Equation 1: ${line1Formatted}\n`;
+        message += `Equation 2: ${line2Formatted}\n`;
+        message += `Relationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
+        
+        showResult(message, 'success');
+        updateStats('relationship', true);
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+        updateStats('relationship', false);
+    }
+}
+
+function handleParallelProblem() {
+    const equation = document.getElementById('parallelEquationInput').value.trim();
+    const pointStr = document.getElementById('parallelPointInput').value.trim();
+    
+    try {
+        const baseLine = parseEquation(equation);
+        const point = parsePoint(pointStr);
+        const resultLine = findParallelLine(baseLine, point);
+        const equationFormatted = formatEquation(resultLine);
+        
+        showResult(`Parallel line: ${equationFormatted}`, 'success');
+        updateStats('parallel', true);
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+        updateStats('parallel', false);
+    }
+}
+
+function handlePerpendicularProblem() {
+    const equation = document.getElementById('perpendicularEquationInput').value.trim();
+    const pointStr = document.getElementById('perpendicularPointInput').value.trim();
+    
+    try {
+        const baseLine = parseEquation(equation);
+        const point = parsePoint(pointStr);
+        const resultLine = findPerpendicularLine(baseLine, point);
+        const equationFormatted = formatEquation(resultLine);
+        
+        showResult(`Perpendicular line: ${equationFormatted}`, 'success');
+        updateStats('perpendicular', true);
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+        updateStats('perpendicular', false);
+    }
+}
+
+// LocalStorage Functions
+function saveGameState() {
+    const stateToSave = {
+        score: gameState.score,
+        streakBest: gameState.streakBest,
+        achievementsUnlocked: gameState.achievementsUnlocked,
+        stats: gameState.stats
+    };
+    localStorage.setItem('lineTrainerGameState', JSON.stringify(stateToSave));
+}
+
+function loadGameState() {
+    const saved = localStorage.getItem('lineTrainerGameState');
+    if (saved) {
+        try {
+            const state = JSON.parse(saved);
+            gameState.score = state.score || 0;
+            gameState.streakBest = state.streakBest || 0;
+            gameState.achievementsUnlocked = state.achievementsUnlocked || [];
+            if (state.stats) {
+                gameState.stats = { ...gameState.stats, ...state.stats };
+            }
+        } catch (error) {
+            console.error('Error loading game state:', error);
+        }
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    loadGameState();
+    updateUI();
+    
+    // Tab switching
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const tab = button.dataset.tab;
+            
+            // Update active tab
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Update active panel
+            document.querySelectorAll('.problem-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(tab + '-panel').classList.add('active');
+            
+            // Clear results
+            document.querySelectorAll('.result-area').forEach(r => {
+                r.textContent = '';
+                r.className = 'result-area';
+            });
+            
+            // Reset timer for new question
+            stopQuestionTimer();
+        });
+    });
+    
+    // Mode selector
+    document.getElementById('modeSelector').addEventListener('change', (e) => {
+        gameState.mode = e.target.value;
+        stopQuestionTimer();
+        stopSessionTimer();
+        
+        if (gameState.mode === 'session') {
+            startSessionTimer();
+        }
+        
+        // Reset session score for new mode
+        if (gameState.mode !== 'session') {
+            gameState.score = 0;
+            gameState.streakCurrent = 0;
+            gameState.totalQuestions = 0;
+            gameState.correctQuestions = 0;
+        }
+        
+        updateUI();
+    });
+    
+    // Problem type submit buttons
+    document.getElementById('slopeSubmit').addEventListener('click', () => {
+        startQuestionTimer();
+        handleSlopeProblem();
+    });
+    
+    document.getElementById('relationshipSubmit').addEventListener('click', () => {
+        startQuestionTimer();
+        handleRelationshipProblem();
+    });
+    
+    document.getElementById('parallelSubmit').addEventListener('click', () => {
+        startQuestionTimer();
+        handleParallelProblem();
+    });
+    
+    document.getElementById('perpendicularSubmit').addEventListener('click', () => {
+        startQuestionTimer();
+        handlePerpendicularProblem();
+    });
+    
+    // Start timer on input
+    document.querySelectorAll('.input-field').forEach(input => {
+        input.addEventListener('focus', startQuestionTimer);
+    });
+    
+    // Achievement modal
+    document.getElementById('viewAchievements').addEventListener('click', showAllAchievements);
+    document.querySelector('.close-modal').addEventListener('click', () => {
+        document.getElementById('achievementModal').classList.remove('active');
+    });
+    
+    document.getElementById('achievementModal').addEventListener('click', (e) => {
+        if (e.target.id === 'achievementModal') {
+            document.getElementById('achievementModal').classList.remove('active');
+        }
+    });
+    
+    // Start session timer if in session mode
+    if (gameState.mode === 'session') {
+        startSessionTimer();
+    }
+});
+
