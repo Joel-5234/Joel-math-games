@@ -425,13 +425,21 @@ function handleSlopeProblem() {
     const input = document.getElementById('slopeInput').value.trim();
     
     try {
-        const parts = input.split(',');
+        // Match two points in the format (x,y), (x,y) or (x,y),(x,y)
+        // Split on '),' pattern which separates the two points
+        const pointSeparator = /\)\s*,\s*\(/;
+        const parts = input.split(pointSeparator);
+        
         if (parts.length !== 2) {
-            throw new Error('Please enter two points separated by a comma');
+            throw new Error('Please enter two points in the format: (x1,y1), (x2,y2)');
         }
         
-        const p1 = parsePoint(parts[0]);
-        const p2 = parsePoint(parts[1]);
+        // Add back the closing parenthesis to first part and opening to second part
+        const p1Str = parts[0] + ')';
+        const p2Str = '(' + parts[1];
+        
+        const p1 = parsePoint(p1Str);
+        const p2 = parsePoint(p2Str);
         const result = calculateSlope(p1, p2);
         
         let message;

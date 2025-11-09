@@ -1,4 +1,12 @@
 {
-  "issues": []
+  "issues": [
+    {
+      "id": "001",
+      "description": "Slope input parsing error - splits on all commas instead of point separator",
+      "status": "fixed",
+      "filename": "issue-001-20251109-185825.md",
+      "date": "2025-11-09T18:58:25"
+    }
+  ]
 }
 
