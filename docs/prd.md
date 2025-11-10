@@ -310,3 +310,13 @@ c) Hints provide helpful guidance without revealing the answer
 d) Tooltip is dismissible (click outside or close button)
 e) All hints displayed at once when hint button is clicked
 
+10.6 Hints in Challenge Mode
+a) Hints available in Set Challenge Mode
+b) Display in same right column layout as practice mode
+c) Available for all questions (answered, unanswered, skipped)
+d) Point penalty: Using a hint halves the points for that question
+e) Hint limit: Maximum of 5 hints per challenge
+f) Hint tracking: Track hints used per question and total
+g) Completion summary: Display hint usage statistics
+h) Hint button disabled when limit reached
+

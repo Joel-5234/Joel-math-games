@@ -41,6 +41,12 @@
       "name": "Set Challenge Mode",
       "status": "completed",
       "description": "Replace Challenge Mode with Set Challenge Mode - pre-generated question sets with navigation, skip, and give-up features"
+    },
+    {
+      "id": "milestone-8",
+      "name": "Hints in Challenge Mode",
+      "status": "pending",
+      "description": "Add hint functionality to Challenge Mode with limit (5 hints), point penalty (half points), and usage tracking"
     }
   ]
 }
