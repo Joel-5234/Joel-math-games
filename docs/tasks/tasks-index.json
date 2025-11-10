@@ -45,7 +45,7 @@
     {
       "id": "milestone-8",
       "name": "Hints in Challenge Mode",
-      "status": "pending",
+      "status": "completed",
       "description": "Add hint functionality to Challenge Mode with limit (5 hints), point penalty (half points), and usage tracking"
     }
   ]
