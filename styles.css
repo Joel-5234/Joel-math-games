@@ -130,11 +130,19 @@ body {
     display: block;
 }
 
+.problem-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
 .problem-card {
     background: #f8f9fa;
     padding: 30px;
     border-radius: 10px;
     border: 2px solid #e0e0e0;
+    flex: 1;
+    min-width: 0;
 }
 
 .problem-header {
@@ -430,7 +438,107 @@ body {
     50% { opacity: 0.5; }
 }
 
-/* Hint Tooltip */
+/* Hint Panel (Right Column) */
+.hint-panel {
+    display: none;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    border: 2px solid #ffc107;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 20px;
+}
+
+.hint-panel.active {
+    display: block;
+}
+
+.hint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.hint-header h3 {
+    color: #667eea;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.close-hint {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.close-hint:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.hint-content {
+    line-height: 1.8;
+    color: #333;
+}
+
+.hint-content h4 {
+    color: #667eea;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.hint-content h4:first-child {
+    margin-top: 0;
+}
+
+.hint-content ul {
+    margin: 10px 0;
+    padding-left: 25px;
+}
+
+.hint-content li {
+    margin-bottom: 8px;
+}
+
+.hint-content .formula {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 5px;
+    border-left: 4px solid #667eea;
+    margin: 10px 0;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.hint-content .concept {
+    background: #e3f2fd;
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 4px solid #2196f3;
+}
+
+/* Hint Tooltip (Legacy - kept for backward compatibility but not used) */
 .hint-tooltip {
     display: none;
     position: fixed;
@@ -550,6 +658,16 @@ body {
 
     .sidebar {
         grid-row: 3;
+    }
+
+    .problem-layout {
+        flex-direction: column;
+    }
+
+    .hint-panel {
+        width: 100%;
+        position: static;
+        max-height: none;
     }
 }
 

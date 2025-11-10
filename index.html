@@ -51,89 +51,125 @@
 
             <!-- Problem Type 1: Slope and Line Description -->
             <div id="slope-panel" class="problem-panel active">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Slope and Line Description</h2>
-                        <button class="hint-button" data-hint="slope" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Slope and Line Description</h2>
+                            <button class="hint-button" data-hint="slope" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
+                        <div class="input-group">
+                            <label for="slopeInput">Points:</label>
+                            <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                        </div>
+                        <button id="slopeSubmit" class="submit-button">Calculate</button>
+                        <div id="slopeResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
-                    <div class="input-group">
-                        <label for="slopeInput">Points:</label>
-                        <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                    <div id="slope-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="slope-hint-panel">&times;</button>
+                        </div>
+                        <div id="slope-hint-content" class="hint-content"></div>
                     </div>
-                    <button id="slopeSubmit" class="submit-button">Calculate</button>
-                    <div id="slopeResult" class="result-area"></div>
                 </div>
             </div>
 
             <!-- Problem Type 2: Relationship Between Two Lines -->
             <div id="relationship-panel" class="problem-panel">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Relationship Between Two Lines</h2>
-                        <button class="hint-button" data-hint="relationship" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Relationship Between Two Lines</h2>
+                            <button class="hint-button" data-hint="relationship" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter two equations. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
+                        <div class="input-group">
+                            <label for="equation1Input">Equation 1:</label>
+                            <input type="text" id="equation1Input" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="equation2Input">Equation 2:</label>
+                            <input type="text" id="equation2Input" placeholder="y = 2x - 5" class="input-field">
+                        </div>
+                        <button id="relationshipSubmit" class="submit-button">Check Relationship</button>
+                        <div id="relationshipResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter two equations. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
-                    <div class="input-group">
-                        <label for="equation1Input">Equation 1:</label>
-                        <input type="text" id="equation1Input" placeholder="y = 2x + 3" class="input-field">
+                    <div id="relationship-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="relationship-hint-panel">&times;</button>
+                        </div>
+                        <div id="relationship-hint-content" class="hint-content"></div>
                     </div>
-                    <div class="input-group">
-                        <label for="equation2Input">Equation 2:</label>
-                        <input type="text" id="equation2Input" placeholder="y = 2x - 5" class="input-field">
-                    </div>
-                    <button id="relationshipSubmit" class="submit-button">Check Relationship</button>
-                    <div id="relationshipResult" class="result-area"></div>
                 </div>
             </div>
 
             <!-- Problem Type 3: Parallel Line Through a Point -->
             <div id="parallel-panel" class="problem-panel">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Parallel Line Through a Point</h2>
-                        <button class="hint-button" data-hint="parallel" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Parallel Line Through a Point</h2>
+                            <button class="hint-button" data-hint="parallel" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter a base equation and a point in format (x,y)</p>
+                        <div class="input-group">
+                            <label for="parallelEquationInput">Base Equation:</label>
+                            <input type="text" id="parallelEquationInput" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="parallelPointInput">Point:</label>
+                            <input type="text" id="parallelPointInput" placeholder="(4,5)" class="input-field">
+                        </div>
+                        <button id="parallelSubmit" class="submit-button">Calculate</button>
+                        <div id="parallelResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter a base equation and a point in format (x,y)</p>
-                    <div class="input-group">
-                        <label for="parallelEquationInput">Base Equation:</label>
-                        <input type="text" id="parallelEquationInput" placeholder="y = 2x + 3" class="input-field">
+                    <div id="parallel-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="parallel-hint-panel">&times;</button>
+                        </div>
+                        <div id="parallel-hint-content" class="hint-content"></div>
                     </div>
-                    <div class="input-group">
-                        <label for="parallelPointInput">Point:</label>
-                        <input type="text" id="parallelPointInput" placeholder="(4,5)" class="input-field">
-                    </div>
-                    <button id="parallelSubmit" class="submit-button">Calculate</button>
-                    <div id="parallelResult" class="result-area"></div>
                 </div>
             </div>
 
             <!-- Problem Type 4: Perpendicular Line Through a Point -->
             <div id="perpendicular-panel" class="problem-panel">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Perpendicular Line Through a Point</h2>
-                        <button class="hint-button" data-hint="perpendicular" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Perpendicular Line Through a Point</h2>
+                            <button class="hint-button" data-hint="perpendicular" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter a base equation and a point in format (x,y)</p>
+                        <div class="input-group">
+                            <label for="perpendicularEquationInput">Base Equation:</label>
+                            <input type="text" id="perpendicularEquationInput" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="perpendicularPointInput">Point:</label>
+                            <input type="text" id="perpendicularPointInput" placeholder="(4,5)" class="input-field">
+                        </div>
+                        <button id="perpendicularSubmit" class="submit-button">Calculate</button>
+                        <div id="perpendicularResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter a base equation and a point in format (x,y)</p>
-                    <div class="input-group">
-                        <label for="perpendicularEquationInput">Base Equation:</label>
-                        <input type="text" id="perpendicularEquationInput" placeholder="y = 2x + 3" class="input-field">
+                    <div id="perpendicular-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="perpendicular-hint-panel">&times;</button>
+                        </div>
+                        <div id="perpendicular-hint-content" class="hint-content"></div>
                     </div>
-                    <div class="input-group">
-                        <label for="perpendicularPointInput">Point:</label>
-                        <input type="text" id="perpendicularPointInput" placeholder="(4,5)" class="input-field">
-                    </div>
-                    <button id="perpendicularSubmit" class="submit-button">Calculate</button>
-                    <div id="perpendicularResult" class="result-area"></div>
                 </div>
             </div>
         </main>

@@ -497,11 +497,32 @@ function showAllAchievements() {
 }
 
 // Hint Functions
+const hintTypeToPanelId = {
+    slope: 'slope-hint-panel',
+    relationship: 'relationship-hint-panel',
+    parallel: 'parallel-hint-panel',
+    perpendicular: 'perpendicular-hint-panel'
+};
+
+const hintTypeToContentId = {
+    slope: 'slope-hint-content',
+    relationship: 'relationship-hint-content',
+    parallel: 'parallel-hint-content',
+    perpendicular: 'perpendicular-hint-content'
+};
+
 function showHints(hintType) {
     const hintData = hints[hintType];
     if (!hintData) return;
     
-    const content = document.getElementById('hintContent');
+    const panelId = hintTypeToPanelId[hintType];
+    const contentId = hintTypeToContentId[hintType];
+    
+    if (!panelId || !contentId) return;
+    
+    const content = document.getElementById(contentId);
+    if (!content) return;
+    
     let html = '';
     
     // Step-by-step guidance
@@ -525,11 +546,31 @@ function showHints(hintType) {
     html += '</div>';
     
     content.innerHTML = html;
-    document.getElementById('hintTooltip').classList.add('active');
+    
+    const panel = document.getElementById(panelId);
+    if (panel) {
+        panel.classList.add('active');
+    }
 }
 
-function hideHints() {
-    document.getElementById('hintTooltip').classList.remove('active');
+function hideHints(hintType) {
+    if (hintType) {
+        const panelId = hintTypeToPanelId[hintType];
+        if (panelId) {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.classList.remove('active');
+            }
+        }
+    } else {
+        // Hide all hint panels
+        Object.values(hintTypeToPanelId).forEach(panelId => {
+            const panel = document.getElementById(panelId);
+            if (panel) {
+                panel.classList.remove('active');
+            }
+        });
+    }
 }
 
 // Problem Type Handlers
@@ -709,6 +750,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 r.className = 'result-area';
             });
             
+            // Hide all hint panels when switching tabs
+            hideHints();
+            
             // Reset question answered flag for new question
             gameState.questionAnswered = false;
             
@@ -784,18 +828,50 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.hint-button').forEach(button => {
         button.addEventListener('click', () => {
             const hintType = button.dataset.hint;
-            showHints(hintType);
+            // Toggle hint panel - if already shown, hide it; otherwise show it
+            const panelId = hintTypeToPanelId[hintType];
+            if (panelId) {
+                const panel = document.getElementById(panelId);
+                if (panel && panel.classList.contains('active')) {
+                    hideHints(hintType);
+                } else {
+                    // Hide all other hint panels first
+                    hideHints();
+                    showHints(hintType);
+                }
+            }
         });
     });
     
-    // Close hint tooltip
-    document.querySelector('.close-tooltip').addEventListener('click', hideHints);
-    
-    document.getElementById('hintTooltip').addEventListener('click', (e) => {
-        if (e.target.id === 'hintTooltip') {
-            hideHints();
-        }
+    // Close hint panels
+    document.querySelectorAll('.close-hint').forEach(button => {
+        button.addEventListener('click', () => {
+            const panelId = button.dataset.hintPanel;
+            if (panelId) {
+                const panel = document.getElementById(panelId);
+                if (panel) {
+                    panel.classList.remove('active');
+                }
+            }
+        });
     });
+    
+    // Close hint tooltip (legacy - kept for backward compatibility)
+    const closeTooltip = document.querySelector('.close-tooltip');
+    if (closeTooltip) {
+        closeTooltip.addEventListener('click', () => {
+            document.getElementById('hintTooltip')?.classList.remove('active');
+        });
+    }
+    
+    const hintTooltip = document.getElementById('hintTooltip');
+    if (hintTooltip) {
+        hintTooltip.addEventListener('click', (e) => {
+            if (e.target.id === 'hintTooltip') {
+                hintTooltip.classList.remove('active');
+            }
+        });
+    }
     
     // Start session timer if in session mode
     if (gameState.mode === 'session') {
