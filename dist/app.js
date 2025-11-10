@@ -41,6 +41,79 @@ let gameState = {
     }
 };
 
+// Hint Content Definitions
+const hints = {
+    slope: {
+        steps: [
+            "1. Identify the two points from your input: (x₁, y₁) and (x₂, y₂)",
+            "2. Use the slope formula: m = (y₂ - y₁) / (x₂ - x₁)",
+            "3. Calculate the difference in y-coordinates (rise)",
+            "4. Calculate the difference in x-coordinates (run)",
+            "5. Divide rise by run to get the slope",
+            "6. Classify the line based on the slope value"
+        ],
+        formula: "Slope Formula: m = (y₂ - y₁) / (x₂ - x₁)\n\nWhere:\n• m = slope\n• (x₁, y₁) = first point\n• (x₂, y₂) = second point",
+        concepts: [
+            "Rising line: Slope is positive (m > 0). The line goes up from left to right.",
+            "Falling line: Slope is negative (m < 0). The line goes down from left to right.",
+            "Horizontal line: Slope is zero (m = 0). The line is flat, parallel to x-axis.",
+            "Vertical line: Slope is undefined (x₁ = x₂). The line is parallel to y-axis."
+        ]
+    },
+    relationship: {
+        steps: [
+            "1. Convert both equations to slope-intercept form (y = mx + b) if possible",
+            "2. Identify the slope (m) of each line",
+            "3. Compare the slopes to determine the relationship",
+            "4. Check if lines are identical (same slope AND same y-intercept)",
+            "5. For vertical/horizontal lines, use special rules"
+        ],
+        formula: "Parallel Lines: m₁ = m₂ (same slope)\n\nPerpendicular Lines: m₁ × m₂ = -1\n(Product of slopes equals -1)\n\nSpecial Cases:\n• Vertical ⟂ Horizontal\n• Two vertical lines are parallel",
+        concepts: [
+            "Parallel lines: Have the same slope but different y-intercepts. They never intersect.",
+            "Perpendicular lines: Have slopes that are negative reciprocals. They intersect at a 90° angle.",
+            "Neither: Lines that are not parallel or perpendicular. They intersect at some angle other than 90°.",
+            "Same line: Identical equations represent the same line (infinite intersections)."
+        ]
+    },
+    parallel: {
+        steps: [
+            "1. Identify the slope (m) of the base line",
+            "2. Remember: parallel lines have the SAME slope",
+            "3. Use the given point (x₀, y₀) to find the y-intercept (b)",
+            "4. Substitute into y = mx + b: y₀ = m × x₀ + b",
+            "5. Solve for b: b = y₀ - m × x₀",
+            "6. Write the final equation: y = mx + b",
+            "7. Special case: If base is vertical (x = c), result is x = x₀"
+        ],
+        formula: "Parallel Line Formula:\n\nGiven: y = mx + b (base line)\nPoint: (x₀, y₀)\n\nStep 1: Use same slope m\nStep 2: Find b: b = y₀ - m × x₀\nStep 3: Result: y = mx + b",
+        concepts: [
+            "Parallel lines always have the same slope. They never meet, no matter how far extended.",
+            "To find a parallel line through a point, keep the slope the same and find the new y-intercept.",
+            "If the base line is vertical (x = constant), the parallel line is also vertical at the x-coordinate of the given point.",
+            "The y-intercept changes, but the slope stays identical to the base line."
+        ]
+    },
+    perpendicular: {
+        steps: [
+            "1. Identify the slope (m) of the base line",
+            "2. Calculate the negative reciprocal: m_perp = -1/m",
+            "3. Use the given point (x₀, y₀) to find the y-intercept (b)",
+            "4. Substitute into y = m_perp × x + b: y₀ = m_perp × x₀ + b",
+            "5. Solve for b: b = y₀ - m_perp × x₀",
+            "6. Write the final equation: y = m_perp × x + b",
+            "7. Special cases: Vertical ⟷ Horizontal"
+        ],
+        formula: "Perpendicular Line Formula:\n\nGiven: y = mx + b (base line)\nPoint: (x₀, y₀)\n\nStep 1: Find negative reciprocal: m_perp = -1/m\nStep 2: Find b: b = y₀ - m_perp × x₀\nStep 3: Result: y = m_perp × x + b\n\nSpecial Cases:\n• Vertical line (x = c) ⟷ Horizontal line (y = y₀)\n• Horizontal line (y = c) ⟷ Vertical line (x = x₀)",
+        concepts: [
+            "Perpendicular lines intersect at a 90-degree angle. Their slopes are negative reciprocals.",
+            "Negative reciprocal: Flip the fraction and change the sign. Example: 2/3 becomes -3/2.",
+            "If the base line is vertical, the perpendicular line is horizontal (and vice versa).",
+            "The product of slopes of perpendicular lines always equals -1: m₁ × m₂ = -1."
+        ]
+    }
+};
+
 // Achievement Definitions
 const achievements = [
     { id: 'firstSteps', name: 'First Steps', description: 'Get your first correct answer', condition: (state) => state.correctQuestions >= 1 },
@@ -423,6 +496,42 @@ function showAllAchievements() {
     document.getElementById('achievementModal').classList.add('active');
 }
 
+// Hint Functions
+function showHints(hintType) {
+    const hintData = hints[hintType];
+    if (!hintData) return;
+    
+    const content = document.getElementById('hintContent');
+    let html = '';
+    
+    // Step-by-step guidance
+    html += '<h4>📝 Step-by-Step Guide</h4>';
+    html += '<ul>';
+    hintData.steps.forEach(step => {
+        html += `<li>${step}</li>`;
+    });
+    html += '</ul>';
+    
+    // Formula
+    html += '<h4>📐 Formula</h4>';
+    html += `<div class="formula">${hintData.formula.replace(/\n/g, '<br>')}</div>`;
+    
+    // Concepts
+    html += '<h4>💡 Key Concepts</h4>';
+    html += '<div class="concept">';
+    hintData.concepts.forEach(concept => {
+        html += `<p>${concept}</p>`;
+    });
+    html += '</div>';
+    
+    content.innerHTML = html;
+    document.getElementById('hintTooltip').classList.add('active');
+}
+
+function hideHints() {
+    document.getElementById('hintTooltip').classList.remove('active');
+}
+
 // Problem Type Handlers
 function handleSlopeProblem() {
     // Prevent spam clicking - check if question already answered
@@ -668,6 +777,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('achievementModal').addEventListener('click', (e) => {
         if (e.target.id === 'achievementModal') {
             document.getElementById('achievementModal').classList.remove('active');
+        }
+    });
+    
+    // Hint buttons
+    document.querySelectorAll('.hint-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const hintType = button.dataset.hint;
+            showHints(hintType);
+        });
+    });
+    
+    // Close hint tooltip
+    document.querySelector('.close-tooltip').addEventListener('click', hideHints);
+    
+    document.getElementById('hintTooltip').addEventListener('click', (e) => {
+        if (e.target.id === 'hintTooltip') {
+            hideHints();
         }
     });
     

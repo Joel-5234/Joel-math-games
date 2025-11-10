@@ -279,3 +279,13 @@ c) Build process prepares production files in dist/ directory
 d) Publicly accessible via GitHub Pages URL
 e) No server-side dependencies required
 
+10.5 Hint System
+a) Hint button available for each of the four problem types
+b) Tooltip displays comprehensive hints including:
+	• Step-by-step guidance
+	• Formula reminders
+	• Key concepts and explanations
+c) Hints provide helpful guidance without revealing the answer
+d) Tooltip is dismissible (click outside or close button)
+e) All hints displayed at once when hint button is clicked
+

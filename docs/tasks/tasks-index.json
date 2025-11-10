@@ -27,8 +27,14 @@
     {
       "id": "milestone-5",
       "name": "GitHub Pages Deployment",
-      "status": "pending",
+      "status": "completed",
       "description": "Set up automated deployment to GitHub Pages using GitHub Actions"
+    },
+    {
+      "id": "milestone-6",
+      "name": "Hint System",
+      "status": "completed",
+      "description": "Add hint buttons with tooltips for all problem types"
     }
   ]
 }

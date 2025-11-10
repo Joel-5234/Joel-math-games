@@ -62,6 +62,7 @@ The app features gamification with timers, streaks, achievements, and local prog
 - **Challenge Mode**: Countdown timer with time bonuses
 - **Session Mode**: Extended practice sessions
 - **Achievements**: Unlock achievements as you progress
+- **Hint System**: Helpful hints with step-by-step guidance, formulas, and concepts
 - **Local Storage**: All progress saved in your browser
 
 ## 📚 Documentation

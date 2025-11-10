@@ -52,7 +52,12 @@
             <!-- Problem Type 1: Slope and Line Description -->
             <div id="slope-panel" class="problem-panel active">
                 <div class="problem-card">
-                    <h2>Slope and Line Description</h2>
+                    <div class="problem-header">
+                        <h2>Slope and Line Description</h2>
+                        <button class="hint-button" data-hint="slope" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
                     <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
                     <div class="input-group">
                         <label for="slopeInput">Points:</label>
@@ -66,7 +71,12 @@
             <!-- Problem Type 2: Relationship Between Two Lines -->
             <div id="relationship-panel" class="problem-panel">
                 <div class="problem-card">
-                    <h2>Relationship Between Two Lines</h2>
+                    <div class="problem-header">
+                        <h2>Relationship Between Two Lines</h2>
+                        <button class="hint-button" data-hint="relationship" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
                     <p class="instructions">Enter two equations. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
                     <div class="input-group">
                         <label for="equation1Input">Equation 1:</label>
@@ -84,7 +94,12 @@
             <!-- Problem Type 3: Parallel Line Through a Point -->
             <div id="parallel-panel" class="problem-panel">
                 <div class="problem-card">
-                    <h2>Parallel Line Through a Point</h2>
+                    <div class="problem-header">
+                        <h2>Parallel Line Through a Point</h2>
+                        <button class="hint-button" data-hint="parallel" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
                     <p class="instructions">Enter a base equation and a point in format (x,y)</p>
                     <div class="input-group">
                         <label for="parallelEquationInput">Base Equation:</label>
@@ -102,7 +117,12 @@
             <!-- Problem Type 4: Perpendicular Line Through a Point -->
             <div id="perpendicular-panel" class="problem-panel">
                 <div class="problem-card">
-                    <h2>Perpendicular Line Through a Point</h2>
+                    <div class="problem-header">
+                        <h2>Perpendicular Line Through a Point</h2>
+                        <button class="hint-button" data-hint="perpendicular" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
                     <p class="instructions">Enter a base equation and a point in format (x,y)</p>
                     <div class="input-group">
                         <label for="perpendicularEquationInput">Base Equation:</label>
@@ -159,6 +179,17 @@
             <h3>🎉 Achievement Unlocked!</h3>
             <p id="toastAchievementName"></p>
             <p id="toastAchievementDesc"></p>
+        </div>
+    </div>
+
+    <!-- Hint Tooltip -->
+    <div id="hintTooltip" class="hint-tooltip">
+        <div class="tooltip-content">
+            <div class="tooltip-header">
+                <h3>💡 Hints</h3>
+                <button class="close-tooltip">&times;</button>
+            </div>
+            <div id="hintContent" class="tooltip-body"></div>
         </div>
     </div>
 
