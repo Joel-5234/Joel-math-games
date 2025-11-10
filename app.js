@@ -1057,6 +1057,7 @@ function triggerConfetti() {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
             confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-10px';
             confetti.style.animationDelay = Math.random() * 2 + 's';
             confetti.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7'][Math.floor(Math.random() * 7)];
             confettiContainer.appendChild(confetti);
@@ -1064,6 +1065,8 @@ function triggerConfetti() {
         setTimeout(() => {
             confettiContainer.innerHTML = '';
         }, 5000);
+    } else {
+        console.error('confettiContainer not found');
     }
 }
 
@@ -1084,6 +1087,8 @@ function triggerFireworks() {
         setTimeout(() => {
             fireworksContainer.innerHTML = '';
         }, 3000);
+    } else {
+        console.error('fireworksContainer not found');
     }
 }
 
@@ -1868,13 +1873,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Test celebration buttons
-    document.getElementById('testConfettiBtn')?.addEventListener('click', () => {
-        triggerConfetti();
-    });
+    const testConfettiBtn = document.getElementById('testConfettiBtn');
+    if (testConfettiBtn) {
+        testConfettiBtn.addEventListener('click', () => {
+            console.log('Test Confetti button clicked');
+            triggerConfetti();
+        });
+    } else {
+        console.error('testConfettiBtn not found');
+    }
     
-    document.getElementById('testFireworksBtn')?.addEventListener('click', () => {
-        triggerFireworks();
-    });
+    const testFireworksBtn = document.getElementById('testFireworksBtn');
+    if (testFireworksBtn) {
+        testFireworksBtn.addEventListener('click', () => {
+            console.log('Test Fireworks button clicked');
+            triggerFireworks();
+        });
+    } else {
+        console.error('testFireworksBtn not found');
+    }
     
     // Close hint tooltip (legacy - kept for backward compatibility)
     const closeTooltip = document.querySelector('.close-tooltip');
