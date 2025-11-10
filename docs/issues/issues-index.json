@@ -6,6 +6,13 @@
       "status": "fixed",
       "filename": "issue-001-20251109-185825.md",
       "date": "2025-11-09T18:58:25"
+    },
+    {
+      "id": "002",
+      "description": "Spam clicking submit button to gain multiple points for same answer",
+      "status": "fixed",
+      "filename": "issue-002-20251109-190414.md",
+      "date": "2025-11-09T19:04:14"
     }
   ]
 }

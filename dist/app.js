@@ -32,6 +32,7 @@ let gameState = {
     sessionStartTime: null,
     sessionTimer: null,
     challengeCountdown: null,
+    questionAnswered: false, // Track if current question has been answered
     stats: {
         slope: { correct: 0, total: 0, times: [] },
         relationship: { correct: 0, total: 0, times: [] },
@@ -261,6 +262,8 @@ function handleTimeout() {
 function startQuestionTimer() {
     if (gameState.questionTimer) return;
     
+    // Reset question answered flag when starting new question
+    gameState.questionAnswered = false;
     gameState.questionStartTime = Date.now();
     if (gameState.mode === 'challenge') {
         gameState.challengeCountdown = config.challengeModeTimeLimit;
@@ -422,6 +425,11 @@ function showAllAchievements() {
 
 // Problem Type Handlers
 function handleSlopeProblem() {
+    // Prevent spam clicking - check if question already answered
+    if (gameState.questionAnswered) {
+        return;
+    }
+    
     const input = document.getElementById('slopeInput').value.trim();
     
     try {
@@ -450,14 +458,21 @@ function handleSlopeProblem() {
         }
         
         showResult(message, 'success');
+        gameState.questionAnswered = true; // Mark question as answered
         updateStats('slope', true);
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
+        gameState.questionAnswered = true; // Mark question as answered even on error
         updateStats('slope', false);
     }
 }
 
 function handleRelationshipProblem() {
+    // Prevent spam clicking - check if question already answered
+    if (gameState.questionAnswered) {
+        return;
+    }
+    
     const eq1 = document.getElementById('equation1Input').value.trim();
     const eq2 = document.getElementById('equation2Input').value.trim();
     
@@ -474,14 +489,21 @@ function handleRelationshipProblem() {
         message += `Relationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
         
         showResult(message, 'success');
+        gameState.questionAnswered = true; // Mark question as answered
         updateStats('relationship', true);
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
+        gameState.questionAnswered = true; // Mark question as answered even on error
         updateStats('relationship', false);
     }
 }
 
 function handleParallelProblem() {
+    // Prevent spam clicking - check if question already answered
+    if (gameState.questionAnswered) {
+        return;
+    }
+    
     const equation = document.getElementById('parallelEquationInput').value.trim();
     const pointStr = document.getElementById('parallelPointInput').value.trim();
     
@@ -492,14 +514,21 @@ function handleParallelProblem() {
         const equationFormatted = formatEquation(resultLine);
         
         showResult(`Parallel line: ${equationFormatted}`, 'success');
+        gameState.questionAnswered = true; // Mark question as answered
         updateStats('parallel', true);
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
+        gameState.questionAnswered = true; // Mark question as answered even on error
         updateStats('parallel', false);
     }
 }
 
 function handlePerpendicularProblem() {
+    // Prevent spam clicking - check if question already answered
+    if (gameState.questionAnswered) {
+        return;
+    }
+    
     const equation = document.getElementById('perpendicularEquationInput').value.trim();
     const pointStr = document.getElementById('perpendicularPointInput').value.trim();
     
@@ -510,9 +539,11 @@ function handlePerpendicularProblem() {
         const equationFormatted = formatEquation(resultLine);
         
         showResult(`Perpendicular line: ${equationFormatted}`, 'success');
+        gameState.questionAnswered = true; // Mark question as answered
         updateStats('perpendicular', true);
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
+        gameState.questionAnswered = true; // Mark question as answered even on error
         updateStats('perpendicular', false);
     }
 }
@@ -569,6 +600,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 r.className = 'result-area';
             });
             
+            // Reset question answered flag for new question
+            gameState.questionAnswered = false;
+            
             // Reset timer for new question
             stopQuestionTimer();
         });
@@ -616,9 +650,13 @@ document.addEventListener('DOMContentLoaded', () => {
         handlePerpendicularProblem();
     });
     
-    // Start timer on input
+    // Start timer on input and reset question answered flag when input changes
     document.querySelectorAll('.input-field').forEach(input => {
         input.addEventListener('focus', startQuestionTimer);
+        input.addEventListener('input', () => {
+            // Reset question answered flag when user changes input (new question)
+            gameState.questionAnswered = false;
+        });
     });
     
     // Achievement modal
