@@ -284,6 +284,758 @@ function formatEquation(line) {
     return equation;
 }
 
+// Random number generation utility
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomFloat(min, max, decimals = 1) {
+    const num = Math.random() * (max - min) + min;
+    return roundToDecimal(num, decimals);
+}
+
+// Question Generation Functions for Set Challenge Mode
+function generateSlopeQuestion() {
+    let p1, p2;
+    let attempts = 0;
+    
+    // Ensure points are not identical
+    do {
+        p1 = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
+        p2 = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
+        attempts++;
+    } while (p1.x === p2.x && p1.y === p2.y && attempts < 100);
+    
+    const result = calculateSlope(p1, p2);
+    const correctAnswer = result.slope === Infinity 
+        ? `Slope: Undefined (Vertical Line)\nClassification: ${result.classification}`
+        : `Slope: ${result.slope}\nClassification: ${result.classification}`;
+    
+    return {
+        type: 'slope',
+        question: `Find the slope and classification for the line through points (${p1.x},${p1.y}) and (${p2.x},${p2.y})`,
+        display: `(${p1.x},${p1.y}), (${p2.x},${p2.y})`,
+        correctAnswer: correctAnswer,
+        data: { p1, p2, result }
+    };
+}
+
+function generateRelationshipQuestion() {
+    // Generate two random lines
+    const types = ['slope-intercept', 'standard', 'vertical', 'horizontal'];
+    const type1 = types[randomInt(0, types.length - 1)];
+    const type2 = types[randomInt(0, types.length - 1)];
+    
+    let line1, line2, eq1Str, eq2Str;
+    
+    // Generate first equation
+    if (type1 === 'vertical') {
+        const x0 = randomInt(-10, 10);
+        line1 = { kind: 'vertical', x0 };
+        eq1Str = `x = ${x0}`;
+    } else if (type1 === 'horizontal') {
+        const y0 = randomInt(-10, 10);
+        line1 = { kind: 'slope', m: 0, b: y0 };
+        eq1Str = `y = ${y0}`;
+    } else if (type1 === 'slope-intercept') {
+        const m = randomInt(-5, 5) || 1; // Avoid zero
+        const b = randomInt(-10, 10);
+        line1 = { kind: 'slope', m, b };
+        eq1Str = formatEquation(line1);
+    } else { // standard
+        const A = randomInt(-5, 5) || 1;
+        const B = randomInt(-5, 5) || 1;
+        const C = randomInt(-20, 20);
+        line1 = { kind: B === 0 ? 'vertical' : 'slope', m: -A/B, b: C/B };
+        if (B === 0) {
+            line1 = { kind: 'vertical', x0: C/A };
+            eq1Str = `${A}x = ${C}`;
+        } else {
+            eq1Str = `${A}x + ${B}y = ${C}`;
+        }
+    }
+    
+    // Generate second equation
+    if (type2 === 'vertical') {
+        const x0 = randomInt(-10, 10);
+        line2 = { kind: 'vertical', x0 };
+        eq2Str = `x = ${x0}`;
+    } else if (type2 === 'horizontal') {
+        const y0 = randomInt(-10, 10);
+        line2 = { kind: 'slope', m: 0, b: y0 };
+        eq2Str = `y = ${y0}`;
+    } else if (type2 === 'slope-intercept') {
+        const m = randomInt(-5, 5) || 1;
+        const b = randomInt(-10, 10);
+        line2 = { kind: 'slope', m, b };
+        eq2Str = formatEquation(line2);
+    } else { // standard
+        const A = randomInt(-5, 5) || 1;
+        const B = randomInt(-5, 5) || 1;
+        const C = randomInt(-20, 20);
+        if (B === 0) {
+            line2 = { kind: 'vertical', x0: C/A };
+            eq2Str = `${A}x = ${C}`;
+        } else {
+            line2 = { kind: 'slope', m: -A/B, b: C/B };
+            eq2Str = `${A}x + ${B}y = ${C}`;
+        }
+    }
+    
+    const relationship = determineRelationship(line1, line2);
+    const correctAnswer = `Equation 1: ${formatEquation(line1)}\nEquation 2: ${formatEquation(line2)}\nRelationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
+    
+    return {
+        type: 'relationship',
+        question: `Determine the relationship between the two lines`,
+        display: { eq1: eq1Str, eq2: eq2Str },
+        correctAnswer: correctAnswer,
+        data: { line1, line2, relationship }
+    };
+}
+
+function generateParallelQuestion() {
+    // Generate base line
+    const lineTypes = ['slope-intercept', 'vertical', 'horizontal'];
+    const lineType = lineTypes[randomInt(0, lineTypes.length - 1)];
+    
+    let baseLine, baseEqStr;
+    
+    if (lineType === 'vertical') {
+        const x0 = randomInt(-10, 10);
+        baseLine = { kind: 'vertical', x0 };
+        baseEqStr = `x = ${x0}`;
+    } else if (lineType === 'horizontal') {
+        const y0 = randomInt(-10, 10);
+        baseLine = { kind: 'slope', m: 0, b: y0 };
+        baseEqStr = `y = ${y0}`;
+    } else {
+        const m = randomInt(-5, 5) || 1;
+        const b = randomInt(-10, 10);
+        baseLine = { kind: 'slope', m, b };
+        baseEqStr = formatEquation(baseLine);
+    }
+    
+    // Generate point
+    const point = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
+    
+    const resultLine = findParallelLine(baseLine, point);
+    const correctAnswer = `Parallel line: ${formatEquation(resultLine)}`;
+    
+    return {
+        type: 'parallel',
+        question: `Find the equation of a line parallel to ${baseEqStr} that passes through point (${point.x},${point.y})`,
+        display: { equation: baseEqStr, point: `(${point.x},${point.y})` },
+        correctAnswer: correctAnswer,
+        data: { baseLine, point, resultLine }
+    };
+}
+
+function generatePerpendicularQuestion() {
+    // Generate base line
+    const lineTypes = ['slope-intercept', 'vertical', 'horizontal'];
+    const lineType = lineTypes[randomInt(0, lineTypes.length - 1)];
+    
+    let baseLine, baseEqStr;
+    
+    if (lineType === 'vertical') {
+        const x0 = randomInt(-10, 10);
+        baseLine = { kind: 'vertical', x0 };
+        baseEqStr = `x = ${x0}`;
+    } else if (lineType === 'horizontal') {
+        const y0 = randomInt(-10, 10);
+        baseLine = { kind: 'slope', m: 0, b: y0 };
+        baseEqStr = `y = ${y0}`;
+    } else {
+        const m = randomInt(-5, 5) || 1;
+        const b = randomInt(-10, 10);
+        baseLine = { kind: 'slope', m, b };
+        baseEqStr = formatEquation(baseLine);
+    }
+    
+    // Generate point
+    const point = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
+    
+    const resultLine = findPerpendicularLine(baseLine, point);
+    const correctAnswer = `Perpendicular line: ${formatEquation(resultLine)}`;
+    
+    return {
+        type: 'perpendicular',
+        question: `Find the equation of a line perpendicular to ${baseEqStr} that passes through point (${point.x},${point.y})`,
+        display: { equation: baseEqStr, point: `(${point.x},${point.y})` },
+        correctAnswer: correctAnswer,
+        data: { baseLine, point, resultLine }
+    };
+}
+
+// Challenge State Management
+let challengeState = {
+    active: false,
+    setSize: null,
+    currentProblemType: null,
+    questions: [],
+    currentQuestionIndex: 0,
+    answers: {}, // Map of question index to user answer
+    questionStates: {}, // 'unanswered', 'answered', 'skipped', 'gave-up'
+    correctAnswers: {}, // Map of question index to boolean (was answer correct)
+    startTime: null,
+    endTime: null
+};
+
+function generateChallengeQuestions(problemType, count) {
+    const questions = [];
+    const generators = {
+        slope: generateSlopeQuestion,
+        relationship: generateRelationshipQuestion,
+        parallel: generateParallelQuestion,
+        perpendicular: generatePerpendicularQuestion
+    };
+    
+    const generator = generators[problemType];
+    if (!generator) return [];
+    
+    for (let i = 0; i < count; i++) {
+        questions.push(generator());
+    }
+    
+    return questions;
+}
+
+function initializeChallenge(problemType, setSize) {
+    challengeState = {
+        active: true,
+        setSize: setSize,
+        currentProblemType: problemType,
+        questions: generateChallengeQuestions(problemType, setSize),
+        currentQuestionIndex: 0,
+        answers: {},
+        questionStates: {},
+        correctAnswers: {},
+        startTime: Date.now(),
+        endTime: null
+    };
+    
+    // Initialize all question states
+    for (let i = 0; i < challengeState.questions.length; i++) {
+        challengeState.questionStates[i] = 'unanswered';
+    }
+}
+
+function resetChallenge() {
+    challengeState = {
+        active: false,
+        setSize: null,
+        currentProblemType: null,
+        questions: [],
+        currentQuestionIndex: 0,
+        answers: {},
+        questionStates: {},
+        correctAnswers: {},
+        startTime: null,
+        endTime: null
+    };
+}
+
+// Challenge UI Functions
+function showChallengeSetupModal() {
+    const modal = document.getElementById('challengeSetupModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function hideChallengeSetupModal() {
+    const modal = document.getElementById('challengeSetupModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function startChallenge(setSize) {
+    const activeTab = document.querySelector('.tab-button.active');
+    const problemType = activeTab ? activeTab.dataset.tab : 'slope';
+    
+    initializeChallenge(problemType, setSize);
+    hideChallengeSetupModal();
+    displayChallengeQuestion();
+    showChallengeInterface();
+}
+
+function showChallengeInterface() {
+    // Hide normal problem panels
+    document.querySelectorAll('.problem-panel').forEach(p => p.classList.remove('active'));
+    
+    // Show challenge interface in main content
+    const challengeInterface = document.getElementById('challengeInterface');
+    if (challengeInterface) {
+        challengeInterface.style.display = 'block';
+        challengeInterface.classList.add('active');
+    }
+}
+
+function hideChallengeInterface() {
+    const challengeInterface = document.getElementById('challengeInterface');
+    if (challengeInterface) {
+        challengeInterface.style.display = 'none';
+        challengeInterface.classList.remove('active');
+    }
+}
+
+function displayChallengeQuestion() {
+    if (!challengeState.active || challengeState.questions.length === 0) return;
+    
+    const question = challengeState.questions[challengeState.currentQuestionIndex];
+    const questionState = challengeState.questionStates[challengeState.currentQuestionIndex];
+    const userAnswer = challengeState.answers[challengeState.currentQuestionIndex] || '';
+    
+    // Update question counter
+    const questionCounter = document.getElementById('challengeQuestionCounter');
+    if (questionCounter) {
+        questionCounter.textContent = `Question ${challengeState.currentQuestionIndex + 1} of ${challengeState.questions.length}`;
+    }
+    
+    // Update progress bar
+    const progressBar = document.getElementById('challengeProgressBar');
+    if (progressBar) {
+        const progress = ((challengeState.currentQuestionIndex + 1) / challengeState.questions.length) * 100;
+        progressBar.style.width = progress + '%';
+    }
+    
+    // Display question based on type
+    const questionDisplay = document.getElementById('challengeQuestionDisplay');
+    const inputContainer = document.getElementById('challengeInputContainer');
+    
+    if (questionDisplay && inputContainer) {
+        questionDisplay.innerHTML = '';
+        inputContainer.innerHTML = '';
+        
+        // Clear result area
+        const resultArea = document.getElementById('challengeResult');
+        if (resultArea) {
+            resultArea.textContent = '';
+            resultArea.className = 'result-area';
+        }
+        
+        if (question.type === 'slope') {
+            questionDisplay.innerHTML = `<p class="challenge-question-text">Find the slope and classification for the line through points: <strong>${question.display}</strong></p>`;
+            inputContainer.innerHTML = `
+                <div class="input-group">
+                    <label for="challengeSlopeInput">Your Answer (format: Slope: X, Classification: Y):</label>
+                    <input type="text" id="challengeSlopeInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="Slope: 2, Classification: rising">
+                </div>
+            `;
+        } else if (question.type === 'relationship') {
+            questionDisplay.innerHTML = `
+                <p class="challenge-question-text">Determine the relationship between:</p>
+                <p><strong>Equation 1:</strong> ${question.display.eq1}</p>
+                <p><strong>Equation 2:</strong> ${question.display.eq2}</p>
+            `;
+            inputContainer.innerHTML = `
+                <div class="input-group">
+                    <label for="challengeRelationshipInput">Your Answer (parallel, perpendicular, neither, or same):</label>
+                    <input type="text" id="challengeRelationshipInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="parallel">
+                </div>
+            `;
+        } else if (question.type === 'parallel') {
+            questionDisplay.innerHTML = `
+                <p class="challenge-question-text">Find the equation of a line parallel to <strong>${question.display.equation}</strong> that passes through point <strong>${question.display.point}</strong></p>
+            `;
+            inputContainer.innerHTML = `
+                <div class="input-group">
+                    <label for="challengeParallelInput">Your Answer:</label>
+                    <input type="text" id="challengeParallelInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="y = 2x + 3">
+                </div>
+            `;
+        } else if (question.type === 'perpendicular') {
+            questionDisplay.innerHTML = `
+                <p class="challenge-question-text">Find the equation of a line perpendicular to <strong>${question.display.equation}</strong> that passes through point <strong>${question.display.point}</strong></p>
+            `;
+            inputContainer.innerHTML = `
+                <div class="input-group">
+                    <label for="challengePerpendicularInput">Your Answer:</label>
+                    <input type="text" id="challengePerpendicularInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="y = -0.5x + 5">
+                </div>
+            `;
+        }
+        
+        // Show answer if gave up
+        if (questionState === 'gave-up') {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = `Correct Answer: ${question.correctAnswer}`;
+                resultArea.className = 'result-area error';
+            }
+        }
+        
+        // Update navigation buttons
+        updateChallengeNavigation();
+    }
+}
+
+function updateChallengeNavigation() {
+    const backBtn = document.getElementById('challengeBackBtn');
+    const skipBtn = document.getElementById('challengeSkipBtn');
+    const giveUpBtn = document.getElementById('challengeGiveUpBtn');
+    const submitBtn = document.getElementById('challengeSubmitBtn');
+    
+    if (backBtn) {
+        backBtn.disabled = challengeState.currentQuestionIndex === 0;
+    }
+    
+    const questionState = challengeState.questionStates[challengeState.currentQuestionIndex];
+    const isAnswered = questionState === 'answered' || questionState === 'gave-up';
+    
+    if (skipBtn) {
+        skipBtn.disabled = isAnswered;
+    }
+    
+    if (giveUpBtn) {
+        giveUpBtn.disabled = isAnswered;
+    }
+    
+    if (submitBtn) {
+        submitBtn.disabled = isAnswered;
+    }
+}
+
+function navigateChallengeQuestion(direction) {
+    if (direction === 'next') {
+        if (challengeState.currentQuestionIndex < challengeState.questions.length - 1) {
+            challengeState.currentQuestionIndex++;
+        } else {
+            // Check if all questions answered
+            checkChallengeCompletion();
+            return;
+        }
+    } else if (direction === 'prev') {
+        if (challengeState.currentQuestionIndex > 0) {
+            challengeState.currentQuestionIndex--;
+        }
+    }
+    
+    displayChallengeQuestion();
+}
+
+function skipChallengeQuestion() {
+    challengeState.questionStates[challengeState.currentQuestionIndex] = 'skipped';
+    navigateChallengeQuestion('next');
+}
+
+function giveUpChallengeQuestion() {
+    const question = challengeState.questions[challengeState.currentQuestionIndex];
+    challengeState.questionStates[challengeState.currentQuestionIndex] = 'gave-up';
+    challengeState.correctAnswers[challengeState.currentQuestionIndex] = false;
+    
+    // Show answer
+    const resultArea = document.getElementById('challengeResult');
+    if (resultArea) {
+        resultArea.textContent = `Correct Answer: ${question.correctAnswer}`;
+        resultArea.className = 'result-area error';
+    }
+    
+    // Mark as incorrect for scoring
+    updateChallengeStats(false);
+    
+    // Generate new question to replace this one
+    const newQuestion = generateChallengeQuestions(challengeState.currentProblemType, 1)[0];
+    challengeState.questions[challengeState.currentQuestionIndex] = newQuestion;
+    challengeState.questionStates[challengeState.currentQuestionIndex] = 'unanswered';
+    challengeState.answers[challengeState.currentQuestionIndex] = '';
+    delete challengeState.correctAnswers[challengeState.currentQuestionIndex];
+    
+    // Move to next question
+    setTimeout(() => {
+        navigateChallengeQuestion('next');
+    }, 2000);
+}
+
+function submitChallengeAnswer() {
+    const question = challengeState.questions[challengeState.currentQuestionIndex];
+    const questionState = challengeState.questionStates[challengeState.currentQuestionIndex];
+    
+    if (questionState === 'answered' || questionState === 'gave-up') {
+        return; // Already answered
+    }
+    
+    let userInput = '';
+    let isCorrect = false;
+    
+    // Get user input based on question type
+    if (question.type === 'slope') {
+        const input = document.getElementById('challengeSlopeInput');
+        if (input) {
+            userInput = input.value.trim();
+            // Parse user answer
+            const correctResult = question.data.result;
+            const correctSlope = correctResult.slope === Infinity ? 'undefined' : correctResult.slope.toString();
+            const correctClassification = correctResult.classification;
+            
+            // Extract slope and classification from user input
+            const slopeMatch = userInput.match(/slope[:\s]+(undefined|(-?\d+\.?\d*))/i);
+            const classificationMatch = userInput.match(/classification[:\s]+(\w+)/i);
+            
+            if (slopeMatch && classificationMatch) {
+                const userSlope = slopeMatch[1].toLowerCase();
+                const userClassification = classificationMatch[1].toLowerCase();
+                
+                // Check slope (handle undefined/vertical case)
+                let slopeCorrect = false;
+                if (correctSlope === 'undefined' || correctSlope === 'Infinity') {
+                    slopeCorrect = userSlope === 'undefined' || userSlope === 'infinity';
+                } else {
+                    const userSlopeNum = parseFloat(userSlope);
+                    const correctSlopeNum = parseFloat(correctSlope);
+                    slopeCorrect = Math.abs(userSlopeNum - correctSlopeNum) < 0.01;
+                }
+                
+                // Check classification
+                const classificationCorrect = userClassification === correctClassification.toLowerCase();
+                
+                isCorrect = slopeCorrect && classificationCorrect;
+            } else {
+                // Fallback: try to parse as two points and calculate
+                try {
+                    const pointSeparator = /\)\s*,\s*\(/;
+                    const parts = userInput.split(pointSeparator);
+                    if (parts.length === 2) {
+                        const p1Str = parts[0] + ')';
+                        const p2Str = '(' + parts[1];
+                        const p1 = parsePoint(p1Str);
+                        const p2 = parsePoint(p2Str);
+                        const result = calculateSlope(p1, p2);
+                        isCorrect = (result.slope === Infinity ? correctResult.slope === Infinity : 
+                                    Math.abs(result.slope - correctResult.slope) < 0.01) &&
+                                    result.classification === correctResult.classification;
+                    }
+                } catch (e) {
+                    isCorrect = false;
+                }
+            }
+        }
+    } else if (question.type === 'relationship') {
+        const input = document.getElementById('challengeRelationshipInput');
+        if (input) {
+            userInput = input.value.trim().toLowerCase();
+            const correctRel = question.data.relationship.toLowerCase();
+            isCorrect = userInput === correctRel;
+        }
+    } else if (question.type === 'parallel' || question.type === 'perpendicular') {
+        const inputId = question.type === 'parallel' ? 'challengeParallelInput' : 'challengePerpendicularInput';
+        const input = document.getElementById(inputId);
+        if (input) {
+            userInput = input.value.trim();
+            try {
+                const userLine = parseEquation(userInput);
+                const correctLine = question.data.resultLine;
+                isCorrect = (userLine.kind === correctLine.kind) &&
+                           (userLine.kind === 'vertical' ? 
+                            Math.abs(userLine.x0 - correctLine.x0) < 0.01 :
+                            Math.abs(userLine.m - correctLine.m) < 0.01 && 
+                            Math.abs(userLine.b - correctLine.b) < 0.01);
+            } catch (e) {
+                isCorrect = false;
+            }
+        }
+    }
+    
+    // Store answer and correctness
+    challengeState.answers[challengeState.currentQuestionIndex] = userInput;
+    challengeState.questionStates[challengeState.currentQuestionIndex] = 'answered';
+    challengeState.correctAnswers[challengeState.currentQuestionIndex] = isCorrect;
+    
+    // Show result
+    const resultArea = document.getElementById('challengeResult');
+    if (resultArea) {
+        if (isCorrect) {
+            resultArea.textContent = 'Correct! ✓';
+            resultArea.className = 'result-area success';
+        } else {
+            resultArea.textContent = `Incorrect. Correct answer: ${question.correctAnswer}`;
+            resultArea.className = 'result-area error';
+        }
+    }
+    
+    // Update stats
+    updateChallengeStats(isCorrect);
+    
+    // Update navigation
+    updateChallengeNavigation();
+    
+    // Auto-advance after a delay
+    setTimeout(() => {
+        navigateChallengeQuestion('next');
+    }, 2000);
+}
+
+function updateChallengeStats(isCorrect) {
+    const problemType = challengeState.currentProblemType;
+    if (problemType) {
+        gameState.stats[problemType].total++;
+        if (isCorrect) {
+            gameState.stats[problemType].correct++;
+            gameState.correctQuestions++;
+            gameState.streakCurrent++;
+            if (gameState.streakCurrent > gameState.streakBest) {
+                gameState.streakBest = gameState.streakCurrent;
+            }
+            gameState.score += config.baseScore;
+        } else {
+            gameState.streakCurrent = 0;
+        }
+    }
+    
+    gameState.totalQuestions++;
+    updateUI();
+    checkAchievements();
+    saveGameState();
+}
+
+function checkChallengeCompletion() {
+    // Check if all questions are answered or gave up
+    const allAnswered = Object.values(challengeState.questionStates).every(
+        state => state === 'answered' || state === 'gave-up'
+    );
+    
+    if (allAnswered || challengeState.currentQuestionIndex >= challengeState.questions.length - 1) {
+        challengeState.endTime = Date.now();
+        showChallengeCompletion();
+    }
+}
+
+function calculateChallengeGrade() {
+    let correct = 0;
+    let incorrect = 0;
+    let skipped = 0;
+    let gaveUp = 0;
+    
+    Object.entries(challengeState.questionStates).forEach(([index, state]) => {
+        const idx = parseInt(index);
+        if (state === 'answered') {
+            if (challengeState.correctAnswers[idx] === true) {
+                correct++;
+            } else {
+                incorrect++;
+            }
+        } else if (state === 'gave-up') {
+            gaveUp++;
+            incorrect++;
+        } else if (state === 'skipped') {
+            skipped++;
+        }
+    });
+    
+    const total = challengeState.questions.length;
+    const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+    
+    let letterGrade = 'F';
+    if (percentage >= 90) letterGrade = 'A';
+    else if (percentage >= 80) letterGrade = 'B';
+    else if (percentage >= 70) letterGrade = 'C';
+    else if (percentage >= 60) letterGrade = 'D';
+    
+    return {
+        total,
+        correct,
+        incorrect,
+        skipped,
+        gaveUp,
+        percentage,
+        letterGrade
+    };
+}
+
+function showChallengeCompletion() {
+    const grade = calculateChallengeGrade();
+    
+    // Show completion modal
+    const completionModal = document.getElementById('challengeCompletionModal');
+    if (completionModal) {
+        const statsHtml = `
+            <div class="completion-stats">
+                <h3>Challenge Complete!</h3>
+                <div class="stat-row">
+                    <span>Total Questions:</span>
+                    <span>${grade.total}</span>
+                </div>
+                <div class="stat-row">
+                    <span>Correct:</span>
+                    <span class="stat-correct">${grade.correct}</span>
+                </div>
+                <div class="stat-row">
+                    <span>Incorrect:</span>
+                    <span class="stat-incorrect">${grade.incorrect}</span>
+                </div>
+                <div class="stat-row">
+                    <span>Skipped:</span>
+                    <span class="stat-skipped">${grade.skipped}</span>
+                </div>
+                <div class="stat-row">
+                    <span>Gave Up:</span>
+                    <span class="stat-gave-up">${grade.gaveUp}</span>
+                </div>
+                <div class="stat-row grade-row">
+                    <span>Final Grade:</span>
+                    <span class="grade-value grade-${grade.letterGrade.toLowerCase()}">${grade.percentage}% (${grade.letterGrade})</span>
+                </div>
+            </div>
+        `;
+        
+        const content = completionModal.querySelector('.completion-content');
+        if (content) {
+            content.innerHTML = statsHtml;
+        }
+        
+        completionModal.classList.add('active');
+        
+        // Trigger celebrations
+        if (grade.percentage >= 85) {
+            triggerConfetti();
+        }
+        if (grade.percentage === 100) {
+            triggerFireworks();
+        }
+    }
+}
+
+function triggerConfetti() {
+    // Simple confetti effect using canvas or CSS
+    const confettiContainer = document.getElementById('confettiContainer');
+    if (confettiContainer) {
+        confettiContainer.innerHTML = '';
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDelay = Math.random() * 2 + 's';
+            confetti.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7'][Math.floor(Math.random() * 7)];
+            confettiContainer.appendChild(confetti);
+        }
+        setTimeout(() => {
+            confettiContainer.innerHTML = '';
+        }, 5000);
+    }
+}
+
+function triggerFireworks() {
+    // Simple fireworks effect
+    const fireworksContainer = document.getElementById('fireworksContainer');
+    if (fireworksContainer) {
+        fireworksContainer.innerHTML = '';
+        for (let i = 0; i < 50; i++) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = Math.random() * 100 + '%';
+            firework.style.top = Math.random() * 50 + '%';
+            firework.style.animationDelay = Math.random() * 1 + 's';
+            firework.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7'][Math.floor(Math.random() * 7)];
+            fireworksContainer.appendChild(firework);
+        }
+        setTimeout(() => {
+            fireworksContainer.innerHTML = '';
+        }, 3000);
+    }
+}
+
 // UI Update Functions
 function updateUI() {
     document.getElementById('scoreDisplay').textContent = gameState.score;
@@ -306,24 +1058,9 @@ function updateTimer() {
     const elapsed = Math.floor((Date.now() - gameState.questionStartTime) / 1000);
     const timerDisplay = document.getElementById('timerDisplay');
     
-    if (gameState.mode === 'challenge' && gameState.challengeCountdown !== null) {
-        const remaining = gameState.challengeCountdown - elapsed;
-        if (remaining <= 0) {
-            timerDisplay.textContent = '0s';
-            timerDisplay.classList.add('timer-warning');
-            handleTimeout();
-            return;
-        }
-        if (remaining <= 10) {
-            timerDisplay.classList.add('timer-warning');
-        } else {
-            timerDisplay.classList.remove('timer-warning');
-        }
-        timerDisplay.textContent = remaining + 's';
-    } else {
-        timerDisplay.textContent = elapsed + 's';
-        timerDisplay.classList.remove('timer-warning');
-    }
+    // Challenge mode now uses stopwatch (no countdown)
+    timerDisplay.textContent = elapsed + 's';
+    timerDisplay.classList.remove('timer-warning');
 }
 
 function handleTimeout() {
@@ -338,9 +1075,6 @@ function startQuestionTimer() {
     // Reset question answered flag when starting new question
     gameState.questionAnswered = false;
     gameState.questionStartTime = Date.now();
-    if (gameState.mode === 'challenge') {
-        gameState.challengeCountdown = config.challengeModeTimeLimit;
-    }
     
     gameState.questionTimer = setInterval(updateTimer, 100);
 }
@@ -406,10 +1140,7 @@ function updateStats(problemType, isCorrect) {
         
         // Calculate score
         let points = config.baseScore;
-        if (gameState.mode === 'challenge' && gameState.challengeCountdown !== null) {
-            const timeBonus = Math.max(0, gameState.challengeCountdown - Math.floor((Date.now() - gameState.questionStartTime) / 1000));
-            points += Math.floor(timeBonus * config.timeBonusMultiplier);
-        }
+        // Challenge mode uses base score only (no time bonus)
         gameState.score += points;
     } else {
         gameState.streakCurrent = 0;
@@ -734,6 +1465,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tab switching
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
+            // Don't allow tab switching during active challenge
+            if (challengeState.active) {
+                return;
+            }
+            
             const tab = button.dataset.tab;
             
             // Update active tab
@@ -763,22 +1499,138 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Mode selector
     document.getElementById('modeSelector').addEventListener('change', (e) => {
-        gameState.mode = e.target.value;
+        const newMode = e.target.value;
+        
+        // If switching away from challenge mode, reset challenge
+        if (gameState.mode === 'challenge' && challengeState.active) {
+            resetChallenge();
+            hideChallengeInterface();
+            // Show problem panels again
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                const tab = activeTab.dataset.tab;
+                document.getElementById(tab + '-panel').classList.add('active');
+            }
+        }
+        
+        gameState.mode = newMode;
         stopQuestionTimer();
         stopSessionTimer();
         
-        if (gameState.mode === 'session') {
+        if (gameState.mode === 'challenge') {
+            // Show challenge setup modal
+            showChallengeSetupModal();
+        } else if (gameState.mode === 'session') {
             startSessionTimer();
         }
         
         // Reset session score for new mode
-        if (gameState.mode !== 'session') {
+        if (gameState.mode !== 'session' && gameState.mode !== 'challenge') {
             gameState.score = 0;
             gameState.streakCurrent = 0;
             gameState.totalQuestions = 0;
             gameState.correctQuestions = 0;
         }
         
+        updateUI();
+    });
+    
+    // Challenge setup modal
+    document.querySelectorAll('.set-size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const setSize = parseInt(btn.dataset.size);
+            startChallenge(setSize);
+        });
+    });
+    
+    document.getElementById('cancelChallengeSetup')?.addEventListener('click', () => {
+        hideChallengeSetupModal();
+        // Reset mode selector to practice
+        document.getElementById('modeSelector').value = 'practice';
+        gameState.mode = 'practice';
+    });
+    
+    document.getElementById('closeChallengeSetup')?.addEventListener('click', () => {
+        hideChallengeSetupModal();
+        document.getElementById('modeSelector').value = 'practice';
+        gameState.mode = 'practice';
+    });
+    
+    // Challenge navigation buttons
+    document.getElementById('challengeBackBtn')?.addEventListener('click', () => {
+        navigateChallengeQuestion('prev');
+    });
+    
+    document.getElementById('challengeSkipBtn')?.addEventListener('click', () => {
+        skipChallengeQuestion();
+    });
+    
+    document.getElementById('challengeGiveUpBtn')?.addEventListener('click', () => {
+        giveUpChallengeQuestion();
+    });
+    
+    document.getElementById('challengeSubmitBtn')?.addEventListener('click', () => {
+        submitChallengeAnswer();
+    });
+    
+    document.getElementById('exitChallenge')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to exit the challenge? Your progress will be lost.')) {
+            resetChallenge();
+            hideChallengeInterface();
+            document.getElementById('modeSelector').value = 'practice';
+            gameState.mode = 'practice';
+            // Show problem panels again
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+                const tab = activeTab.dataset.tab;
+                document.getElementById(tab + '-panel').classList.add('active');
+            }
+            updateUI();
+        }
+    });
+    
+    // Challenge completion modal
+    document.getElementById('restartChallenge')?.addEventListener('click', () => {
+        const completionModal = document.getElementById('challengeCompletionModal');
+        if (completionModal) {
+            completionModal.classList.remove('active');
+        }
+        resetChallenge();
+        showChallengeSetupModal();
+    });
+    
+    document.getElementById('returnToPractice')?.addEventListener('click', () => {
+        const completionModal = document.getElementById('challengeCompletionModal');
+        if (completionModal) {
+            completionModal.classList.remove('active');
+        }
+        resetChallenge();
+        hideChallengeInterface();
+        document.getElementById('modeSelector').value = 'practice';
+        gameState.mode = 'practice';
+        // Show problem panels again
+        const activeTab = document.querySelector('.tab-button.active');
+        if (activeTab) {
+            const tab = activeTab.dataset.tab;
+            document.getElementById(tab + '-panel').classList.add('active');
+        }
+        updateUI();
+    });
+    
+    document.getElementById('closeChallengeCompletion')?.addEventListener('click', () => {
+        const completionModal = document.getElementById('challengeCompletionModal');
+        if (completionModal) {
+            completionModal.classList.remove('active');
+        }
+        resetChallenge();
+        hideChallengeInterface();
+        document.getElementById('modeSelector').value = 'practice';
+        gameState.mode = 'practice';
+        const activeTab = document.querySelector('.tab-button.active');
+        if (activeTab) {
+            const tab = activeTab.dataset.tab;
+            document.getElementById(tab + '-panel').classList.add('active');
+        }
         updateUI();
     });
     

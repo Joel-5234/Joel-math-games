@@ -82,9 +82,15 @@ Output
 a) Practice mode
 • No strict time limit
 • Timer works as a stopwatch to track time per question
-b) Timed challenge mode
-• Fixed countdown per question, for example 60 seconds
-• Bonus points for finishing early
+b) Set Challenge mode
+• User selects set size: 5, 10, 25, 50, or 100 questions
+• Questions are pre-generated randomly for the current problem type section
+• All questions generated at start of challenge
+• Navigation: Back, Skip, Give Up buttons
+• One answer per question - cannot change after submission
+• Give Up: Shows answer, marks as incorrect, generates new question
+• Skip: Allows returning later to answer
+• Completion: Shows summary with grade, confetti for 85%+, fireworks for 100%
 c) Session mode
 • Set a session length, for example 10 minutes
 • Student tries to solve as many questions as possible
@@ -94,10 +100,10 @@ a) Per question timer
 • Start when the user clicks "Start" or when they first type
 • Stop on answer submission
 • Show elapsed time in seconds
-b) Countdown timer for challenge mode
-• Start at configured duration
-• Visually warn at last 10 seconds
-• If timer reaches zero, mark question as timed out and show the correct solution
+b) Set Challenge mode timer
+• Tracks time per question (stopwatch style)
+• Shows total elapsed time for the challenge
+• No countdown - user works at their own pace
 c) Session timer
 • Track total active time in the current session
 • Reset when the user clicks "New session"
@@ -105,9 +111,24 @@ c) Session timer
 5.3 Scoring system
 a) Each correct answer grants points
 • Base score per correct answer
-• Time bonus for faster completion in challenge mode
-b) Incorrect answer reduces score slightly or breaks streak
-c) Show total score, current streak, and best streak in a header or sidebar panel
+• Same scoring as other modes
+b) Set Challenge mode scoring
+• Correct answer: Awards points (same as other modes)
+• Give Up: No points awarded, marks as incorrect
+• Skip: No points initially, but can earn points if answered correctly later
+• Final grade calculated as percentage: (correct / total) * 100
+c) Incorrect answer reduces score slightly or breaks streak
+d) Show total score, current streak, and best streak in a header or sidebar panel
+e) Set Challenge completion
+• Display summary screen with:
+  - Total questions answered
+  - Correct answers
+  - Incorrect answers
+  - Skipped questions
+  - Final grade percentage
+  - Letter grade (A: 90-100%, B: 80-89%, C: 70-79%, D: 60-69%, F: <60%)
+• Confetti animation for 85% or better
+• Fireworks animation for 100% (all correct)
 
 5.4 Achievements
 All achievements stored in browser localStorage.

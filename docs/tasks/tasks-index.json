@@ -35,6 +35,12 @@
       "name": "Hint System",
       "status": "completed",
       "description": "Add hint buttons with tooltips for all problem types"
+    },
+    {
+      "id": "milestone-7",
+      "name": "Set Challenge Mode",
+      "status": "pending",
+      "description": "Replace Challenge Mode with Set Challenge Mode - pre-generated question sets with navigation, skip, and give-up features"
     }
   ]
 }

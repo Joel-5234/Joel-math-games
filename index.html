@@ -172,6 +172,33 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Challenge Interface -->
+            <div id="challengeInterface" class="challenge-interface" style="display: none;">
+                <div class="challenge-header">
+                    <h2>Challenge Mode</h2>
+                    <div class="challenge-info">
+                        <span id="challengeQuestionCounter">Question 1 of 10</span>
+                        <button id="exitChallenge" class="exit-challenge-btn">Exit Challenge</button>
+                    </div>
+                </div>
+                <div class="challenge-progress">
+                    <div class="progress-bar-container">
+                        <div id="challengeProgressBar" class="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="challenge-content">
+                    <div id="challengeQuestionDisplay" class="challenge-question-display"></div>
+                    <div id="challengeInputContainer" class="challenge-input-container"></div>
+                    <div id="challengeResult" class="result-area"></div>
+                    <div class="challenge-navigation">
+                        <button id="challengeBackBtn" class="nav-button">← Back</button>
+                        <button id="challengeSkipBtn" class="nav-button skip-btn">Skip</button>
+                        <button id="challengeGiveUpBtn" class="nav-button give-up-btn">Give Up</button>
+                        <button id="challengeSubmitBtn" class="nav-button submit-btn">Submit Answer</button>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <!-- Sidebar -->
@@ -193,7 +220,7 @@
                 <h3>Help</h3>
                 <div class="help-text">
                     <p><strong>Practice Mode:</strong> No time limit, track your time</p>
-                    <p><strong>Challenge Mode:</strong> 60 second countdown per question</p>
+                    <p><strong>Challenge Mode:</strong> Pre-generated question sets with navigation</p>
                     <p><strong>Session Mode:</strong> 10 minute practice session</p>
                 </div>
             </div>
@@ -228,6 +255,39 @@
             <div id="hintContent" class="tooltip-body"></div>
         </div>
     </div>
+
+    <!-- Challenge Setup Modal -->
+    <div id="challengeSetupModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeChallengeSetup">&times;</span>
+            <h2>Start Challenge</h2>
+            <p>Select the number of questions for your challenge:</p>
+            <div class="set-size-options">
+                <button class="set-size-btn" data-size="5">5 Questions</button>
+                <button class="set-size-btn" data-size="10">10 Questions</button>
+                <button class="set-size-btn" data-size="25">25 Questions</button>
+                <button class="set-size-btn" data-size="50">50 Questions</button>
+                <button class="set-size-btn" data-size="100">100 Questions</button>
+            </div>
+            <button id="cancelChallengeSetup" class="cancel-button">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Challenge Completion Modal -->
+    <div id="challengeCompletionModal" class="modal">
+        <div class="modal-content completion-modal">
+            <span class="close-modal" id="closeChallengeCompletion">&times;</span>
+            <div class="completion-content"></div>
+            <div class="completion-actions">
+                <button id="restartChallenge" class="action-button">Start New Challenge</button>
+                <button id="returnToPractice" class="action-button">Return to Practice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Containers -->
+    <div id="confettiContainer" class="celebration-container"></div>
+    <div id="fireworksContainer" class="celebration-container"></div>
 
     <script src="app.js"></script>
 </body>
