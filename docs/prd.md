@@ -320,3 +320,10 @@ f) Hint tracking: Track hints used per question and total
 g) Completion summary: Display hint usage statistics
 h) Hint button disabled when limit reached
 
+10.7 Test Celebration Buttons
+a) Developer/test buttons available in sidebar
+b) "Test Confetti" button triggers confetti animation
+c) "Test Fireworks" button triggers fireworks animation
+d) Buttons clearly labeled as test buttons
+e) Available in all modes for testing and demonstration
+

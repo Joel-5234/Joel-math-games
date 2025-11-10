@@ -47,6 +47,12 @@
       "name": "Hints in Challenge Mode",
       "status": "completed",
       "description": "Add hint functionality to Challenge Mode with limit (5 hints), point penalty (half points), and usage tracking"
+    },
+    {
+      "id": "milestone-9",
+      "name": "Test Celebration Buttons",
+      "status": "pending",
+      "description": "Add 'Test Confetti' and 'Test Fireworks' buttons to allow manual testing of celebration animations"
     }
   ]
 }
