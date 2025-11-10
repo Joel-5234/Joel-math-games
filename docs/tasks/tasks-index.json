@@ -39,7 +39,7 @@
     {
       "id": "milestone-7",
       "name": "Set Challenge Mode",
-      "status": "pending",
+      "status": "completed",
       "description": "Replace Challenge Mode with Set Challenge Mode - pre-generated question sets with navigation, skip, and give-up features"
     }
   ]
