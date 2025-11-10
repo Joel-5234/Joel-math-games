@@ -9,22 +9,22 @@ Add developer/test buttons to trigger confetti and fireworks animations manually
 ## Tasks
 
 ### 9.1 UI Components
-- [ ] Add "Developer Tools" section to sidebar
-- [ ] Add "Test Confetti" button
-- [ ] Add "Test Fireworks" button
-- [ ] Style buttons appropriately (distinct from regular buttons, maybe with test/dev styling)
-- [ ] Position buttons in sidebar (bottom section or separate section)
+- [x] Add "Developer Tools" section to sidebar
+- [x] Add "Test Confetti" button
+- [x] Add "Test Fireworks" button
+- [x] Style buttons appropriately (distinct from regular buttons, maybe with test/dev styling)
+- [x] Position buttons in sidebar (bottom section or separate section)
 
 ### 9.2 Event Handlers
-- [ ] Add click event listener for "Test Confetti" button
-- [ ] Add click event listener for "Test Fireworks" button
-- [ ] Wire buttons to existing `triggerConfetti()` and `triggerFireworks()` functions
+- [x] Add click event listener for "Test Confetti" button
+- [x] Add click event listener for "Test Fireworks" button
+- [x] Wire buttons to existing `triggerConfetti()` and `triggerFireworks()` functions
 
 ### 9.3 Styling
-- [ ] Style test buttons to be visually distinct (e.g., different color, smaller size)
-- [ ] Add tooltip or label indicating these are test buttons
-- [ ] Ensure buttons don't interfere with existing UI
-- [ ] Make buttons responsive
+- [x] Style test buttons to be visually distinct (e.g., different color, smaller size)
+- [x] Add tooltip or label indicating these are test buttons
+- [x] Ensure buttons don't interfere with existing UI
+- [x] Make buttons responsive
 
 ### 9.4 Documentation
 - [ ] Update PRD to mention test buttons
@@ -32,13 +32,13 @@ Add developer/test buttons to trigger confetti and fireworks animations manually
 - [ ] Document in activity log
 
 ## Acceptance Criteria
-- [ ] "Test Confetti" button visible in sidebar
-- [ ] "Test Fireworks" button visible in sidebar
-- [ ] Clicking "Test Confetti" triggers confetti animation
-- [ ] Clicking "Test Fireworks" triggers fireworks animation
-- [ ] Buttons are clearly labeled as test buttons
-- [ ] Buttons don't interfere with existing functionality
-- [ ] Buttons work in all modes (Practice, Challenge, Session)
+- [x] "Test Confetti" button visible in sidebar
+- [x] "Test Fireworks" button visible in sidebar
+- [x] Clicking "Test Confetti" triggers confetti animation
+- [x] Clicking "Test Fireworks" triggers fireworks animation
+- [x] Buttons are clearly labeled as test buttons
+- [x] Buttons don't interfere with existing functionality
+- [x] Buttons work in all modes (Practice, Challenge, Session)
 
 ## Technical Notes
 

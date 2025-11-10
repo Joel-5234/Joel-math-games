@@ -1867,6 +1867,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // Test celebration buttons
+    document.getElementById('testConfettiBtn')?.addEventListener('click', () => {
+        triggerConfetti();
+    });
+    
+    document.getElementById('testFireworksBtn')?.addEventListener('click', () => {
+        triggerFireworks();
+    });
+    
     // Close hint tooltip (legacy - kept for backward compatibility)
     const closeTooltip = document.querySelector('.close-tooltip');
     if (closeTooltip) {

@@ -308,7 +308,49 @@ body {
 
 .achievements-list {
     max-height: 200px;
-    overflow-y: auto;
+}
+
+/* Developer Tools */
+.developer-tools {
+    border-top: 2px dashed #ddd;
+    padding-top: 20px;
+    margin-top: 10px;
+}
+
+.developer-tools h3 {
+    font-size: 1rem;
+    color: #999;
+    margin-bottom: 10px;
+}
+
+.test-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.test-button {
+    width: 100%;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.test-button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    color: #495057;
+    transform: translateY(-1px);
+}
+
+.test-button:active {
+    transform: translateY(0);
 }
 
 .achievement-item {
