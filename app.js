@@ -1057,7 +1057,7 @@ function triggerConfetti() {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
             confetti.style.left = Math.random() * 100 + '%';
-            confetti.style.top = '-10px';
+            confetti.style.top = '0';
             confetti.style.animationDelay = Math.random() * 2 + 's';
             confetti.style.backgroundColor = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7'][Math.floor(Math.random() * 7)];
             confettiContainer.appendChild(confetti);
