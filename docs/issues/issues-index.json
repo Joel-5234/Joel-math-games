@@ -13,6 +13,13 @@
       "status": "fixed",
       "filename": "issue-002-20251109-190414.md",
       "date": "2025-11-09T19:04:14"
+    },
+    {
+      "id": "003",
+      "description": "Missing 'Get Hint' button in Challenge Mode",
+      "status": "fixed",
+      "filename": "issue-003-20251109-195500.md",
+      "date": "2025-11-09T19:55:00"
     }
   ]
 }

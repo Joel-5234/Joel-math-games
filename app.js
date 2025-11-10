@@ -478,6 +478,9 @@ let challengeState = {
     answers: {}, // Map of question index to user answer
     questionStates: {}, // 'unanswered', 'answered', 'skipped', 'gave-up'
     correctAnswers: {}, // Map of question index to boolean (was answer correct)
+    hintsUsed: 0, // Total hints used in challenge
+    hintsUsedPerQuestion: {}, // Map of question index to boolean (used hint)
+    hintLimit: 5, // Maximum hints allowed per challenge
     startTime: null,
     endTime: null
 };
@@ -511,6 +514,9 @@ function initializeChallenge(problemType, setSize) {
         answers: {},
         questionStates: {},
         correctAnswers: {},
+        hintsUsed: 0,
+        hintsUsedPerQuestion: {},
+        hintLimit: 5,
         startTime: Date.now(),
         endTime: null
     };
@@ -531,6 +537,9 @@ function resetChallenge() {
         answers: {},
         questionStates: {},
         correctAnswers: {},
+        hintsUsed: 0,
+        hintsUsedPerQuestion: {},
+        hintLimit: 5,
         startTime: null,
         endTime: null
     };
@@ -592,6 +601,31 @@ function displayChallengeQuestion() {
     const questionCounter = document.getElementById('challengeQuestionCounter');
     if (questionCounter) {
         questionCounter.textContent = `Question ${challengeState.currentQuestionIndex + 1} of ${challengeState.questions.length}`;
+    }
+    
+    // Update hint count
+    const hintCount = document.getElementById('challengeHintCount');
+    if (hintCount) {
+        const remaining = challengeState.hintLimit - challengeState.hintsUsed;
+        hintCount.textContent = `Hints: ${challengeState.hintsUsed}/${challengeState.hintLimit}`;
+        if (remaining === 0) {
+            hintCount.classList.add('hint-limit-reached');
+        } else {
+            hintCount.classList.remove('hint-limit-reached');
+        }
+    }
+    
+    // Update hint button
+    const hintButton = document.getElementById('challengeHintButton');
+    if (hintButton) {
+        hintButton.dataset.hint = challengeState.currentProblemType;
+        const canUseHint = challengeState.hintsUsed < challengeState.hintLimit;
+        hintButton.disabled = !canUseHint;
+        if (!canUseHint) {
+            hintButton.title = 'Hint limit reached (5/5)';
+        } else {
+            hintButton.title = `Get hints (reduces points by half) - ${challengeState.hintLimit - challengeState.hintsUsed} remaining`;
+        }
     }
     
     // Update progress bar
@@ -699,6 +733,9 @@ function updateChallengeNavigation() {
 }
 
 function navigateChallengeQuestion(direction) {
+    // Hide hints when navigating
+    hideHints();
+    
     if (direction === 'next') {
         if (challengeState.currentQuestionIndex < challengeState.questions.length - 1) {
             challengeState.currentQuestionIndex++;
@@ -869,6 +906,9 @@ function submitChallengeAnswer() {
 
 function updateChallengeStats(isCorrect) {
     const problemType = challengeState.currentProblemType;
+    const questionIndex = challengeState.currentQuestionIndex;
+    const usedHint = challengeState.hintsUsedPerQuestion[questionIndex] === true;
+    
     if (problemType) {
         gameState.stats[problemType].total++;
         if (isCorrect) {
@@ -878,7 +918,12 @@ function updateChallengeStats(isCorrect) {
             if (gameState.streakCurrent > gameState.streakBest) {
                 gameState.streakBest = gameState.streakCurrent;
             }
-            gameState.score += config.baseScore;
+            // Calculate points: halve if hint was used
+            let points = config.baseScore;
+            if (usedHint) {
+                points = Math.floor(config.baseScore / 2);
+            }
+            gameState.score += points;
         } else {
             gameState.streakCurrent = 0;
         }
@@ -939,6 +984,8 @@ function calculateChallengeGrade() {
         incorrect,
         skipped,
         gaveUp,
+        hintsUsed: challengeState.hintsUsed,
+        hintLimit: challengeState.hintLimit,
         percentage,
         letterGrade
     };
@@ -972,6 +1019,10 @@ function showChallengeCompletion() {
                 <div class="stat-row">
                     <span>Gave Up:</span>
                     <span class="stat-gave-up">${grade.gaveUp}</span>
+                </div>
+                <div class="stat-row">
+                    <span>Hints Used:</span>
+                    <span class="stat-hints">${grade.hintsUsed}/${grade.hintLimit}</span>
                 </div>
                 <div class="stat-row grade-row">
                     <span>Final Grade:</span>
@@ -1246,6 +1297,12 @@ function showHints(hintType) {
     const hintData = hints[hintType];
     if (!hintData) return;
     
+    // Check if we're in challenge mode
+    if (challengeState.active) {
+        showChallengeHints(hintType);
+        return;
+    }
+    
     const panelId = hintTypeToPanelId[hintType];
     const contentId = hintTypeToContentId[hintType];
     
@@ -1284,7 +1341,93 @@ function showHints(hintType) {
     }
 }
 
+function showChallengeHints(hintType) {
+    // Check hint limit
+    if (challengeState.hintsUsed >= challengeState.hintLimit) {
+        alert(`Hint limit reached! You've used all ${challengeState.hintLimit} hints.`);
+        return;
+    }
+    
+    const hintData = hints[hintType];
+    if (!hintData) return;
+    
+    const questionIndex = challengeState.currentQuestionIndex;
+    
+    // Track hint usage (only count once per question)
+    if (!challengeState.hintsUsedPerQuestion[questionIndex]) {
+        challengeState.hintsUsed++;
+        challengeState.hintsUsedPerQuestion[questionIndex] = true;
+    }
+    
+    // Update hint count display
+    const hintCount = document.getElementById('challengeHintCount');
+    if (hintCount) {
+        hintCount.textContent = `Hints: ${challengeState.hintsUsed}/${challengeState.hintLimit}`;
+        if (challengeState.hintsUsed >= challengeState.hintLimit) {
+            hintCount.classList.add('hint-limit-reached');
+        }
+    }
+    
+    // Update hint button
+    const hintButton = document.getElementById('challengeHintButton');
+    if (hintButton) {
+        if (challengeState.hintsUsed >= challengeState.hintLimit) {
+            hintButton.disabled = true;
+            hintButton.title = 'Hint limit reached (5/5)';
+        } else {
+            hintButton.title = `Get hints (reduces points by half) - ${challengeState.hintLimit - challengeState.hintsUsed} remaining`;
+        }
+    }
+    
+    // Display hints in challenge hint panel
+    const content = document.getElementById('challenge-hint-content');
+    if (!content) return;
+    
+    let html = '';
+    
+    // Step-by-step guidance
+    html += '<h4>📝 Step-by-Step Guide</h4>';
+    html += '<ul>';
+    hintData.steps.forEach(step => {
+        html += `<li>${step}</li>`;
+    });
+    html += '</ul>';
+    
+    // Formula
+    html += '<h4>📐 Formula</h4>';
+    html += `<div class="formula">${hintData.formula.replace(/\n/g, '<br>')}</div>`;
+    
+    // Concepts
+    html += '<h4>💡 Key Concepts</h4>';
+    html += '<div class="concept">';
+    hintData.concepts.forEach(concept => {
+        html += `<p>${concept}</p>`;
+    });
+    html += '</div>';
+    
+    // Add warning about point penalty
+    html += '<div class="hint-warning">';
+    html += '<p><strong>⚠️ Note:</strong> Using a hint will reduce your points for this question by half.</p>';
+    html += '</div>';
+    
+    content.innerHTML = html;
+    
+    const panel = document.getElementById('challenge-hint-panel');
+    if (panel) {
+        panel.classList.add('active');
+    }
+}
+
 function hideHints(hintType) {
+    // Check if we're in challenge mode
+    if (challengeState.active) {
+        const panel = document.getElementById('challenge-hint-panel');
+        if (panel) {
+            panel.classList.remove('active');
+        }
+        return;
+    }
+    
     if (hintType) {
         const panelId = hintTypeToPanelId[hintType];
         if (panelId) {
@@ -1556,6 +1699,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameState.mode = 'practice';
     });
     
+    // Challenge hint button
+    document.getElementById('challengeHintButton')?.addEventListener('click', () => {
+        const hintType = challengeState.currentProblemType;
+        if (hintType) {
+            showHints(hintType);
+        }
+    });
+    
     // Challenge navigation buttons
     document.getElementById('challengeBackBtn')?.addEventListener('click', () => {
         navigateChallengeQuestion('prev');
@@ -1707,6 +1858,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    
+    // Close challenge hint panel
+    const challengeCloseHint = document.querySelector('[data-hint-panel="challenge-hint-panel"]');
+    if (challengeCloseHint) {
+        challengeCloseHint.addEventListener('click', () => {
+            hideHints();
+        });
+    }
     
     // Close hint tooltip (legacy - kept for backward compatibility)
     const closeTooltip = document.querySelector('.close-tooltip');

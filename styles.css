@@ -538,6 +538,20 @@ body {
     border-left: 4px solid #2196f3;
 }
 
+.hint-warning {
+    background: #fff3cd;
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin: 15px 0;
+    border-left: 4px solid #ffc107;
+}
+
+.hint-warning p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.9rem;
+}
+
 /* Hint Tooltip (Legacy - kept for backward compatibility but not used) */
 .hint-tooltip {
     display: none;
@@ -725,6 +739,37 @@ body {
     display: block;
 }
 
+.challenge-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.challenge-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.challenge-question-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.hint-count {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.hint-count.hint-limit-reached {
+    color: #dc3545;
+    background: #ffe0e0;
+}
+
 .challenge-header {
     display: flex;
     justify-content: space-between;
@@ -894,6 +939,11 @@ body {
     font-weight: 700;
 }
 
+.stat-hints {
+    color: #667eea;
+    font-weight: 700;
+}
+
 .grade-row {
     margin-top: 20px;
     padding-top: 20px;
@@ -1048,6 +1098,16 @@ body {
 
     .set-size-options {
         grid-template-columns: 1fr;
+    }
+
+    .challenge-layout {
+        flex-direction: column;
+    }
+
+    .challenge-hint-panel {
+        width: 100%;
+        position: static;
+        max-height: none;
     }
 }
 

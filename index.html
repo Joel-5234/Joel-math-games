@@ -179,6 +179,7 @@
                     <h2>Challenge Mode</h2>
                     <div class="challenge-info">
                         <span id="challengeQuestionCounter">Question 1 of 10</span>
+                        <span id="challengeHintCount" class="hint-count">Hints: 0/5</span>
                         <button id="exitChallenge" class="exit-challenge-btn">Exit Challenge</button>
                     </div>
                 </div>
@@ -187,15 +188,29 @@
                         <div id="challengeProgressBar" class="progress-bar"></div>
                     </div>
                 </div>
-                <div class="challenge-content">
-                    <div id="challengeQuestionDisplay" class="challenge-question-display"></div>
-                    <div id="challengeInputContainer" class="challenge-input-container"></div>
-                    <div id="challengeResult" class="result-area"></div>
-                    <div class="challenge-navigation">
-                        <button id="challengeBackBtn" class="nav-button">← Back</button>
-                        <button id="challengeSkipBtn" class="nav-button skip-btn">Skip</button>
-                        <button id="challengeGiveUpBtn" class="nav-button give-up-btn">Give Up</button>
-                        <button id="challengeSubmitBtn" class="nav-button submit-btn">Submit Answer</button>
+                <div class="challenge-layout">
+                    <div class="challenge-content">
+                        <div class="challenge-question-header">
+                            <button id="challengeHintButton" class="hint-button" data-hint="" title="Get hints (reduces points by half)">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <div id="challengeQuestionDisplay" class="challenge-question-display"></div>
+                        <div id="challengeInputContainer" class="challenge-input-container"></div>
+                        <div id="challengeResult" class="result-area"></div>
+                        <div class="challenge-navigation">
+                            <button id="challengeBackBtn" class="nav-button">← Back</button>
+                            <button id="challengeSkipBtn" class="nav-button skip-btn">Skip</button>
+                            <button id="challengeGiveUpBtn" class="nav-button give-up-btn">Give Up</button>
+                            <button id="challengeSubmitBtn" class="nav-button submit-btn">Submit Answer</button>
+                        </div>
+                    </div>
+                    <div id="challenge-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="challenge-hint-panel">&times;</button>
+                        </div>
+                        <div id="challenge-hint-content" class="hint-content"></div>
                     </div>
                 </div>
             </div>

@@ -51,89 +51,167 @@
 
             <!-- Problem Type 1: Slope and Line Description -->
             <div id="slope-panel" class="problem-panel active">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Slope and Line Description</h2>
-                        <button class="hint-button" data-hint="slope" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Slope and Line Description</h2>
+                            <button class="hint-button" data-hint="slope" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
+                        <div class="input-group">
+                            <label for="slopeInput">Points:</label>
+                            <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                        </div>
+                        <button id="slopeSubmit" class="submit-button">Calculate</button>
+                        <div id="slopeResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
-                    <div class="input-group">
-                        <label for="slopeInput">Points:</label>
-                        <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                    <div id="slope-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="slope-hint-panel">&times;</button>
+                        </div>
+                        <div id="slope-hint-content" class="hint-content"></div>
                     </div>
-                    <button id="slopeSubmit" class="submit-button">Calculate</button>
-                    <div id="slopeResult" class="result-area"></div>
                 </div>
             </div>
 
             <!-- Problem Type 2: Relationship Between Two Lines -->
             <div id="relationship-panel" class="problem-panel">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Relationship Between Two Lines</h2>
-                        <button class="hint-button" data-hint="relationship" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Relationship Between Two Lines</h2>
+                            <button class="hint-button" data-hint="relationship" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter two equations. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
+                        <div class="input-group">
+                            <label for="equation1Input">Equation 1:</label>
+                            <input type="text" id="equation1Input" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="equation2Input">Equation 2:</label>
+                            <input type="text" id="equation2Input" placeholder="y = 2x - 5" class="input-field">
+                        </div>
+                        <button id="relationshipSubmit" class="submit-button">Check Relationship</button>
+                        <div id="relationshipResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter two equations. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
-                    <div class="input-group">
-                        <label for="equation1Input">Equation 1:</label>
-                        <input type="text" id="equation1Input" placeholder="y = 2x + 3" class="input-field">
+                    <div id="relationship-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="relationship-hint-panel">&times;</button>
+                        </div>
+                        <div id="relationship-hint-content" class="hint-content"></div>
                     </div>
-                    <div class="input-group">
-                        <label for="equation2Input">Equation 2:</label>
-                        <input type="text" id="equation2Input" placeholder="y = 2x - 5" class="input-field">
-                    </div>
-                    <button id="relationshipSubmit" class="submit-button">Check Relationship</button>
-                    <div id="relationshipResult" class="result-area"></div>
                 </div>
             </div>
 
             <!-- Problem Type 3: Parallel Line Through a Point -->
             <div id="parallel-panel" class="problem-panel">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Parallel Line Through a Point</h2>
-                        <button class="hint-button" data-hint="parallel" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Parallel Line Through a Point</h2>
+                            <button class="hint-button" data-hint="parallel" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter a base equation and a point in format (x,y)</p>
+                        <div class="input-group">
+                            <label for="parallelEquationInput">Base Equation:</label>
+                            <input type="text" id="parallelEquationInput" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="parallelPointInput">Point:</label>
+                            <input type="text" id="parallelPointInput" placeholder="(4,5)" class="input-field">
+                        </div>
+                        <button id="parallelSubmit" class="submit-button">Calculate</button>
+                        <div id="parallelResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter a base equation and a point in format (x,y)</p>
-                    <div class="input-group">
-                        <label for="parallelEquationInput">Base Equation:</label>
-                        <input type="text" id="parallelEquationInput" placeholder="y = 2x + 3" class="input-field">
+                    <div id="parallel-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="parallel-hint-panel">&times;</button>
+                        </div>
+                        <div id="parallel-hint-content" class="hint-content"></div>
                     </div>
-                    <div class="input-group">
-                        <label for="parallelPointInput">Point:</label>
-                        <input type="text" id="parallelPointInput" placeholder="(4,5)" class="input-field">
-                    </div>
-                    <button id="parallelSubmit" class="submit-button">Calculate</button>
-                    <div id="parallelResult" class="result-area"></div>
                 </div>
             </div>
 
             <!-- Problem Type 4: Perpendicular Line Through a Point -->
             <div id="perpendicular-panel" class="problem-panel">
-                <div class="problem-card">
-                    <div class="problem-header">
-                        <h2>Perpendicular Line Through a Point</h2>
-                        <button class="hint-button" data-hint="perpendicular" title="Get hints">
-                            💡 Get Hint
-                        </button>
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Perpendicular Line Through a Point</h2>
+                            <button class="hint-button" data-hint="perpendicular" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter a base equation and a point in format (x,y)</p>
+                        <div class="input-group">
+                            <label for="perpendicularEquationInput">Base Equation:</label>
+                            <input type="text" id="perpendicularEquationInput" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="perpendicularPointInput">Point:</label>
+                            <input type="text" id="perpendicularPointInput" placeholder="(4,5)" class="input-field">
+                        </div>
+                        <button id="perpendicularSubmit" class="submit-button">Calculate</button>
+                        <div id="perpendicularResult" class="result-area"></div>
                     </div>
-                    <p class="instructions">Enter a base equation and a point in format (x,y)</p>
-                    <div class="input-group">
-                        <label for="perpendicularEquationInput">Base Equation:</label>
-                        <input type="text" id="perpendicularEquationInput" placeholder="y = 2x + 3" class="input-field">
+                    <div id="perpendicular-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="perpendicular-hint-panel">&times;</button>
+                        </div>
+                        <div id="perpendicular-hint-content" class="hint-content"></div>
                     </div>
-                    <div class="input-group">
-                        <label for="perpendicularPointInput">Point:</label>
-                        <input type="text" id="perpendicularPointInput" placeholder="(4,5)" class="input-field">
+                </div>
+            </div>
+
+            <!-- Challenge Interface -->
+            <div id="challengeInterface" class="challenge-interface" style="display: none;">
+                <div class="challenge-header">
+                    <h2>Challenge Mode</h2>
+                    <div class="challenge-info">
+                        <span id="challengeQuestionCounter">Question 1 of 10</span>
+                        <span id="challengeHintCount" class="hint-count">Hints: 0/5</span>
+                        <button id="exitChallenge" class="exit-challenge-btn">Exit Challenge</button>
                     </div>
-                    <button id="perpendicularSubmit" class="submit-button">Calculate</button>
-                    <div id="perpendicularResult" class="result-area"></div>
+                </div>
+                <div class="challenge-progress">
+                    <div class="progress-bar-container">
+                        <div id="challengeProgressBar" class="progress-bar"></div>
+                    </div>
+                </div>
+                <div class="challenge-layout">
+                    <div class="challenge-content">
+                        <div class="challenge-question-header">
+                            <button id="challengeHintButton" class="hint-button" data-hint="" title="Get hints (reduces points by half)">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <div id="challengeQuestionDisplay" class="challenge-question-display"></div>
+                        <div id="challengeInputContainer" class="challenge-input-container"></div>
+                        <div id="challengeResult" class="result-area"></div>
+                        <div class="challenge-navigation">
+                            <button id="challengeBackBtn" class="nav-button">← Back</button>
+                            <button id="challengeSkipBtn" class="nav-button skip-btn">Skip</button>
+                            <button id="challengeGiveUpBtn" class="nav-button give-up-btn">Give Up</button>
+                            <button id="challengeSubmitBtn" class="nav-button submit-btn">Submit Answer</button>
+                        </div>
+                    </div>
+                    <div id="challenge-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="challenge-hint-panel">&times;</button>
+                        </div>
+                        <div id="challenge-hint-content" class="hint-content"></div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -157,7 +235,7 @@
                 <h3>Help</h3>
                 <div class="help-text">
                     <p><strong>Practice Mode:</strong> No time limit, track your time</p>
-                    <p><strong>Challenge Mode:</strong> 60 second countdown per question</p>
+                    <p><strong>Challenge Mode:</strong> Pre-generated question sets with navigation</p>
                     <p><strong>Session Mode:</strong> 10 minute practice session</p>
                 </div>
             </div>
@@ -192,6 +270,39 @@
             <div id="hintContent" class="tooltip-body"></div>
         </div>
     </div>
+
+    <!-- Challenge Setup Modal -->
+    <div id="challengeSetupModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeChallengeSetup">&times;</span>
+            <h2>Start Challenge</h2>
+            <p>Select the number of questions for your challenge:</p>
+            <div class="set-size-options">
+                <button class="set-size-btn" data-size="5">5 Questions</button>
+                <button class="set-size-btn" data-size="10">10 Questions</button>
+                <button class="set-size-btn" data-size="25">25 Questions</button>
+                <button class="set-size-btn" data-size="50">50 Questions</button>
+                <button class="set-size-btn" data-size="100">100 Questions</button>
+            </div>
+            <button id="cancelChallengeSetup" class="cancel-button">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Challenge Completion Modal -->
+    <div id="challengeCompletionModal" class="modal">
+        <div class="modal-content completion-modal">
+            <span class="close-modal" id="closeChallengeCompletion">&times;</span>
+            <div class="completion-content"></div>
+            <div class="completion-actions">
+                <button id="restartChallenge" class="action-button">Start New Challenge</button>
+                <button id="returnToPractice" class="action-button">Return to Practice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Containers -->
+    <div id="confettiContainer" class="celebration-container"></div>
+    <div id="fireworksContainer" class="celebration-container"></div>
 
     <script src="app.js"></script>
 </body>
