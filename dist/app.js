@@ -1480,8 +1480,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        // Use dataset.correct for reliable comparison instead of label comparison
-        isCorrect = selected.dataset.correct === 'true';
+        // Use dataset.correct for reliable comparison - ensure it's explicitly checked as string
+        isCorrect = String(selected.dataset.correct) === 'true';
         
         // Disable and highlight
         document.querySelectorAll('#challengeRelationshipOptions input').forEach(radio => {
@@ -1509,8 +1509,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        // Use dataset.correct for reliable comparison instead of label comparison
-        isCorrect = selected.dataset.correct === 'true';
+        // Use dataset.correct for reliable comparison - ensure it's explicitly checked as string
+        isCorrect = String(selected.dataset.correct) === 'true';
         
         // Disable and highlight
         document.querySelectorAll('#challengeParallelOptions input').forEach(radio => {
@@ -1538,8 +1538,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        // Use dataset.correct for reliable comparison instead of label comparison
-        isCorrect = selected.dataset.correct === 'true';
+        // Use dataset.correct for reliable comparison - ensure it's explicitly checked as string
+        isCorrect = String(selected.dataset.correct) === 'true';
         
         // Disable and highlight
         document.querySelectorAll('#challengePerpendicularOptions input').forEach(radio => {
@@ -1582,8 +1582,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        // Use dataset.correct for reliable comparison instead of label comparison
-        isCorrect = selected.dataset.correct === 'true';
+        // Use dataset.correct for reliable comparison - ensure it's explicitly checked as string
+        isCorrect = String(selected.dataset.correct) === 'true';
         
         // Disable and highlight
         document.querySelectorAll(`#${optionId} input`).forEach(radio => {
@@ -2200,7 +2200,8 @@ function renderRadioOptions(containerId, options, name, onSelect) {
         radio.name = name;
         radio.id = `${name}_${option.label}`;
         radio.value = option.label;
-        radio.dataset.correct = option.correct;
+        // Ensure correct is set as string 'true' or 'false' for reliable comparison
+        radio.dataset.correct = option.correct === true ? 'true' : 'false';
         radio.dataset.value = option.value;
         
         const label = document.createElement('label');
