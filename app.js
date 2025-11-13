@@ -800,9 +800,25 @@ function hideChallengeSetupModal() {
     }
 }
 
+// Map tab data-tab values to generator keys
+function mapTabToProblemType(tabName) {
+    const mapping = {
+        'slope': 'slope',
+        'relationship': 'relationship',
+        'parallel': 'parallel',
+        'perpendicular': 'perpendicular',
+        'intercepts': 'intercept',
+        'rateofchange': 'rateOfChange',
+        'linearfunction': 'linearFunction',
+        'standardform': 'standardForm'
+    };
+    return mapping[tabName] || 'slope';
+}
+
 function startChallenge(setSize) {
     const activeTab = document.querySelector('.tab-button.active');
-    const problemType = activeTab ? activeTab.dataset.tab : 'slope';
+    const tabName = activeTab ? activeTab.dataset.tab : 'slope';
+    const problemType = mapTabToProblemType(tabName);
     
     initializeChallenge(problemType, setSize);
     hideChallengeSetupModal();
@@ -2211,8 +2227,8 @@ const PracticeMode = {
      * Reset all Practice mode question state
      */
     resetState: function() {
-        gameState.questionAnswered = false;
-        currentQuestionData = null;
+    gameState.questionAnswered = false;
+    currentQuestionData = null;
         currentInterceptData = null;
         currentRateOfChangeData = null;
         currentLinearFunctionData = null;
@@ -2228,13 +2244,13 @@ const PracticeMode = {
         this.hideContainer('rateOfChangeQuestionContainer', 'rateOfChangeSubmit');
         this.hideContainer('linearFunctionQuestionContainer', 'linearFunctionSubmit');
         this.hideContainer('standardFormQuestionContainer', 'standardFormSubmit');
-        
-        // Clear result areas
-        document.querySelectorAll('.result-area').forEach(area => {
-            area.textContent = '';
-            area.className = 'result-area';
-        });
-    }
+    
+    // Clear result areas
+    document.querySelectorAll('.result-area').forEach(area => {
+        area.textContent = '';
+        area.className = 'result-area';
+    });
+}
 };
 
 // Reset question state when switching tabs or starting new question
@@ -2330,11 +2346,11 @@ function handleSlopeCalculate() {
         const classificationQuestion = document.getElementById('slopeClassificationQuestion');
         if (valueQuestion) {
             const valueText = valueQuestion.querySelector('.question-text');
-            if (valueText) valueText.textContent = 'What is the slope?';
+        if (valueText) valueText.textContent = 'What is the slope?';
         }
         if (classificationQuestion) {
             const classificationText = classificationQuestion.querySelector('.question-text');
-            if (classificationText) classificationText.textContent = 'What is the classification?';
+        if (classificationText) classificationText.textContent = 'What is the classification?';
         }
         
         // Display multiple choice options
