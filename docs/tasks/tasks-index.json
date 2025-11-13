@@ -71,6 +71,12 @@
       "name": "Complete Practice Mode Rewrite",
       "status": "pending",
       "description": "Completely rewrite Practice mode code from scratch to fix multiple choice display issues and improve code structure while maintaining all existing functionality"
+    },
+    {
+      "id": "milestone-13",
+      "name": "Additional Problem Types",
+      "status": "completed",
+      "description": "Add five new problem types: Finding Intercepts, Rate of Change, Identifying Linear Functions, Converting to Standard Form, with interactive graphs and table displays"
     }
   ]
 }

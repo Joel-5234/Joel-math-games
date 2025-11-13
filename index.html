@@ -47,6 +47,10 @@
                 <button class="tab-button" data-tab="relationship">Line Relationship</button>
                 <button class="tab-button" data-tab="parallel">Parallel Line</button>
                 <button class="tab-button" data-tab="perpendicular">Perpendicular Line</button>
+                <button class="tab-button" data-tab="intercepts">Intercepts</button>
+                <button class="tab-button" data-tab="rateofchange">Rate of Change</button>
+                <button class="tab-button" data-tab="linearfunction">Linear Functions</button>
+                <button class="tab-button" data-tab="standardform">Standard Form</button>
             </div>
 
             <!-- Problem Type 1: Slope and Line Description -->
@@ -201,6 +205,147 @@
                             <button class="close-hint" data-hint-panel="perpendicular-hint-panel">&times;</button>
                         </div>
                         <div id="perpendicular-hint-content" class="hint-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Type 5: Finding Intercepts -->
+            <div id="intercepts-panel" class="problem-panel">
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Finding Intercepts</h2>
+                            <button class="hint-button" data-hint="intercepts" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter an equation. Supported formats: y=mx+b, Ax+By=C, x=c, y=c</p>
+                        <div class="input-group">
+                            <label for="interceptEquationInput">Equation:</label>
+                            <input type="text" id="interceptEquationInput" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <button id="interceptCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="interceptGraphContainer" style="display: none;">
+                            <canvas id="interceptGraph" width="400" height="400"></canvas>
+                        </div>
+                        <div id="interceptQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="interceptOptions"></div>
+                            </div>
+                            <button id="interceptSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
+                        <div id="interceptResult" class="result-area"></div>
+                    </div>
+                    <div id="intercepts-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="intercepts-hint-panel">&times;</button>
+                        </div>
+                        <div id="intercepts-hint-content" class="hint-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Type 6: Rate of Change -->
+            <div id="rateofchange-panel" class="problem-panel">
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Rate of Change</h2>
+                            <button class="hint-button" data-hint="rateofchange" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter table data or click Calculate to generate a problem</p>
+                        <div id="rateOfChangeTableContainer" class="table-container"></div>
+                        <button id="rateOfChangeCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="rateOfChangeQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="rateOfChangeOptions"></div>
+                            </div>
+                            <button id="rateOfChangeSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
+                        <div id="rateOfChangeResult" class="result-area"></div>
+                    </div>
+                    <div id="rateofchange-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="rateofchange-hint-panel">&times;</button>
+                        </div>
+                        <div id="rateofchange-hint-content" class="hint-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Type 7: Identifying Linear Functions -->
+            <div id="linearfunction-panel" class="problem-panel">
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Identifying Linear Functions</h2>
+                            <button class="hint-button" data-hint="linearfunction" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter table data or click Calculate to generate a problem</p>
+                        <div id="linearFunctionTableContainer" class="table-container"></div>
+                        <button id="linearFunctionCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="linearFunctionQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="linearFunctionOptions"></div>
+                            </div>
+                            <button id="linearFunctionSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
+                        <div id="linearFunctionResult" class="result-area"></div>
+                    </div>
+                    <div id="linearfunction-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="linearfunction-hint-panel">&times;</button>
+                        </div>
+                        <div id="linearfunction-hint-content" class="hint-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Type 8: Converting to Standard Form -->
+            <div id="standardform-panel" class="problem-panel">
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Converting to Standard Form</h2>
+                            <button class="hint-button" data-hint="standardform" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter an equation in any format (y=mx+b, point-slope, etc.)</p>
+                        <div class="input-group">
+                            <label for="standardFormInput">Equation:</label>
+                            <input type="text" id="standardFormInput" placeholder="y = 2x + 3" class="input-field">
+                        </div>
+                        <button id="standardFormCalculateBtn" class="submit-button">Convert</button>
+                        <div id="standardFormQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="standardFormOptions"></div>
+                            </div>
+                            <div class="multiple-choice-question" id="standardFormABCQuestion" style="display: none;">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="standardFormABCOptions"></div>
+                            </div>
+                            <button id="standardFormSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
+                        <div id="standardFormResult" class="result-area"></div>
+                    </div>
+                    <div id="standardform-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="standardform-hint-panel">&times;</button>
+                        </div>
+                        <div id="standardform-hint-content" class="hint-content"></div>
                     </div>
                 </div>
             </div>

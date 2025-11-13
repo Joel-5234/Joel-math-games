@@ -2,14 +2,18 @@ Product Requirements Document
 Parallel & Perpendicular Lines Web Trainer
 	1.	Product overview
 Parallel & Perpendicular Lines Web Trainer is a browser-based app built with HTML, CSS, and JavaScript.
-It helps students practice four types of line problems and turns practice into a timed, achievement-based game.
+It helps students practice nine types of line problems and turns practice into a timed, achievement-based game.
 The app runs fully client-side and stores progress locally in the browser.
 	2.	Objectives
-a) Help students answer four core homework question types on lines:
+a) Help students answer nine core homework question types on lines:
 	1.	Slope and line description through two points
 	2.	Relationship between two equations
 	3.	Parallel line through a point
 	4.	Perpendicular line through a point
+	5.	Finding intercepts (from graphs and equations)
+	6.	Rate of change (from tables)
+	7.	Identifying linear functions (from tables)
+	8.	Converting to standard form
 
 b) Improve speed and accuracy with a timer, streaks, and achievements.
 
@@ -94,6 +98,88 @@ Output
 • Slopes shown as "fraction (decimal)" format
 • For vertical, display x = c
 • Show as multiple choice with full equation options
+
+4.5 Finding intercepts
+Input
+• One text field for equation (or interactive graph display)
+• Supported formats: y = mx + b, Ax + By = C, x = c, y = c
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options show intercepts as coordinate points: (x, 0) for x-intercept, (0, y) for y-intercept
+  - May ask for both intercepts or one at a time
+Behavior
+• Parse equation or display interactive graph
+• Calculate x-intercept: Set y = 0, solve for x → (x, 0)
+• Calculate y-intercept: Set x = 0, solve for y → (0, y)
+• Generate 3 plausible wrong answers (distractors) for each intercept
+  - Wrong sign errors
+  - Calculation errors
+  - Confusing x and y intercepts
+• Display interactive graph with line and intercepts highlighted
+Output
+• Show intercepts as coordinate points in multiple choice format
+• Graph displays line with intercepts visually highlighted
+• Mark answer status for gamification
+
+4.6 Rate of change
+Input
+• Table input interface with X and Y columns (or generated table)
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options show rate of change values for different intervals
+  - May ask for rate of change for specific interval or greatest rate
+Behavior
+• Parse table data (X and Y values)
+• Calculate rate of change for each interval: (y2 - y1) / (x2 - x1)
+• Identify greatest rate of change (or greatest decrease)
+• Generate 3 plausible wrong answers (distractors)
+  - Wrong interval calculations
+  - Sign errors
+  - Calculation mistakes
+Output
+• Display table visually
+• Show rate of change values in multiple choice format
+• Rate of change shown as "fraction (decimal)" format when applicable
+• Mark answer status for gamification
+
+4.7 Identifying linear functions
+Input
+• Table input interface with X and Y columns (or generated table)
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options: Yes/No with explanations
+Behavior
+• Parse table data (X and Y values)
+• Check if change in X is constant
+• Check if change in Y is constant
+• Check if ratio (change Y / change X) is constant
+• Determine if table represents a linear function
+• Generate 3 plausible wrong answers (distractors)
+  - Wrong explanations
+  - Confusing with other function types
+Output
+• Display table visually
+• Show Yes/No answer with explanation in multiple choice format
+• Mark answer status for gamification
+
+4.8 Converting to standard form
+Input
+• One text field for equation in any format
+• Supported input formats: y = mx + b, point-slope form, etc.
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options show standard form equations: Ax + By = C
+  - May also ask for A, B, C values separately
+Behavior
+• Parse equation in any format
+• Convert to standard form: Ax + By = C
+• Ensure A, B, C are integers (if possible)
+• Handle negative values correctly
+• Generate 3 plausible wrong answers (distractors)
+  - Wrong signs
+  - Wrong coefficients
+  - Wrong form (not standard form)
+Output
+• Display converted equation in standard form: Ax + By = C
+• Show A, B, C values if asked separately
+• Display as multiple choice with full equation options
+• Mark answer status for gamification
 
 	5.	Gamification features
 
@@ -187,9 +273,11 @@ a) Header
 • Current mode (Practice, Challenge, Session)
 • Score, streak, timer display
 b) Main content
-• Tabbed or segmented controls for the four question types
+• Tabbed or segmented controls for the nine question types
 • Input fields and action buttons per tab
 • Result panel with text feedback
+• Interactive graph display for intercept problems
+• Table display for rate of change and linear function problems
 c) Right or bottom panel
 • Timer details
 • Achievements and status summary
@@ -387,4 +475,22 @@ f) Consistent patterns across all problem types
 g) Enhanced debugging and logging
 h) All existing functionality preserved
 i) Improved maintainability and code quality
+
+10.11 Additional Problem Types
+a) Five new problem types added (expanding from 4 to 9 total):
+   - Finding intercepts (from graphs and equations)
+   - Rate of change (from tables)
+   - Identifying linear functions (from tables)
+   - Converting to standard form
+b) Interactive graph rendering system for intercept problems
+   - Canvas or SVG-based graph display
+   - Visual highlighting of intercepts
+   - Interactive zoom/pan capabilities
+c) Table display system for rate of change and linear function problems
+   - Visual table rendering
+   - Clear X and Y column display
+d) All new problem types use multiple choice format
+e) Consistent with existing problem type patterns and UI
+f) Integrated into all game modes (Practice, Challenge, Session)
+g) Hint system support for all new types
 

@@ -37,7 +37,11 @@ let gameState = {
         slope: { correct: 0, total: 0, times: [] },
         relationship: { correct: 0, total: 0, times: [] },
         parallel: { correct: 0, total: 0, times: [] },
-        perpendicular: { correct: 0, total: 0, times: [] }
+        perpendicular: { correct: 0, total: 0, times: [] },
+        intercept: { correct: 0, total: 0, times: [] },
+        rateOfChange: { correct: 0, total: 0, times: [] },
+        linearFunction: { correct: 0, total: 0, times: [] },
+        standardForm: { correct: 0, total: 0, times: [] }
     }
 };
 
@@ -110,6 +114,72 @@ const hints = {
             "Negative reciprocal: Flip the fraction and change the sign. Example: 2/3 becomes -3/2.",
             "If the base line is vertical, the perpendicular line is horizontal (and vice versa).",
             "The product of slopes of perpendicular lines always equals -1: m₁ × m₂ = -1."
+        ]
+    },
+    intercepts: {
+        steps: [
+            "1. For x-intercept: Set y = 0 in the equation and solve for x",
+            "2. For y-intercept: Set x = 0 in the equation and solve for y",
+            "3. Write intercepts as coordinate points: (x, 0) for x-intercept, (0, y) for y-intercept",
+            "4. Vertical lines (x = c) have x-intercept at (c, 0) but no y-intercept",
+            "5. Horizontal lines (y = c) have y-intercept at (0, c) but no x-intercept (unless c = 0)"
+        ],
+        formula: "X-Intercept: Set y = 0, solve for x → (x, 0)\n\nY-Intercept: Set x = 0, solve for y → (0, y)\n\nFor y = mx + b:\n• X-intercept: x = -b/m (when m ≠ 0)\n• Y-intercept: y = b\n\nFor Ax + By = C:\n• X-intercept: x = C/A (when A ≠ 0)\n• Y-intercept: y = C/B (when B ≠ 0)",
+        concepts: [
+            "The x-intercept is where the line crosses the x-axis (y = 0).",
+            "The y-intercept is where the line crosses the y-axis (x = 0).",
+            "A line can have at most one x-intercept and one y-intercept.",
+            "Vertical lines have no y-intercept. Horizontal lines have no x-intercept (unless they pass through origin)."
+        ]
+    },
+    rateofchange: {
+        steps: [
+            "1. Identify two consecutive points in the table: (x₁, y₁) and (x₂, y₂)",
+            "2. Calculate the change in y: Δy = y₂ - y₁",
+            "3. Calculate the change in x: Δx = x₂ - x₁",
+            "4. Calculate rate of change: rate = Δy / Δx",
+            "5. Repeat for each interval to find the greatest rate or decrease",
+            "6. Compare all rates to find the maximum (or minimum for greatest decrease)"
+        ],
+        formula: "Rate of Change Formula:\n\nrate = (y₂ - y₁) / (x₂ - x₁)\n\nWhere:\n• Δy = change in y (vertical change)\n• Δx = change in x (horizontal change)\n• Rate represents how much y changes per unit change in x",
+        concepts: [
+            "Rate of change measures how one quantity changes relative to another.",
+            "A positive rate means the quantity is increasing.",
+            "A negative rate means the quantity is decreasing.",
+            "The rate of change is similar to slope: it's the ratio of vertical change to horizontal change."
+        ]
+    },
+    linearfunction: {
+        steps: [
+            "1. Check if the change in X is constant between consecutive points",
+            "2. Check if the change in Y is constant between consecutive points",
+            "3. Check if the ratio (change Y / change X) is constant",
+            "4. If all changes are constant, the table represents a linear function",
+            "5. If changes vary, it's not a linear function"
+        ],
+        formula: "Linear Function Test:\n\nFor a table to represent a linear function:\n• Change in X must be constant: x₂ - x₁ = x₃ - x₂ = ...\n• Change in Y must be constant: y₂ - y₁ = y₃ - y₂ = ...\n• OR ratio (Δy/Δx) must be constant\n\nIf these conditions are met, the relationship is linear.",
+        concepts: [
+            "A linear function has a constant rate of change (slope).",
+            "In a linear function table, the change in X and change in Y are both constant.",
+            "If the changes vary, the function is not linear (could be quadratic, exponential, etc.).",
+            "The constant ratio Δy/Δx represents the slope of the linear function."
+        ]
+    },
+    standardform: {
+        steps: [
+            "1. Start with the equation in any form (y = mx + b, point-slope, etc.)",
+            "2. Move all terms to one side so the equation equals 0",
+            "3. Rearrange to get Ax + By = C format",
+            "4. Ensure A, B, and C are integers (multiply by common denominator if needed)",
+            "5. Prefer A to be positive (multiply by -1 if A is negative)",
+            "6. Simplify by dividing by the greatest common factor if possible"
+        ],
+        formula: "Standard Form: Ax + By = C\n\nConversion from y = mx + b:\n• y = mx + b\n• -mx + y = b\n• Multiply by -1 if needed: mx - y = -b\n• Result: Ax + By = C\n\nWhere A, B, C are integers and A ≥ 0",
+        concepts: [
+            "Standard form is Ax + By = C, where A, B, and C are integers.",
+            "A should be positive (or zero). If A is negative, multiply the entire equation by -1.",
+            "All coefficients should be integers. Multiply by denominators to eliminate fractions.",
+            "Standard form makes it easy to find intercepts: x-intercept = C/A, y-intercept = C/B."
         ]
     }
 };
@@ -657,7 +727,11 @@ function generateChallengeQuestions(problemType, count) {
         slope: generateSlopeQuestion,
         relationship: generateRelationshipQuestion,
         parallel: generateParallelQuestion,
-        perpendicular: generatePerpendicularQuestion
+        perpendicular: generatePerpendicularQuestion,
+        intercept: generateInterceptQuestion,
+        rateOfChange: generateRateOfChangeQuestion,
+        linearFunction: generateLinearFunctionQuestion,
+        standardForm: generateStandardFormQuestion
     };
     
     const generator = generators[problemType];
@@ -980,12 +1054,81 @@ function displayChallengeQuestion() {
                 if (radio) radio.checked = true;
                 document.querySelectorAll('#challengePerpendicularOptions input').forEach(r => r.disabled = true);
             }
+        } else if (question.type === 'intercept') {
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>`;
+            inputContainer.innerHTML = `
+                <div class="multiple-choice-question">
+                    <p class="question-text">${question.question}</p>
+                    <div class="radio-group" id="challengeInterceptOptions"></div>
+                </div>
+            `;
+            renderRadioOptions('challengeInterceptOptions', question.options, 'challengeIntercept', null);
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeIntercept"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeInterceptOptions input').forEach(r => r.disabled = true);
+            }
+        } else if (question.type === 'rateOfChange') {
+            // Display table
+            let tableHtml = '<table class="data-table"><thead><tr><th>X</th><th>Y</th></tr></thead><tbody>';
+            for (const row of question.display) {
+                tableHtml += `<tr><td>${row.x}</td><td>${row.y}</td></tr>`;
+            }
+            tableHtml += '</tbody></table>';
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>${tableHtml}`;
+            inputContainer.innerHTML = `
+                <div class="multiple-choice-question">
+                    <p class="question-text">${question.question}</p>
+                    <div class="radio-group" id="challengeRateOfChangeOptions"></div>
+                </div>
+            `;
+            renderRadioOptions('challengeRateOfChangeOptions', question.options, 'challengeRateOfChange', null);
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeRateOfChange"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeRateOfChangeOptions input').forEach(r => r.disabled = true);
+            }
+        } else if (question.type === 'linearFunction') {
+            // Display table
+            let tableHtml = '<table class="data-table"><thead><tr><th>X</th><th>Y</th></tr></thead><tbody>';
+            for (const row of question.display) {
+                tableHtml += `<tr><td>${row.x}</td><td>${row.y}</td></tr>`;
+            }
+            tableHtml += '</tbody></table>';
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>${tableHtml}`;
+            inputContainer.innerHTML = `
+                <div class="multiple-choice-question">
+                    <p class="question-text">${question.question}</p>
+                    <div class="radio-group" id="challengeLinearFunctionOptions"></div>
+                </div>
+            `;
+            renderRadioOptions('challengeLinearFunctionOptions', question.options, 'challengeLinearFunction', null);
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeLinearFunction"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeLinearFunctionOptions input').forEach(r => r.disabled = true);
+            }
+        } else if (question.type === 'standardForm') {
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>`;
+            inputContainer.innerHTML = `
+                <div class="multiple-choice-question">
+                    <p class="question-text">${question.question}</p>
+                    <div class="radio-group" id="challengeStandardFormOptions"></div>
+                </div>
+            `;
+            renderRadioOptions('challengeStandardFormOptions', question.options, 'challengeStandardForm', null);
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeStandardForm"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeStandardFormOptions input').forEach(r => r.disabled = true);
+            }
         }
         
         // Show answer if gave up - highlight correct options
         if (questionState === 'gave-up') {
             // Disable all radio buttons
-            document.querySelectorAll('#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input, #challengeRelationshipOptions input, #challengeParallelOptions input, #challengePerpendicularOptions input').forEach(radio => {
+            const allRadioSelectors = '#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input, #challengeRelationshipOptions input, #challengeParallelOptions input, #challengePerpendicularOptions input, #challengeInterceptOptions input, #challengeRateOfChangeOptions input, #challengeLinearFunctionOptions input, #challengeStandardFormOptions input';
+            document.querySelectorAll(allRadioSelectors).forEach(radio => {
                 if (radio) radio.disabled = true;
             });
             
@@ -998,7 +1141,8 @@ function displayChallengeQuestion() {
                     }
                 });
             } else {
-                document.querySelectorAll(`#challenge${question.type.charAt(0).toUpperCase() + question.type.slice(1)}Options .radio-option`).forEach(opt => {
+                const optionId = `challenge${question.type.charAt(0).toUpperCase() + question.type.slice(1)}Options`;
+                document.querySelectorAll(`#${optionId} .radio-option`).forEach(opt => {
                     const radio = opt.querySelector('input');
                     if (radio && radio.dataset.correct === 'true') {
                         opt.classList.add('correct');
@@ -1218,6 +1362,49 @@ function submitChallengeAnswer() {
         });
         
         document.querySelectorAll('#challengePerpendicularOptions .radio-option').forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
+    } else if (question.type === 'intercept' || question.type === 'rateOfChange' || question.type === 'linearFunction' || question.type === 'standardForm') {
+        const nameMap = {
+            intercept: 'challengeIntercept',
+            rateOfChange: 'challengeRateOfChange',
+            linearFunction: 'challengeLinearFunction',
+            standardForm: 'challengeStandardForm'
+        };
+        const optionIdMap = {
+            intercept: 'challengeInterceptOptions',
+            rateOfChange: 'challengeRateOfChangeOptions',
+            linearFunction: 'challengeLinearFunctionOptions',
+            standardForm: 'challengeStandardFormOptions'
+        };
+        
+        const name = nameMap[question.type];
+        const optionId = optionIdMap[question.type];
+        const selected = document.querySelector(`input[name="${name}"]:checked`);
+        
+        if (!selected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select an answer.';
+                resultArea.className = 'result-area error';
+            }
+            return;
+        }
+        
+        userInput = selected.value;
+        isCorrect = selected.value === question.correctAnswerLabel;
+        
+        // Disable and highlight
+        document.querySelectorAll(`#${optionId} input`).forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll(`#${optionId} .radio-option`).forEach(opt => {
             const radio = opt.querySelector('input');
             if (radio.dataset.correct === 'true') {
                 opt.classList.add('correct');
@@ -1640,14 +1827,22 @@ const hintTypeToPanelId = {
     slope: 'slope-hint-panel',
     relationship: 'relationship-hint-panel',
     parallel: 'parallel-hint-panel',
-    perpendicular: 'perpendicular-hint-panel'
+    perpendicular: 'perpendicular-hint-panel',
+    intercepts: 'intercepts-hint-panel',
+    rateofchange: 'rateofchange-hint-panel',
+    linearfunction: 'linearfunction-hint-panel',
+    standardform: 'standardform-hint-panel'
 };
 
 const hintTypeToContentId = {
     slope: 'slope-hint-content',
     relationship: 'relationship-hint-content',
     parallel: 'parallel-hint-content',
-    perpendicular: 'perpendicular-hint-content'
+    perpendicular: 'perpendicular-hint-content',
+    intercepts: 'intercepts-hint-content',
+    rateofchange: 'rateofchange-hint-content',
+    linearfunction: 'linearfunction-hint-content',
+    standardform: 'standardform-hint-content'
 };
 
 function showHints(hintType) {
@@ -2018,12 +2213,21 @@ const PracticeMode = {
     resetState: function() {
         gameState.questionAnswered = false;
         currentQuestionData = null;
+        currentInterceptData = null;
+        currentRateOfChangeData = null;
+        currentLinearFunctionData = null;
+        currentStandardFormData = null;
         
         // Hide all containers
         this.hideContainer('slopeQuestionsContainer', 'slopeSubmit');
         this.hideContainer('relationshipQuestionContainer', 'relationshipSubmit');
         this.hideContainer('parallelQuestionContainer', 'parallelSubmit');
         this.hideContainer('perpendicularQuestionContainer', 'perpendicularSubmit');
+        this.hideContainer('interceptQuestionContainer', 'interceptSubmit');
+        this.hideContainer('interceptGraphContainer', null);
+        this.hideContainer('rateOfChangeQuestionContainer', 'rateOfChangeSubmit');
+        this.hideContainer('linearFunctionQuestionContainer', 'linearFunctionSubmit');
+        this.hideContainer('standardFormQuestionContainer', 'standardFormSubmit');
         
         // Clear result areas
         document.querySelectorAll('.result-area').forEach(area => {
@@ -2532,6 +2736,912 @@ function handlePerpendicularSubmit() {
     gameState.questionAnswered = true;
 }
 
+// ============================================================================
+// NEW PROBLEM TYPES: Intercepts, Rate of Change, Linear Functions, Standard Form
+// ============================================================================
+
+// Graph Rendering System
+function drawGraph(canvasId, line, xIntercept, yIntercept) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 40;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Set bounds (adjust as needed)
+    const xMin = -10, xMax = 10;
+    const yMin = -10, yMax = 10;
+    const xRange = xMax - xMin;
+    const yRange = yMax - yMin;
+    
+    // Helper to convert graph coordinates to canvas coordinates
+    const toCanvasX = (x) => padding + ((x - xMin) / xRange) * graphWidth;
+    const toCanvasY = (y) => padding + graphHeight - ((y - yMin) / yRange) * graphHeight;
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    
+    // X-axis
+    ctx.beginPath();
+    ctx.moveTo(padding, toCanvasY(0));
+    ctx.lineTo(width - padding, toCanvasY(0));
+    ctx.stroke();
+    
+    // Y-axis
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(0), padding);
+    ctx.lineTo(toCanvasX(0), height - padding);
+    ctx.stroke();
+    
+    // Draw grid lines
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1;
+    for (let x = xMin; x <= xMax; x++) {
+        if (x !== 0) {
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(x), padding);
+            ctx.lineTo(toCanvasX(x), height - padding);
+            ctx.stroke();
+        }
+    }
+    for (let y = yMin; y <= yMax; y++) {
+        if (y !== 0) {
+            ctx.beginPath();
+            ctx.moveTo(padding, toCanvasY(y));
+            ctx.lineTo(width - padding, toCanvasY(y));
+            ctx.stroke();
+        }
+    }
+    
+    // Draw line
+    if (line.kind === 'vertical') {
+        ctx.strokeStyle = '#0066cc';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(line.x0), padding);
+        ctx.lineTo(toCanvasX(line.x0), height - padding);
+        ctx.stroke();
+    } else {
+        ctx.strokeStyle = '#0066cc';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        let firstPoint = true;
+        for (let x = xMin; x <= xMax; x += 0.1) {
+            const y = line.m * x + line.b;
+            if (y >= yMin && y <= yMax) {
+                if (firstPoint) {
+                    ctx.moveTo(toCanvasX(x), toCanvasY(y));
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(toCanvasX(x), toCanvasY(y));
+                }
+            }
+        }
+        ctx.stroke();
+    }
+    
+    // Highlight intercepts
+    if (xIntercept !== null && xIntercept !== undefined) {
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath();
+        ctx.arc(toCanvasX(xIntercept), toCanvasY(0), 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = '12px Arial';
+        ctx.fillText(`(${xIntercept}, 0)`, toCanvasX(xIntercept) + 8, toCanvasY(0) - 8);
+    }
+    
+    if (yIntercept !== null && yIntercept !== undefined) {
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath();
+        ctx.arc(toCanvasX(0), toCanvasY(yIntercept), 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.font = '12px Arial';
+        ctx.fillText(`(0, ${yIntercept})`, toCanvasX(0) + 8, toCanvasY(yIntercept) - 8);
+    }
+    
+    // Draw axis labels
+    ctx.fillStyle = '#000';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('x', width - padding + 10, toCanvasY(0) + 5);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', toCanvasX(0) + 5, padding - 10);
+}
+
+// Intercept Calculation Functions
+function findXIntercept(line) {
+    if (line.kind === 'vertical') {
+        return line.x0; // x-intercept is the x-value itself
+    } else if (line.kind === 'slope') {
+        if (line.m === 0) {
+            return null; // Horizontal line has no x-intercept (unless y=0)
+        }
+        return -line.b / line.m;
+    }
+    return null;
+}
+
+function findYIntercept(line) {
+    if (line.kind === 'vertical') {
+        return null; // Vertical line has no y-intercept
+    } else if (line.kind === 'slope') {
+        return line.b;
+    }
+    return null;
+}
+
+// Rate of Change Calculation
+function calculateRateOfChange(table) {
+    const rates = [];
+    for (let i = 0; i < table.length - 1; i++) {
+        const deltaY = table[i + 1].y - table[i].y;
+        const deltaX = table[i + 1].x - table[i].x;
+        if (deltaX === 0) {
+            rates.push({ interval: `${table[i].x}-${table[i + 1].x}`, rate: null, undefined: true });
+        } else {
+            rates.push({ interval: `${table[i].x}-${table[i + 1].x}`, rate: deltaY / deltaX, undefined: false });
+        }
+    }
+    return rates;
+}
+
+function findGreatestRate(rates) {
+    let greatest = null;
+    let greatestValue = -Infinity;
+    for (const r of rates) {
+        if (!r.undefined && r.rate > greatestValue) {
+            greatestValue = r.rate;
+            greatest = r;
+        }
+    }
+    return greatest;
+}
+
+function findGreatestDecrease(rates) {
+    let greatest = null;
+    let greatestValue = Infinity;
+    for (const r of rates) {
+        if (!r.undefined && r.rate < greatestValue) {
+            greatestValue = r.rate;
+            greatest = r;
+        }
+    }
+    return greatest;
+}
+
+// Linear Function Detection
+function isLinearFunction(table) {
+    if (table.length < 2) return { isLinear: false, explanation: 'Need at least 2 points' };
+    
+    // Check if change in X is constant
+    const deltaX = table[1].x - table[0].x;
+    let constantDeltaX = true;
+    for (let i = 1; i < table.length - 1; i++) {
+        if (Math.abs((table[i + 1].x - table[i].x) - deltaX) > 0.001) {
+            constantDeltaX = false;
+            break;
+        }
+    }
+    
+    // Check if change in Y is constant
+    const deltaY = table[1].y - table[0].y;
+    let constantDeltaY = true;
+    for (let i = 1; i < table.length - 1; i++) {
+        if (Math.abs((table[i + 1].y - table[i].y) - deltaY) > 0.001) {
+            constantDeltaY = false;
+            break;
+        }
+    }
+    
+    // Check if ratio (change Y / change X) is constant
+    let constantRatio = true;
+    if (deltaX !== 0) {
+        const ratio = deltaY / deltaX;
+        for (let i = 1; i < table.length - 1; i++) {
+            const dx = table[i + 1].x - table[i].x;
+            const dy = table[i + 1].y - table[i].y;
+            if (dx === 0 || Math.abs((dy / dx) - ratio) > 0.001) {
+                constantRatio = false;
+                break;
+            }
+        }
+    } else {
+        constantRatio = false; // Can't have constant ratio if deltaX is 0
+    }
+    
+    const isLinear = constantDeltaX && (constantDeltaY || constantRatio);
+    let explanation = '';
+    if (isLinear) {
+        explanation = `A constant change of ${deltaX} in X corresponds with a constant change of ${deltaY} in Y`;
+    } else {
+        explanation = `The change in X or Y is not constant, so this is not a linear function`;
+    }
+    
+    return { isLinear, explanation };
+}
+
+// Standard Form Conversion
+function convertToStandardForm(eqStr) {
+    try {
+        const line = parseEquation(eqStr);
+        
+        // If already in a form we can work with
+        if (line.kind === 'vertical') {
+            return { equation: `x = ${line.x0}`, A: 1, B: 0, C: line.x0 };
+        } else if (line.kind === 'slope') {
+            // Convert y = mx + b to Ax + By = C
+            // y = mx + b => -mx + y = b => multiply by -1 if needed to make A positive
+            let A = -line.m;
+            let B = 1;
+            let C = line.b;
+            
+            // Multiply by -1 if A is negative (prefer positive A)
+            if (A < 0) {
+                A = -A;
+                B = -B;
+                C = -C;
+            }
+            
+            // Simplify to integers if possible
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const absA = Math.abs(A);
+            const absB = Math.abs(B);
+            const absC = Math.abs(C);
+            const commonFactor = gcd(gcd(absA, absB), absC);
+            
+            if (commonFactor > 1 && Number.isInteger(A / commonFactor) && 
+                Number.isInteger(B / commonFactor) && Number.isInteger(C / commonFactor)) {
+                A = A / commonFactor;
+                B = B / commonFactor;
+                C = C / commonFactor;
+            }
+            
+            // Format equation
+            let eqStr = '';
+            if (A === 1) eqStr += 'x';
+            else if (A === -1) eqStr += '-x';
+            else eqStr += `${A}x`;
+            
+            if (B === 1) eqStr += ' + y';
+            else if (B === -1) eqStr += ' - y';
+            else if (B > 0) eqStr += ` + ${B}y`;
+            else eqStr += ` - ${Math.abs(B)}y`;
+            
+            eqStr += ` = ${C}`;
+            
+            return { equation: eqStr, A, B, C };
+        }
+    } catch (error) {
+        throw new Error('Could not convert equation to standard form');
+    }
+}
+
+// Distractor Generation for New Types
+function generateInterceptDistractors(correctX, correctY, line) {
+    const distractors = [];
+    
+    // Wrong sign errors
+    if (correctX !== null) distractors.push(`(${-correctX}, 0)`);
+    if (correctY !== null) distractors.push(`(0, ${-correctY})`);
+    
+    // Calculation errors (small variations)
+    if (correctX !== null) distractors.push(`(${correctX + 1}, 0)`);
+    if (correctY !== null) distractors.push(`(0, ${correctY + 1})`);
+    
+    // Confusing x and y intercepts
+    if (correctX !== null && correctY !== null) {
+        distractors.push(`(${correctY}, 0)`);
+        distractors.push(`(0, ${correctX})`);
+    }
+    
+    return distractors.slice(0, 3);
+}
+
+function generateRateOfChangeDistractors(correctRate, rates) {
+    const distractors = [];
+    
+    // Wrong interval calculations
+    for (const r of rates) {
+        if (r.rate !== correctRate && r.rate !== null) {
+            distractors.push(r.rate);
+        }
+    }
+    
+    // Sign errors
+    if (correctRate !== null) {
+        distractors.push(-correctRate);
+    }
+    
+    // Calculation mistakes
+    if (correctRate !== null) {
+        distractors.push(correctRate + 1);
+        distractors.push(correctRate - 1);
+    }
+    
+    return distractors.slice(0, 3);
+}
+
+function generateLinearFunctionDistractors(isLinear) {
+    const distractors = [];
+    
+    if (isLinear) {
+        distractors.push('No - The change in X is not constant');
+        distractors.push('No - The change in Y is not constant');
+        distractors.push('No - This represents an exponential function');
+    } else {
+        distractors.push('Yes - A constant change in X corresponds with a constant change in Y');
+        distractors.push('Yes - The ratio of change Y to change X is constant');
+        distractors.push('Yes - This represents a linear relationship');
+    }
+    
+    return distractors.slice(0, 3);
+}
+
+function generateStandardFormDistractors(correctEq, correctA, correctB, correctC) {
+    const distractors = [];
+    
+    // Wrong signs
+    distractors.push(correctEq.replace(/\+/g, 'temp').replace(/-/g, '+').replace(/temp/g, '-'));
+    
+    // Wrong coefficients
+    distractors.push(correctEq.replace(correctA.toString(), (correctA + 1).toString()));
+    distractors.push(correctEq.replace(correctC.toString(), (correctC + 1).toString()));
+    
+    // Wrong form
+    distractors.push(`y = ${-correctA / correctB}x + ${correctC / correctB}`);
+    
+    return distractors.slice(0, 3);
+}
+
+// Handler Functions for New Problem Types
+let currentInterceptData = null;
+let currentRateOfChangeData = null;
+let currentLinearFunctionData = null;
+let currentStandardFormData = null;
+
+function handleInterceptCalculate() {
+    try {
+        const eqInput = document.getElementById('interceptEquationInput');
+        if (!eqInput) {
+            console.error('interceptEquationInput not found');
+            return;
+        }
+        
+        const eqStr = eqInput.value.trim();
+        if (!eqStr) {
+            showResult('Please enter an equation.', 'error');
+            return;
+        }
+        
+        const line = parseEquation(eqStr);
+        const xIntercept = findXIntercept(line);
+        const yIntercept = findYIntercept(line);
+        
+        // Store data for submission
+        currentInterceptData = { line, xIntercept, yIntercept, eqStr };
+        
+        // Draw graph
+        const graphContainer = document.getElementById('interceptGraphContainer');
+        if (graphContainer) {
+            graphContainer.style.setProperty('display', 'block', 'important');
+            drawGraph('interceptGraph', line, xIntercept, yIntercept);
+        }
+        
+        // Generate question (ask for both intercepts or one at a time)
+        const askForX = Math.random() > 0.5;
+        const interceptValue = askForX ? xIntercept : yIntercept;
+        const interceptType = askForX ? 'x' : 'y';
+        
+        if (interceptValue === null || interceptValue === undefined) {
+            // Ask for the other intercept
+            const otherValue = askForX ? yIntercept : xIntercept;
+            const otherType = askForX ? 'y' : 'x';
+            if (otherValue === null || otherValue === undefined) {
+                showResult('This line has no intercepts.', 'error');
+                return;
+            }
+            currentInterceptData.askFor = otherType;
+            currentInterceptData.correctValue = otherValue;
+            currentInterceptData.correctAnswer = `(0, ${otherValue})`;
+        } else {
+            currentInterceptData.askFor = interceptType;
+            currentInterceptData.correctValue = interceptValue;
+            currentInterceptData.correctAnswer = askForX ? `(${interceptValue}, 0)` : `(0, ${interceptValue})`;
+        }
+        
+        // Generate distractors
+        const distractors = generateInterceptDistractors(xIntercept, yIntercept, line);
+        
+        // Create options
+        const options = [
+            { label: 'A', value: currentInterceptData.correctAnswer, correct: true },
+            { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
+            { label: 'C', value: distractors[1] || '(1, 0)', correct: false },
+            { label: 'D', value: distractors[2] || '(0, 1)', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        currentInterceptData.correctLabel = options[correctIndex].label;
+        currentInterceptData.options = options;
+        
+        // Display question
+        PracticeMode.showContainer('interceptQuestionContainer', 'interceptSubmit');
+        const questionText = document.querySelector('#interceptQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `What is the ${currentInterceptData.askFor}-intercept of the line ${eqStr}?`;
+        }
+        PracticeMode.displayMultipleChoice('interceptOptions', options, 'intercept', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleInterceptSubmit() {
+    if (gameState.questionAnswered || !currentInterceptData) return;
+    
+    const selected = document.querySelector('input[name="intercept"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { intercept: selected.value };
+    const correctAnswers = { intercept: currentInterceptData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('intercept', selectedAnswers, correctAnswers, ['interceptOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult('Correct! ✓', 'success');
+        updateStats('intercept', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentInterceptData.correctAnswer} (${currentInterceptData.correctLabel})`, 'error');
+        updateStats('intercept', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+function handleRateOfChangeCalculate() {
+    try {
+        // Generate a random table
+        const tableSize = randomInt(4, 6);
+        const table = [];
+        const startX = randomInt(0, 5);
+        const startY = randomInt(0, 20);
+        const deltaX = randomInt(1, 3);
+        const deltaY = randomInt(-5, 5);
+        
+        for (let i = 0; i < tableSize; i++) {
+            table.push({ x: startX + i * deltaX, y: startY + i * deltaY });
+        }
+        
+        currentRateOfChangeData = { table };
+        
+        // Display table
+        displayTable('rateOfChangeTableContainer', table);
+        
+        // Calculate rates
+        const rates = calculateRateOfChange(table);
+        const askForGreatest = Math.random() > 0.5;
+        const targetRate = askForGreatest ? findGreatestRate(rates) : findGreatestDecrease(rates);
+        
+        if (!targetRate) {
+            handleRateOfChangeCalculate(); // Retry
+            return;
+        }
+        
+        currentRateOfChangeData.targetRate = targetRate;
+        currentRateOfChangeData.askForGreatest = askForGreatest;
+        currentRateOfChangeData.correctAnswer = targetRate.rate;
+        
+        // Generate distractors
+        const distractors = generateRateOfChangeDistractors(targetRate.rate, rates);
+        
+        // Create options
+        const options = [
+            { label: 'A', value: targetRate.rate.toString(), correct: true },
+            { label: 'B', value: (distractors[0] || 0).toString(), correct: false },
+            { label: 'C', value: (distractors[1] || 1).toString(), correct: false },
+            { label: 'D', value: (distractors[2] || -1).toString(), correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        currentRateOfChangeData.correctLabel = options[correctIndex].label;
+        currentRateOfChangeData.options = options;
+        
+        // Display question
+        PracticeMode.showContainer('rateOfChangeQuestionContainer', 'rateOfChangeSubmit');
+        const questionText = document.querySelector('#rateOfChangeQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `What is the rate of change for the interval with the ${askForGreatest ? 'greatest increase' : 'greatest decrease'}?`;
+        }
+        PracticeMode.displayMultipleChoice('rateOfChangeOptions', options, 'rateOfChange', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleRateOfChangeSubmit() {
+    if (gameState.questionAnswered || !currentRateOfChangeData) return;
+    
+    const selected = document.querySelector('input[name="rateOfChange"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { rateOfChange: selected.value };
+    const correctAnswers = { rateOfChange: currentRateOfChangeData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('rateOfChange', selectedAnswers, correctAnswers, ['rateOfChangeOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult('Correct! ✓', 'success');
+        updateStats('rateOfChange', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentRateOfChangeData.correctAnswer} (${currentRateOfChangeData.correctLabel})`, 'error');
+        updateStats('rateOfChange', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+function handleLinearFunctionCalculate() {
+    try {
+        // Generate a random table (linear or non-linear)
+        const isLinear = Math.random() > 0.5;
+        const tableSize = randomInt(4, 6);
+        const table = [];
+        
+        if (isLinear) {
+            const startX = randomInt(0, 5);
+            const startY = randomInt(0, 10);
+            const deltaX = randomInt(1, 3);
+            const deltaY = randomInt(-5, 5);
+            for (let i = 0; i < tableSize; i++) {
+                table.push({ x: startX + i * deltaX, y: startY + i * deltaY });
+            }
+        } else {
+            // Non-linear
+            const startX = randomInt(0, 5);
+            const startY = randomInt(0, 10);
+            for (let i = 0; i < tableSize; i++) {
+                table.push({ x: startX + i, y: startY + i * i }); // Quadratic
+            }
+        }
+        
+        const result = isLinearFunction(table);
+        currentLinearFunctionData = { table, result };
+        
+        // Display table
+        displayTable('linearFunctionTableContainer', table);
+        
+        // Generate distractors
+        const distractors = generateLinearFunctionDistractors(result.isLinear);
+        
+        // Create options
+        const correctAnswer = result.isLinear ? `Yes - ${result.explanation}` : `No - ${result.explanation}`;
+        const options = [
+            { label: 'A', value: correctAnswer, correct: true },
+            { label: 'B', value: distractors[0] || 'No', correct: false },
+            { label: 'C', value: distractors[1] || 'Yes', correct: false },
+            { label: 'D', value: distractors[2] || 'Maybe', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        currentLinearFunctionData.correctLabel = options[correctIndex].label;
+        currentLinearFunctionData.options = options;
+        currentLinearFunctionData.correctAnswer = correctAnswer;
+        
+        // Display question
+        PracticeMode.showContainer('linearFunctionQuestionContainer', 'linearFunctionSubmit');
+        const questionText = document.querySelector('#linearFunctionQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = 'Does the table represent a linear function? EXPLAIN.';
+        }
+        PracticeMode.displayMultipleChoice('linearFunctionOptions', options, 'linearFunction', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleLinearFunctionSubmit() {
+    if (gameState.questionAnswered || !currentLinearFunctionData) return;
+    
+    const selected = document.querySelector('input[name="linearFunction"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { linearFunction: selected.value };
+    const correctAnswers = { linearFunction: currentLinearFunctionData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('linearFunction', selectedAnswers, correctAnswers, ['linearFunctionOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult('Correct! ✓', 'success');
+        updateStats('linearFunction', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentLinearFunctionData.correctAnswer} (${currentLinearFunctionData.correctLabel})`, 'error');
+        updateStats('linearFunction', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+function handleStandardFormCalculate() {
+    try {
+        const eqInput = document.getElementById('standardFormInput');
+        if (!eqInput) {
+            console.error('standardFormInput not found');
+            return;
+        }
+        
+        const eqStr = eqInput.value.trim();
+        if (!eqStr) {
+            showResult('Please enter an equation.', 'error');
+            return;
+        }
+        
+        const result = convertToStandardForm(eqStr);
+        currentStandardFormData = { originalEq: eqStr, result };
+        
+        // Generate distractors
+        const distractors = generateStandardFormDistractors(result.equation, result.A, result.B, result.C);
+        
+        // Create options for equation
+        const options = [
+            { label: 'A', value: result.equation, correct: true },
+            { label: 'B', value: distractors[0] || 'x + y = 0', correct: false },
+            { label: 'C', value: distractors[1] || 'x - y = 0', correct: false },
+            { label: 'D', value: distractors[2] || 'y = x', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        currentStandardFormData.correctLabel = options[correctIndex].label;
+        currentStandardFormData.options = options;
+        
+        // Display question
+        PracticeMode.showContainer('standardFormQuestionContainer', 'standardFormSubmit');
+        const questionText = document.querySelector('#standardFormQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `Convert ${eqStr} to standard form (Ax + By = C):`;
+        }
+        PracticeMode.displayMultipleChoice('standardFormOptions', options, 'standardForm', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleStandardFormSubmit() {
+    if (gameState.questionAnswered || !currentStandardFormData) return;
+    
+    const selected = document.querySelector('input[name="standardForm"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { standardForm: selected.value };
+    const correctAnswers = { standardForm: currentStandardFormData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('standardForm', selectedAnswers, correctAnswers, ['standardFormOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult(`Correct! ✓ Standard form: ${currentStandardFormData.result.equation}`, 'success');
+        updateStats('standardForm', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentStandardFormData.result.equation} (${currentStandardFormData.correctLabel})`, 'error');
+        updateStats('standardForm', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+// Table Display Function
+function displayTable(containerId, table) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    let html = '<table class="data-table"><thead><tr><th>X</th><th>Y</th></tr></thead><tbody>';
+    for (const row of table) {
+        html += `<tr><td>${row.x}</td><td>${row.y}</td></tr>`;
+    }
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// Question Generators for Challenge Mode
+function generateInterceptQuestion() {
+    const types = ['slope-intercept', 'standard'];
+    const type = types[randomInt(0, types.length - 1)];
+    
+    let line, eqStr;
+    if (type === 'slope-intercept') {
+        const m = randomInt(-5, 5) || 1;
+        const b = randomInt(-10, 10);
+        line = { kind: 'slope', m, b };
+        eqStr = formatEquation(line);
+    } else {
+        const A = randomInt(-5, 5) || 1;
+        const B = randomInt(-5, 5) || 1;
+        const C = randomInt(-20, 20);
+        line = { kind: 'slope', m: -A/B, b: C/B };
+        eqStr = `${A}x + ${B}y = ${C}`;
+    }
+    
+    const xIntercept = findXIntercept(line);
+    const yIntercept = findYIntercept(line);
+    const askForX = Math.random() > 0.5;
+    const interceptValue = askForX ? xIntercept : yIntercept;
+    
+    if (interceptValue === null) {
+        return generateInterceptQuestion(); // Retry
+    }
+    
+    const correctAnswer = askForX ? `(${interceptValue}, 0)` : `(0, ${interceptValue})`;
+    const distractors = generateInterceptDistractors(xIntercept, yIntercept, line);
+    
+    const options = [
+        { label: 'A', value: correctAnswer, correct: true },
+        { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
+        { label: 'C', value: distractors[1] || '(1, 0)', correct: false },
+        { label: 'D', value: distractors[2] || '(0, 1)', correct: false }
+    ].sort(() => Math.random() - 0.5);
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    return {
+        type: 'intercept',
+        question: `What is the ${askForX ? 'x' : 'y'}-intercept of the line ${eqStr}?`,
+        display: eqStr,
+        correctAnswer: `${correctAnswer} (${correctLabel})`,
+        data: { line, xIntercept, yIntercept },
+        options: options,
+        correctAnswerLabel: correctLabel
+    };
+}
+
+function generateRateOfChangeQuestion() {
+    const tableSize = randomInt(4, 6);
+    const table = [];
+    const startX = randomInt(0, 5);
+    const startY = randomInt(0, 20);
+    const deltaX = randomInt(1, 3);
+    const deltaY = randomInt(-5, 5);
+    
+    for (let i = 0; i < tableSize; i++) {
+        table.push({ x: startX + i * deltaX, y: startY + i * deltaY });
+    }
+    
+    const rates = calculateRateOfChange(table);
+    const askForGreatest = Math.random() > 0.5;
+    const targetRate = askForGreatest ? findGreatestRate(rates) : findGreatestDecrease(rates);
+    
+    if (!targetRate) {
+        return generateRateOfChangeQuestion(); // Retry
+    }
+    
+    const distractors = generateRateOfChangeDistractors(targetRate.rate, rates);
+    const options = [
+        { label: 'A', value: targetRate.rate.toString(), correct: true },
+        { label: 'B', value: (distractors[0] || 0).toString(), correct: false },
+        { label: 'C', value: (distractors[1] || 1).toString(), correct: false },
+        { label: 'D', value: (distractors[2] || -1).toString(), correct: false }
+    ].sort(() => Math.random() - 0.5);
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    return {
+        type: 'rateOfChange',
+        question: `During which time interval did the volume ${askForGreatest ? 'increase' : 'decrease'} at the greatest rate?`,
+        display: table,
+        correctAnswer: `${targetRate.rate} (${correctLabel})`,
+        data: { table, rates, targetRate },
+        options: options,
+        correctAnswerLabel: correctLabel
+    };
+}
+
+function generateLinearFunctionQuestion() {
+    const isLinear = Math.random() > 0.5;
+    const tableSize = randomInt(4, 6);
+    const table = [];
+    
+    if (isLinear) {
+        const startX = randomInt(0, 5);
+        const startY = randomInt(0, 10);
+        const deltaX = randomInt(1, 3);
+        const deltaY = randomInt(-5, 5);
+        for (let i = 0; i < tableSize; i++) {
+            table.push({ x: startX + i * deltaX, y: startY + i * deltaY });
+        }
+    } else {
+        const startX = randomInt(0, 5);
+        const startY = randomInt(0, 10);
+        for (let i = 0; i < tableSize; i++) {
+            table.push({ x: startX + i, y: startY + i * i });
+        }
+    }
+    
+    const result = isLinearFunction(table);
+    const distractors = generateLinearFunctionDistractors(result.isLinear);
+    const correctAnswer = result.isLinear ? `Yes - ${result.explanation}` : `No - ${result.explanation}`;
+    
+    const options = [
+        { label: 'A', value: correctAnswer, correct: true },
+        { label: 'B', value: distractors[0] || 'No', correct: false },
+        { label: 'C', value: distractors[1] || 'Yes', correct: false },
+        { label: 'D', value: distractors[2] || 'Maybe', correct: false }
+    ].sort(() => Math.random() - 0.5);
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    return {
+        type: 'linearFunction',
+        question: 'Does the table represent a linear function? EXPLAIN.',
+        display: table,
+        correctAnswer: `${correctAnswer} (${correctLabel})`,
+        data: { table, result },
+        options: options,
+        correctAnswerLabel: correctLabel
+    };
+}
+
+function generateStandardFormQuestion() {
+    const types = ['slope-intercept'];
+    const type = types[randomInt(0, types.length - 1)];
+    
+    let eqStr;
+    if (type === 'slope-intercept') {
+        const m = randomInt(-5, 5) || 1;
+        const b = randomInt(-10, 10);
+        const line = { kind: 'slope', m, b };
+        eqStr = formatEquation(line);
+    }
+    
+    const result = convertToStandardForm(eqStr);
+    const distractors = generateStandardFormDistractors(result.equation, result.A, result.B, result.C);
+    
+    const options = [
+        { label: 'A', value: result.equation, correct: true },
+        { label: 'B', value: distractors[0] || 'x + y = 0', correct: false },
+        { label: 'C', value: distractors[1] || 'x - y = 0', correct: false },
+        { label: 'D', value: distractors[2] || 'y = x', correct: false }
+    ].sort(() => Math.random() - 0.5);
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    return {
+        type: 'standardForm',
+        question: `Convert ${eqStr} to standard form (Ax + By = C):`,
+        display: eqStr,
+        correctAnswer: `${result.equation} (${correctLabel})`,
+        data: { originalEq: eqStr, result },
+        options: options,
+        correctAnswerLabel: correctLabel
+    };
+}
+
 // LocalStorage Functions
 function saveGameState() {
     const stateToSave = {
@@ -2781,6 +3891,44 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('perpendicularSubmit')?.addEventListener('click', () => {
         handlePerpendicularSubmit();
+    });
+    
+    // New problem types - Calculate buttons
+    document.getElementById('interceptCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleInterceptCalculate();
+    });
+    
+    document.getElementById('rateOfChangeCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleRateOfChangeCalculate();
+    });
+    
+    document.getElementById('linearFunctionCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleLinearFunctionCalculate();
+    });
+    
+    document.getElementById('standardFormCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleStandardFormCalculate();
+    });
+    
+    // New problem types - Submit buttons
+    document.getElementById('interceptSubmit')?.addEventListener('click', () => {
+        handleInterceptSubmit();
+    });
+    
+    document.getElementById('rateOfChangeSubmit')?.addEventListener('click', () => {
+        handleRateOfChangeSubmit();
+    });
+    
+    document.getElementById('linearFunctionSubmit')?.addEventListener('click', () => {
+        handleLinearFunctionSubmit();
+    });
+    
+    document.getElementById('standardFormSubmit')?.addEventListener('click', () => {
+        handleStandardFormSubmit();
     });
     
     // Start timer on input and reset question answered flag when input changes
