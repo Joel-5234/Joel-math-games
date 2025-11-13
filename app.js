@@ -294,6 +294,91 @@ function randomFloat(min, max, decimals = 1) {
     return roundToDecimal(num, decimals);
 }
 
+// Distractor Generation Functions for Multiple Choice
+function generateSlopeDistractors(correctSlope) {
+    const distractors = new Set();
+    const correct = correctSlope === Infinity ? 'undefined' : roundToDecimal(correctSlope, 1).toString();
+    
+    // Generate wrong answers: wrong sign, calculation errors, common mistakes
+    while (distractors.size < 3) {
+        let distractor;
+        if (correctSlope === Infinity) {
+            // For vertical lines, wrong answers are numeric slopes
+            distractor = roundToDecimal(randomFloat(-5, 5), 1).toString();
+        } else if (correctSlope === 0) {
+            // For horizontal lines, wrong answers are non-zero slopes
+            const val = randomInt(-5, 5) || 1;
+            distractor = val.toString();
+        } else {
+            // Common mistakes: wrong sign, off by small amount, reciprocal
+            const mistakeType = randomInt(0, 2);
+            if (mistakeType === 0) {
+                // Wrong sign
+                distractor = roundToDecimal(-correctSlope, 1).toString();
+            } else if (mistakeType === 1) {
+                // Off by small amount
+                distractor = roundToDecimal(correctSlope + randomFloat(-1, 1), 1).toString();
+            } else {
+                // Reciprocal or other calculation error
+                distractor = correctSlope !== 0 ? roundToDecimal(1 / correctSlope, 1).toString() : '1';
+            }
+        }
+        
+        if (distractor !== correct && !distractors.has(distractor)) {
+            distractors.add(distractor);
+        }
+    }
+    
+    return Array.from(distractors);
+}
+
+function generateClassificationDistractors(correctClassification) {
+    const allClassifications = ['rising', 'falling', 'horizontal', 'vertical'];
+    const distractors = allClassifications.filter(c => c !== correctClassification);
+    // Shuffle and take 3
+    return distractors.sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function generateRelationshipDistractors(correctRelationship) {
+    const allRelationships = ['parallel', 'perpendicular', 'neither', 'same'];
+    const distractors = allRelationships.filter(r => r !== correctRelationship);
+    // Shuffle and take 3
+    return distractors.sort(() => Math.random() - 0.5).slice(0, 3);
+}
+
+function generateEquationDistractors(correctLine, baseLine, point, isParallel) {
+    const distractors = [];
+    const correctEq = formatEquation(correctLine);
+    
+    while (distractors.length < 3) {
+        let wrongLine;
+        
+        if (correctLine.kind === 'vertical') {
+            // Wrong vertical line (different x)
+            wrongLine = { kind: 'vertical', x0: correctLine.x0 + randomInt(-3, 3) || 1 };
+        } else if (correctLine.kind === 'slope') {
+            const mistakeType = randomInt(0, 2);
+            if (mistakeType === 0 && !isParallel) {
+                // Wrong slope (use parallel slope instead of perpendicular)
+                wrongLine = { kind: 'slope', m: baseLine.m, b: point.y - baseLine.m * point.x };
+            } else if (mistakeType === 1) {
+                // Wrong intercept
+                wrongLine = { kind: 'slope', m: correctLine.m, b: correctLine.b + randomInt(-3, 3) || 1 };
+            } else {
+                // Wrong slope (close but incorrect)
+                wrongLine = { kind: 'slope', m: correctLine.m + randomFloat(-0.5, 0.5), b: point.y - (correctLine.m + randomFloat(-0.5, 0.5)) * point.x };
+            }
+        }
+        
+        const wrongEq = formatEquation(wrongLine);
+        if (wrongEq !== correctEq && !distractors.includes(wrongEq)) {
+            distractors.push(wrongEq);
+        }
+    }
+    
+    return distractors;
+}
+
 // Question Generation Functions for Set Challenge Mode
 function generateSlopeQuestion() {
     let p1, p2;
@@ -307,16 +392,50 @@ function generateSlopeQuestion() {
     } while (p1.x === p2.x && p1.y === p2.y && attempts < 100);
     
     const result = calculateSlope(p1, p2);
-    const correctAnswer = result.slope === Infinity 
-        ? `Slope: Undefined (Vertical Line)\nClassification: ${result.classification}`
-        : `Slope: ${result.slope}\nClassification: ${result.classification}`;
+    
+    // Generate two separate questions: slope value and classification
+    const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
+    const slopeDistractors = generateSlopeDistractors(result.slope);
+    const classificationDistractors = generateClassificationDistractors(result.classification);
+    
+    // Create options for slope question
+    const slopeOptions = [
+        { label: 'A', value: slopeValue, correct: true },
+        { label: 'B', value: slopeDistractors[0], correct: false },
+        { label: 'C', value: slopeDistractors[1], correct: false },
+        { label: 'D', value: slopeDistractors[2], correct: false }
+    ].sort(() => Math.random() - 0.5); // Shuffle options
+    
+    const correctSlopeIndex = slopeOptions.findIndex(opt => opt.correct);
+    const correctSlopeLabel = slopeOptions[correctSlopeIndex].label;
+    
+    // Create options for classification question
+    const classificationOptions = [
+        { label: 'A', value: result.classification, correct: true },
+        { label: 'B', value: classificationDistractors[0], correct: false },
+        { label: 'C', value: classificationDistractors[1], correct: false },
+        { label: 'D', value: classificationDistractors[2], correct: false }
+    ].sort(() => Math.random() - 0.5); // Shuffle options
+    
+    const correctClassificationIndex = classificationOptions.findIndex(opt => opt.correct);
+    const correctClassificationLabel = classificationOptions[correctClassificationIndex].label;
     
     return {
         type: 'slope',
         question: `Find the slope and classification for the line through points (${p1.x},${p1.y}) and (${p2.x},${p2.y})`,
         display: `(${p1.x},${p1.y}), (${p2.x},${p2.y})`,
-        correctAnswer: correctAnswer,
-        data: { p1, p2, result }
+        correctAnswer: `Slope: ${slopeValue} (${correctSlopeLabel})\nClassification: ${result.classification} (${correctClassificationLabel})`,
+        data: { p1, p2, result },
+        slopeQuestion: {
+            question: `What is the slope?`,
+            options: slopeOptions,
+            correctAnswer: correctSlopeLabel
+        },
+        classificationQuestion: {
+            question: `What is the classification?`,
+            options: classificationOptions,
+            correctAnswer: correctClassificationLabel
+        }
     };
 }
 
@@ -383,14 +502,29 @@ function generateRelationshipQuestion() {
     }
     
     const relationship = determineRelationship(line1, line2);
-    const correctAnswer = `Equation 1: ${formatEquation(line1)}\nEquation 2: ${formatEquation(line2)}\nRelationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
+    const relationshipDistractors = generateRelationshipDistractors(relationship);
+    
+    // Create options for relationship question
+    const options = [
+        { label: 'A', value: relationship, correct: true },
+        { label: 'B', value: relationshipDistractors[0], correct: false },
+        { label: 'C', value: relationshipDistractors[1], correct: false },
+        { label: 'D', value: relationshipDistractors[2], correct: false }
+    ].sort(() => Math.random() - 0.5); // Shuffle options
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    const correctAnswer = `Equation 1: ${formatEquation(line1)}\nEquation 2: ${formatEquation(line2)}\nRelationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)} (${correctLabel})`;
     
     return {
         type: 'relationship',
         question: `Determine the relationship between the two lines`,
         display: { eq1: eq1Str, eq2: eq2Str },
         correctAnswer: correctAnswer,
-        data: { line1, line2, relationship }
+        data: { line1, line2, relationship },
+        options: options,
+        correctAnswerLabel: correctLabel
     };
 }
 
@@ -420,14 +554,30 @@ function generateParallelQuestion() {
     const point = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
     
     const resultLine = findParallelLine(baseLine, point);
-    const correctAnswer = `Parallel line: ${formatEquation(resultLine)}`;
+    const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, true);
+    const correctEq = formatEquation(resultLine);
+    
+    // Create options for parallel question
+    const options = [
+        { label: 'A', value: correctEq, correct: true },
+        { label: 'B', value: equationDistractors[0], correct: false },
+        { label: 'C', value: equationDistractors[1], correct: false },
+        { label: 'D', value: equationDistractors[2], correct: false }
+    ].sort(() => Math.random() - 0.5); // Shuffle options
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    const correctAnswer = `Parallel line: ${correctEq} (${correctLabel})`;
     
     return {
         type: 'parallel',
         question: `Find the equation of a line parallel to ${baseEqStr} that passes through point (${point.x},${point.y})`,
         display: { equation: baseEqStr, point: `(${point.x},${point.y})` },
         correctAnswer: correctAnswer,
-        data: { baseLine, point, resultLine }
+        data: { baseLine, point, resultLine },
+        options: options,
+        correctAnswerLabel: correctLabel
     };
 }
 
@@ -457,14 +607,30 @@ function generatePerpendicularQuestion() {
     const point = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
     
     const resultLine = findPerpendicularLine(baseLine, point);
-    const correctAnswer = `Perpendicular line: ${formatEquation(resultLine)}`;
+    const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, false);
+    const correctEq = formatEquation(resultLine);
+    
+    // Create options for perpendicular question
+    const options = [
+        { label: 'A', value: correctEq, correct: true },
+        { label: 'B', value: equationDistractors[0], correct: false },
+        { label: 'C', value: equationDistractors[1], correct: false },
+        { label: 'D', value: equationDistractors[2], correct: false }
+    ].sort(() => Math.random() - 0.5); // Shuffle options
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    const correctAnswer = `Perpendicular line: ${correctEq} (${correctLabel})`;
     
     return {
         type: 'perpendicular',
         question: `Find the equation of a line perpendicular to ${baseEqStr} that passes through point (${point.x},${point.y})`,
         display: { equation: baseEqStr, point: `(${point.x},${point.y})` },
         correctAnswer: correctAnswer,
-        data: { baseLine, point, resultLine }
+        data: { baseLine, point, resultLine },
+        options: options,
+        correctAnswerLabel: correctLabel
     };
 }
 
