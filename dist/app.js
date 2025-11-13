@@ -3675,9 +3675,53 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGameState();
     updateUI();
     
+    // Mobile Menu Toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+    const navSidebar = document.querySelector('.nav-sidebar');
+    
+    function toggleMobileMenu() {
+        if (navSidebar && mobileMenuToggle && mobileMenuOverlay) {
+            navSidebar.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+            mobileMenuOverlay.classList.toggle('active');
+        }
+    }
+    
+    function closeMobileMenu() {
+        if (navSidebar && mobileMenuToggle && mobileMenuOverlay) {
+            navSidebar.classList.remove('active');
+            mobileMenuToggle.classList.remove('active');
+            mobileMenuOverlay.classList.remove('active');
+        }
+    }
+    
+    if (mobileMenuToggle) {
+        mobileMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMobileMenu();
+        });
+    }
+    
+    if (mobileMenuOverlay) {
+        mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+    }
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (navSidebar && navSidebar.classList.contains('active')) {
+            if (!navSidebar.contains(e.target) && e.target !== mobileMenuToggle) {
+                closeMobileMenu();
+            }
+        }
+    });
+    
     // Tab switching
     document.querySelectorAll('.tab-button').forEach(button => {
         button.addEventListener('click', () => {
+            // Close mobile menu when tab is selected
+            closeMobileMenu();
+            
             // Don't allow tab switching during active challenge
             if (challengeState.active) {
                 return;

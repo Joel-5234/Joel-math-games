@@ -272,13 +272,18 @@ a) Header
 • App title
 • Current mode (Practice, Challenge, Session)
 • Score, streak, timer display
-b) Main content
-• Tabbed or segmented controls for the nine question types
+b) Navigation
+• Vertical sidebar navigation on the left (desktop)
+• Fixed width sidebar (220-250px) with all nine problem type tabs
+• Active tab indicated by left border highlight
+• Mobile/tablet: Collapsible dropdown menu with hamburger icon
+c) Main content
+• Problem type panels displayed based on selected tab
 • Input fields and action buttons per tab
 • Result panel with text feedback
 • Interactive graph display for intercept problems
 • Table display for rate of change and linear function problems
-c) Right or bottom panel
+d) Right sidebar
 • Timer details
 • Achievements and status summary
 • Basic help text
@@ -493,4 +498,17 @@ d) All new problem types use multiple choice format
 e) Consistent with existing problem type patterns and UI
 f) Integrated into all game modes (Practice, Challenge, Session)
 g) Hint system support for all new types
+
+10.12 Vertical Navigation Bar
+a) Convert horizontal tab navigation to vertical sidebar
+b) Left sidebar navigation with fixed width (220-250px)
+c) Vertical tab buttons with left border active indicator
+d) Maintains current grid layout structure
+e) Responsive design:
+   - Desktop: Vertical sidebar visible
+   - Tablet/Mobile: Collapsible dropdown menu
+   - Hamburger menu icon for mobile
+   - Dropdown closes when tab is selected
+f) All 9 problem type tabs accessible in sidebar
+g) Smooth transitions and hover effects maintained
 
