@@ -38,7 +38,7 @@
     {
       "id": "006",
       "description": "Multiple choice not appearing in Practice and Session modes",
-      "status": "in_progress",
+      "status": "fixed",
       "filename": "issue-006-20251113-013706.md",
       "date": "2025-11-13T01:37:06"
     }
