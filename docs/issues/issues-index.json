@@ -48,6 +48,13 @@
       "status": "fixed",
       "filename": "issue-007-20251113-015000.md",
       "date": "2025-11-13T01:50:00"
+    },
+    {
+      "id": "008",
+      "description": "Vertical navigation sidebar not showing on desktop",
+      "status": "fixed",
+      "filename": "issue-008-20251112-210620.md",
+      "date": "2025-11-12T21:06:20"
     }
   ]
 }
