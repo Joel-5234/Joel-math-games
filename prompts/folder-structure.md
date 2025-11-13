@@ -3,6 +3,10 @@
 ./
     - config.json or appsettings.json (depending on the tech stack; application configuration file)
     - .cursorrules: rules for the ai coding assistant
+./.cursor/commands/
+    - fix.md: content of ./prompts/fix.md
+    - new.md: content of ./prompts/new.md
+    - proceed.md: content of ./prompts/proceed.md
 - ./docs
     - prd.md: product requirements document
     - ideas.md: user's idea/input

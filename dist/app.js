@@ -1870,11 +1870,17 @@ function resetQuestionState() {
 
 // Problem Type Handlers
 function handleSlopeCalculate() {
-    const input = document.getElementById('slopeInput').value.trim();
+    const input = document.getElementById('slopeInput');
+    if (!input) {
+        console.error('slopeInput element not found');
+        return;
+    }
+    
+    const inputValue = input.value.trim();
     
     try {
         const pointSeparator = /\)\s*,\s*\(/;
-        const parts = input.split(pointSeparator);
+        const parts = inputValue.split(pointSeparator);
         
         if (parts.length !== 2) {
             throw new Error('Please enter two points in the format: (x1,y1), (x2,y2)');
@@ -1920,20 +1926,36 @@ function handleSlopeCalculate() {
             correctClassificationLabel: classificationOptions.find(opt => opt.correct).label
         };
         
-        // Display questions
-        document.getElementById('slopeQuestionsContainer').style.display = 'block';
-        document.getElementById('slopeValueQuestion').querySelector('.question-text').textContent = 'What is the slope?';
-        document.getElementById('slopeClassificationQuestion').querySelector('.question-text').textContent = 'What is the classification?';
+        // Display questions - ensure elements exist
+        const container = document.getElementById('slopeQuestionsContainer');
+        const valueQuestion = document.getElementById('slopeValueQuestion');
+        const classificationQuestion = document.getElementById('slopeClassificationQuestion');
+        const submitBtn = document.getElementById('slopeSubmit');
+        const resultArea = document.getElementById('slopeResult');
+        
+        if (!container || !valueQuestion || !classificationQuestion || !submitBtn || !resultArea) {
+            console.error('Required elements not found for slope questions');
+            showResult('Error: UI elements not found. Please refresh the page.', 'error');
+            return;
+        }
+        
+        container.style.display = 'block';
+        const valueText = valueQuestion.querySelector('.question-text');
+        const classificationText = classificationQuestion.querySelector('.question-text');
+        
+        if (valueText) valueText.textContent = 'What is the slope?';
+        if (classificationText) classificationText.textContent = 'What is the classification?';
         
         renderRadioOptions('slopeValueOptions', slopeOptions, 'slopeValue', null);
         renderRadioOptions('slopeClassificationOptions', classificationOptions, 'slopeClassification', null);
         
-        document.getElementById('slopeSubmit').style.display = 'block';
-        document.getElementById('slopeResult').textContent = '';
-        document.getElementById('slopeResult').className = 'result-area';
+        submitBtn.style.display = 'block';
+        resultArea.textContent = '';
+        resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
     } catch (error) {
+        console.error('Error in handleSlopeCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -2000,8 +2022,16 @@ function handleSlopeSubmit() {
 }
 
 function handleRelationshipCalculate() {
-    const eq1 = document.getElementById('equation1Input').value.trim();
-    const eq2 = document.getElementById('equation2Input').value.trim();
+    const eq1Input = document.getElementById('equation1Input');
+    const eq2Input = document.getElementById('equation2Input');
+    
+    if (!eq1Input || !eq2Input) {
+        console.error('Equation input elements not found');
+        return;
+    }
+    
+    const eq1 = eq1Input.value.trim();
+    const eq2 = eq2Input.value.trim();
     
     try {
         const line1 = parseEquation(eq1);
@@ -2024,15 +2054,29 @@ function handleRelationshipCalculate() {
             correctLabel: correctLabel
         };
         
-        document.getElementById('relationshipQuestionContainer').style.display = 'block';
-        document.querySelector('#relationshipQuestionContainer .question-text').textContent = 'What is the relationship between these two lines?';
+        const container = document.getElementById('relationshipQuestionContainer');
+        const submitBtn = document.getElementById('relationshipSubmit');
+        const resultArea = document.getElementById('relationshipResult');
+        
+        if (!container || !submitBtn || !resultArea) {
+            console.error('Required elements not found for relationship questions');
+            showResult('Error: UI elements not found. Please refresh the page.', 'error');
+            return;
+        }
+        
+        container.style.display = 'block';
+        const questionText = container.querySelector('.question-text');
+        if (questionText) {
+            questionText.textContent = 'What is the relationship between these two lines?';
+        }
         renderRadioOptions('relationshipOptions', options, 'relationship', null);
-        document.getElementById('relationshipSubmit').style.display = 'block';
-        document.getElementById('relationshipResult').textContent = '';
-        document.getElementById('relationshipResult').className = 'result-area';
+        submitBtn.style.display = 'block';
+        resultArea.textContent = '';
+        resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
     } catch (error) {
+        console.error('Error in handleRelationshipCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -2076,8 +2120,16 @@ function handleRelationshipSubmit() {
 }
 
 function handleParallelCalculate() {
-    const equation = document.getElementById('parallelEquationInput').value.trim();
-    const pointStr = document.getElementById('parallelPointInput').value.trim();
+    const equationInput = document.getElementById('parallelEquationInput');
+    const pointInput = document.getElementById('parallelPointInput');
+    
+    if (!equationInput || !pointInput) {
+        console.error('Parallel input elements not found');
+        return;
+    }
+    
+    const equation = equationInput.value.trim();
+    const pointStr = pointInput.value.trim();
     
     try {
         const baseLine = parseEquation(equation);
@@ -2101,15 +2153,29 @@ function handleParallelCalculate() {
             correctLabel: correctLabel
         };
         
-        document.getElementById('parallelQuestionContainer').style.display = 'block';
-        document.querySelector('#parallelQuestionContainer .question-text').textContent = 'Which equation represents a line parallel to the base line that passes through the given point?';
+        const container = document.getElementById('parallelQuestionContainer');
+        const submitBtn = document.getElementById('parallelSubmit');
+        const resultArea = document.getElementById('parallelResult');
+        
+        if (!container || !submitBtn || !resultArea) {
+            console.error('Required elements not found for parallel questions');
+            showResult('Error: UI elements not found. Please refresh the page.', 'error');
+            return;
+        }
+        
+        container.style.display = 'block';
+        const questionText = container.querySelector('.question-text');
+        if (questionText) {
+            questionText.textContent = 'Which equation represents a line parallel to the base line that passes through the given point?';
+        }
         renderRadioOptions('parallelOptions', options, 'parallel', null);
-        document.getElementById('parallelSubmit').style.display = 'block';
-        document.getElementById('parallelResult').textContent = '';
-        document.getElementById('parallelResult').className = 'result-area';
+        submitBtn.style.display = 'block';
+        resultArea.textContent = '';
+        resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
     } catch (error) {
+        console.error('Error in handleParallelCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -2153,8 +2219,16 @@ function handleParallelSubmit() {
 }
 
 function handlePerpendicularCalculate() {
-    const equation = document.getElementById('perpendicularEquationInput').value.trim();
-    const pointStr = document.getElementById('perpendicularPointInput').value.trim();
+    const equationInput = document.getElementById('perpendicularEquationInput');
+    const pointInput = document.getElementById('perpendicularPointInput');
+    
+    if (!equationInput || !pointInput) {
+        console.error('Perpendicular input elements not found');
+        return;
+    }
+    
+    const equation = equationInput.value.trim();
+    const pointStr = pointInput.value.trim();
     
     try {
         const baseLine = parseEquation(equation);
@@ -2178,15 +2252,29 @@ function handlePerpendicularCalculate() {
             correctLabel: correctLabel
         };
         
-        document.getElementById('perpendicularQuestionContainer').style.display = 'block';
-        document.querySelector('#perpendicularQuestionContainer .question-text').textContent = 'Which equation represents a line perpendicular to the base line that passes through the given point?';
+        const container = document.getElementById('perpendicularQuestionContainer');
+        const submitBtn = document.getElementById('perpendicularSubmit');
+        const resultArea = document.getElementById('perpendicularResult');
+        
+        if (!container || !submitBtn || !resultArea) {
+            console.error('Required elements not found for perpendicular questions');
+            showResult('Error: UI elements not found. Please refresh the page.', 'error');
+            return;
+        }
+        
+        container.style.display = 'block';
+        const questionText = container.querySelector('.question-text');
+        if (questionText) {
+            questionText.textContent = 'Which equation represents a line perpendicular to the base line that passes through the given point?';
+        }
         renderRadioOptions('perpendicularOptions', options, 'perpendicular', null);
-        document.getElementById('perpendicularSubmit').style.display = 'block';
-        document.getElementById('perpendicularResult').textContent = '';
-        document.getElementById('perpendicularResult').className = 'result-area';
+        submitBtn.style.display = 'block';
+        resultArea.textContent = '';
+        resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
     } catch (error) {
+        console.error('Error in handlePerpendicularCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }

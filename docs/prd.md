@@ -23,13 +23,18 @@ c) Teachers projecting the app in class to walk through examples live.
 4.1 Slope and line description
 Input
 • Text field for two points in the format (x1,y1),(x2,y2)
+• Two separate multiple choice questions:
+  - Question 1: "What is the slope?" (4 options: A, B, C, D)
+  - Question 2: "What is the classification?" (4 options: A, B, C, D)
 Behavior
 • Parse both points
 • Validate numeric inputs and non-identical points
 • Compute slope, then classify as rising, falling, horizontal, or vertical
+• Generate 3 plausible wrong answers (distractors) for each question
+• Display as radio button multiple choice
 Output
-• Show slope as a rounded number
-• Show classification text
+• Show slope as a rounded number in multiple choice format
+• Show classification text in multiple choice format
 • Mark answer status for gamification (correct vs error due to bad input)
 
 4.2 Relationship between two lines
@@ -40,41 +45,52 @@ Input
 	•	Ax + By = C
 	•	x = c
 	•	y = c
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options: parallel, perpendicular, neither, same
 Behavior
 • Parse each equation into normalized form
 	•	Vertical: kind = vertical, x0 = c
 	•	Non vertical: kind = slope, m, b
 • Determine relationship: parallel, perpendicular, or neither
+• Generate 3 plausible wrong answers (distractors)
 Output
 • Display normalized form for each line
-• Display relationship result
+• Display relationship result as multiple choice
 
 4.3 Parallel line through a point
 Input
 • One text field for base equation
 • One text field for point in format (x,y)
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options show full equations (e.g., "y = 2x + 3", "y = 2x - 5", etc.)
 Behavior
 • Parse equation to get slope or vertical type
 • Compute line parallel to base that passes through the point
 	•	If base is vertical, result is x = x0 for the given x
 	•	If base is non vertical, reuse slope and compute b from the point
+• Generate 3 plausible wrong equations (distractors)
 Output
 • Display final equation in slope intercept form when possible
 • For vertical, display x = c
+• Show as multiple choice with full equation options
 
 4.4 Perpendicular line through a point
 Input
 • One text field for base equation
 • One text field for point in format (x,y)
+• Multiple choice answer: 4 radio button options (A, B, C, D)
+  - Options show full equations (e.g., "y = -0.5x + 5", "y = -0.5x - 3", etc.)
 Behavior
 • Parse equation
 • Compute perpendicular line
 	•	If base is vertical, result is horizontal y = y0
 	•	If base is horizontal, result is vertical x = x0
 	•	Otherwise slope is negative reciprocal and b computed from the point
+• Generate 3 plausible wrong equations (distractors)
 Output
 • Display final equation in slope intercept form when possible
 • For vertical, display x = c
+• Show as multiple choice with full equation options
 
 	5.	Gamification features
 
@@ -326,4 +342,16 @@ b) "Test Confetti" button triggers confetti animation
 c) "Test Fireworks" button triggers fireworks animation
 d) Buttons clearly labeled as test buttons
 e) Available in all modes for testing and demonstration
+
+10.8 Multiple Choice Answer Format
+a) All problem types use multiple choice format (4 options: A, B, C, D)
+b) Radio buttons replace text input fields
+c) Slope questions split into two separate questions:
+   - Question 1: "What is the slope?" (4 options)
+   - Question 2: "What is the classification?" (4 options)
+d) Wrong answers (distractors) are common mistakes, mathematically plausible but incorrect
+e) Full equations shown as options for parallel/perpendicular questions
+f) Available in all modes (Practice, Challenge, Session)
+g) Answer validation simplified to direct option comparison
+h) Visual feedback: correct option highlighted in green, wrong selection in red
 

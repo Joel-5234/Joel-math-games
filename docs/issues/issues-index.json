@@ -27,6 +27,13 @@
       "status": "fixed",
       "filename": "issue-004-20251109-203000.md",
       "date": "2025-11-09T20:30:00"
+    },
+    {
+      "id": "005",
+      "description": "Practice and Session modes missing multiple choice",
+      "status": "fixed",
+      "filename": "issue-005-20251112-194712.md",
+      "date": "2025-11-12T19:47:12"
     }
   ]
 }
