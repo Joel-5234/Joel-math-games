@@ -1844,41 +1844,218 @@ function renderRadioOptions(containerId, options, name, onSelect) {
 // Store current question data for validation
 let currentQuestionData = null;
 
+// Practice Mode Utilities - Complete rewrite for guaranteed functionality
+const PracticeMode = {
+    /**
+     * Show multiple choice container with guaranteed display
+     * @param {string} containerId - ID of container element
+     * @param {string} submitBtnId - ID of submit button element
+     * @returns {boolean} - Success status
+     */
+    showContainer: function(containerId, submitBtnId) {
+        const container = document.getElementById(containerId);
+        const submitBtn = document.getElementById(submitBtnId);
+        
+        if (!container) {
+            console.error(`Container not found: ${containerId}`);
+            return false;
+        }
+        
+        if (!submitBtn) {
+            console.error(`Submit button not found: ${submitBtnId}`);
+            return false;
+        }
+        
+        // Use setProperty with 'important' to guarantee display
+        container.style.setProperty('display', 'block', 'important');
+        submitBtn.style.setProperty('display', 'block', 'important');
+        
+        // Verify it's actually visible
+        const computedStyle = window.getComputedStyle(container);
+        if (computedStyle.display === 'none') {
+            console.error(`Container ${containerId} still hidden after setting display`);
+            return false;
+        }
+        
+        console.log(`PracticeMode: Showing container ${containerId} in mode ${gameState.mode}`);
+        return true;
+    },
+    
+    /**
+     * Hide multiple choice container
+     * @param {string} containerId - ID of container element
+     * @param {string} submitBtnId - ID of submit button element
+     */
+    hideContainer: function(containerId, submitBtnId) {
+        document.getElementById(containerId)?.style.setProperty('display', 'none');
+        document.getElementById(submitBtnId)?.style.setProperty('display', 'none');
+    },
+    
+    /**
+     * Display multiple choice options
+     * @param {string} containerId - ID of container for options
+     * @param {Array} options - Array of option objects {label, value, correct}
+     * @param {string} name - Radio button name attribute
+     * @param {string} questionText - Question text to display (optional)
+     * @returns {boolean} - Success status
+     */
+    displayMultipleChoice: function(containerId, options, name, questionText) {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            console.error(`Options container not found: ${containerId}`);
+            return false;
+        }
+        
+        // Set question text if provided
+        if (questionText) {
+            // Try to find question text element - could be parent or sibling
+            const questionElement = container.closest('.multiple-choice-question')?.querySelector('.question-text') ||
+                                   container.parentElement?.querySelector('.question-text') ||
+                                   document.querySelector(`#${containerId.replace('Options', 'Question')} .question-text`);
+            if (questionElement) {
+                questionElement.textContent = questionText;
+            }
+        }
+        
+        // Render options
+        renderRadioOptions(containerId, options, name, null);
+        return true;
+    },
+    
+    /**
+     * Validate that required elements exist
+     * @param {Array<string>} elementIds - Array of element IDs to check
+     * @returns {boolean} - All elements exist
+     */
+    validateElements: function(elementIds) {
+        for (const id of elementIds) {
+            const element = document.getElementById(id);
+            if (!element) {
+                console.error(`Required element not found: ${id}`);
+                return false;
+            }
+        }
+        return true;
+    },
+    
+    /**
+     * Process answer submission and update UI
+     * @param {string} questionType - Type of question (slope, relationship, parallel, perpendicular)
+     * @param {Object} selectedAnswers - Object with selected answer labels
+     * @param {Object} correctAnswers - Object with correct answer labels
+     * @param {Array<string>} optionContainerIds - Array of option container IDs
+     * @returns {Object} - Result object with isCorrect and details
+     */
+    processAnswer: function(questionType, selectedAnswers, correctAnswers, optionContainerIds) {
+        let allCorrect = true;
+        const results = {};
+        
+        // Check each answer
+        for (const key in correctAnswers) {
+            const selected = selectedAnswers[key];
+            const correct = correctAnswers[key];
+            const isCorrect = selected === correct;
+            results[key] = { selected, correct, isCorrect };
+            if (!isCorrect) allCorrect = false;
+        }
+        
+        // Disable all radio buttons
+        optionContainerIds.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.disabled = true;
+                });
+            }
+        });
+        
+        // Highlight correct/incorrect options
+        optionContainerIds.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.querySelectorAll('.radio-option').forEach(opt => {
+                    const radio = opt.querySelector('input');
+                    if (radio && radio.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    } else if (radio && radio.checked && radio.dataset.correct === 'false') {
+                        opt.classList.add('incorrect');
+                    }
+                });
+            }
+        });
+        
+        return { isCorrect: allCorrect, results };
+    },
+    
+    /**
+     * Generate feedback message
+     * @param {Object} answerResult - Result from processAnswer
+     * @param {Object} questionData - Question data with options
+     * @returns {string} - Feedback message
+     */
+    generateFeedback: function(answerResult, questionData) {
+        if (answerResult.isCorrect) {
+            return 'Correct! ✓';
+        }
+        
+        let message = 'Incorrect.\n';
+        for (const key in answerResult.results) {
+            const result = answerResult.results[key];
+            if (!result.isCorrect) {
+                const options = questionData[key + 'Options'] || questionData.options;
+                const correctOption = options.find(opt => opt.correct);
+                if (correctOption) {
+                    message += `Correct ${key}: ${correctOption.value} (${correctOption.label})\n`;
+                }
+            }
+        }
+        return message.trim();
+    },
+    
+    /**
+     * Reset all Practice mode question state
+     */
+    resetState: function() {
+        gameState.questionAnswered = false;
+        currentQuestionData = null;
+        
+        // Hide all containers
+        this.hideContainer('slopeQuestionsContainer', 'slopeSubmit');
+        this.hideContainer('relationshipQuestionContainer', 'relationshipSubmit');
+        this.hideContainer('parallelQuestionContainer', 'parallelSubmit');
+        this.hideContainer('perpendicularQuestionContainer', 'perpendicularSubmit');
+        
+        // Clear result areas
+        document.querySelectorAll('.result-area').forEach(area => {
+            area.textContent = '';
+            area.className = 'result-area';
+        });
+    }
+};
+
 // Reset question state when switching tabs or starting new question
 function resetQuestionState() {
-    gameState.questionAnswered = false;
-    currentQuestionData = null;
-    
-    // Hide multiple choice containers
-    document.getElementById('slopeQuestionsContainer')?.style.setProperty('display', 'none');
-    document.getElementById('relationshipQuestionContainer')?.style.setProperty('display', 'none');
-    document.getElementById('parallelQuestionContainer')?.style.setProperty('display', 'none');
-    document.getElementById('perpendicularQuestionContainer')?.style.setProperty('display', 'none');
-    
-    // Hide submit buttons
-    document.getElementById('slopeSubmit')?.style.setProperty('display', 'none');
-    document.getElementById('relationshipSubmit')?.style.setProperty('display', 'none');
-    document.getElementById('parallelSubmit')?.style.setProperty('display', 'none');
-    document.getElementById('perpendicularSubmit')?.style.setProperty('display', 'none');
-    
-    // Clear result areas
-    document.querySelectorAll('.result-area').forEach(area => {
-        area.textContent = '';
-        area.className = 'result-area';
-    });
+    PracticeMode.resetState();
 }
 
-// Problem Type Handlers
+// Problem Type Handlers - Complete Rewrite
 function handleSlopeCalculate() {
+    // Validate input element exists
     const input = document.getElementById('slopeInput');
     if (!input) {
-        console.error('slopeInput element not found');
+        console.error('PracticeMode: slopeInput element not found');
+        showResult('Error: Input field not found. Please refresh the page.', 'error');
         return;
     }
     
     const inputValue = input.value.trim();
+    if (!inputValue) {
+        showResult('Please enter two points in the format: (x1,y1), (x2,y2)', 'error');
+        return;
+    }
     
     try {
+        // Parse input
         const pointSeparator = /\)\s*,\s*\(/;
         const parts = inputValue.split(pointSeparator);
         
@@ -1888,18 +2065,13 @@ function handleSlopeCalculate() {
         
         const p1Str = parts[0] + ')';
         const p2Str = '(' + parts[1];
-        
         const p1 = parsePoint(p1Str);
         const p2 = parsePoint(p2Str);
         
-        // Generate question with multiple choice
-        const question = generateSlopeQuestion();
-        question.data.p1 = p1;
-        question.data.p2 = p2;
-        question.data.result = calculateSlope(p1, p2);
+        // Calculate slope
+        const result = calculateSlope(p1, p2);
         
-        // Update question data
-        const result = question.data.result;
+        // Generate multiple choice options
         const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
         const slopeDistractors = generateSlopeDistractors(result.slope);
         const classificationDistractors = generateClassificationDistractors(result.classification);
@@ -1918,6 +2090,7 @@ function handleSlopeCalculate() {
             { label: 'D', value: classificationDistractors[2], correct: false }
         ].sort(() => Math.random() - 0.5);
         
+        // Store question data
         currentQuestionData = {
             type: 'slope',
             slopeOptions: slopeOptions,
@@ -1926,38 +2099,53 @@ function handleSlopeCalculate() {
             correctClassificationLabel: classificationOptions.find(opt => opt.correct).label
         };
         
-        // Display questions - ensure elements exist
-        const container = document.getElementById('slopeQuestionsContainer');
-        const valueQuestion = document.getElementById('slopeValueQuestion');
-        const classificationQuestion = document.getElementById('slopeClassificationQuestion');
-        const submitBtn = document.getElementById('slopeSubmit');
-        const resultArea = document.getElementById('slopeResult');
+        // Validate required elements exist
+        const requiredElements = [
+            'slopeQuestionsContainer',
+            'slopeValueQuestion',
+            'slopeClassificationQuestion',
+            'slopeValueOptions',
+            'slopeClassificationOptions',
+            'slopeSubmit',
+            'slopeResult'
+        ];
         
-        if (!container || !valueQuestion || !classificationQuestion || !submitBtn || !resultArea) {
-            console.error('Required elements not found for slope questions');
+        if (!PracticeMode.validateElements(requiredElements)) {
             showResult('Error: UI elements not found. Please refresh the page.', 'error');
             return;
         }
         
-        container.style.setProperty('display', 'block', 'important');
-        const valueText = valueQuestion.querySelector('.question-text');
-        const classificationText = classificationQuestion.querySelector('.question-text');
+        // Show container using PracticeMode utility
+        if (!PracticeMode.showContainer('slopeQuestionsContainer', 'slopeSubmit')) {
+            showResult('Error: Could not display multiple choice. Please refresh the page.', 'error');
+            return;
+        }
         
-        if (valueText) valueText.textContent = 'What is the slope?';
-        if (classificationText) classificationText.textContent = 'What is the classification?';
+        // Set question texts directly (slope has separate question containers)
+        const valueQuestion = document.getElementById('slopeValueQuestion');
+        const classificationQuestion = document.getElementById('slopeClassificationQuestion');
+        if (valueQuestion) {
+            const valueText = valueQuestion.querySelector('.question-text');
+            if (valueText) valueText.textContent = 'What is the slope?';
+        }
+        if (classificationQuestion) {
+            const classificationText = classificationQuestion.querySelector('.question-text');
+            if (classificationText) classificationText.textContent = 'What is the classification?';
+        }
         
-        console.log('Displaying multiple choice for slope question in mode:', gameState.mode);
-        console.log('Container display style:', container.style.display);
-        renderRadioOptions('slopeValueOptions', slopeOptions, 'slopeValue', null);
-        renderRadioOptions('slopeClassificationOptions', classificationOptions, 'slopeClassification', null);
+        // Display multiple choice options
+        PracticeMode.displayMultipleChoice('slopeValueOptions', slopeOptions, 'slopeValue');
+        PracticeMode.displayMultipleChoice('slopeClassificationOptions', classificationOptions, 'slopeClassification');
         
-        submitBtn.style.setProperty('display', 'block', 'important');
+        // Clear result area
+        const resultArea = document.getElementById('slopeResult');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
+        console.log(`PracticeMode: Slope question displayed successfully in ${gameState.mode} mode`);
     } catch (error) {
-        console.error('Error in handleSlopeCalculate:', error);
+        console.error('PracticeMode: Error in handleSlopeCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -1967,6 +2155,7 @@ function handleSlopeSubmit() {
         return;
     }
     
+    // Get selected answers
     const slopeSelected = document.querySelector('input[name="slopeValue"]:checked');
     const classificationSelected = document.querySelector('input[name="slopeClassification"]:checked');
     
@@ -1975,46 +2164,35 @@ function handleSlopeSubmit() {
         return;
     }
     
-    const slopeCorrect = slopeSelected.value === currentQuestionData.correctSlopeLabel;
-    const classificationCorrect = classificationSelected.value === currentQuestionData.correctClassificationLabel;
-    const bothCorrect = slopeCorrect && classificationCorrect;
+    // Process answer using PracticeMode utility
+    const selectedAnswers = {
+        slope: slopeSelected.value,
+        classification: classificationSelected.value
+    };
     
-    // Disable all radio buttons
-    document.querySelectorAll('#slopeValueOptions input, #slopeClassificationOptions input').forEach(radio => {
-        radio.disabled = true;
-    });
+    const correctAnswers = {
+        slope: currentQuestionData.correctSlopeLabel,
+        classification: currentQuestionData.correctClassificationLabel
+    };
     
-    // Highlight correct/incorrect
-    document.querySelectorAll('#slopeValueOptions .radio-option').forEach(opt => {
-        const radio = opt.querySelector('input');
-        if (radio.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        } else if (radio.checked && radio.dataset.correct === 'false') {
-            opt.classList.add('incorrect');
-        }
-    });
+    const optionContainerIds = ['slopeValueOptions', 'slopeClassificationOptions'];
+    const answerResult = PracticeMode.processAnswer('slope', selectedAnswers, correctAnswers, optionContainerIds);
     
-    document.querySelectorAll('#slopeClassificationOptions .radio-option').forEach(opt => {
-        const radio = opt.querySelector('input');
-        if (radio.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        } else if (radio.checked && radio.dataset.correct === 'false') {
-            opt.classList.add('incorrect');
-        }
-    });
-    
+    // Generate feedback
     let message = '';
-    if (bothCorrect) {
+    if (answerResult.isCorrect) {
         message = 'Correct! ✓\nBoth answers are correct.';
         showResult(message, 'success');
         updateStats('slope', true);
     } else {
         message = 'Incorrect.\n';
-        if (!slopeCorrect) {
-            message += `Correct slope: ${currentQuestionData.slopeOptions.find(opt => opt.correct).value} (${currentQuestionData.correctSlopeLabel})\n`;
+        if (!answerResult.results.slope.isCorrect) {
+            const correctOption = currentQuestionData.slopeOptions.find(opt => opt.correct);
+            message += `Correct slope: ${correctOption.value} (${correctOption.label})\n`;
         }
-        if (!classificationCorrect) {
-            message += `Correct classification: ${currentQuestionData.classificationOptions.find(opt => opt.correct).value} (${currentQuestionData.correctClassificationLabel})`;
+        if (!answerResult.results.classification.isCorrect) {
+            const correctOption = currentQuestionData.classificationOptions.find(opt => opt.correct);
+            message += `Correct classification: ${correctOption.value} (${correctOption.label})`;
         }
         showResult(message, 'error');
         updateStats('slope', false);
@@ -2024,23 +2202,32 @@ function handleSlopeSubmit() {
 }
 
 function handleRelationshipCalculate() {
+    // Validate input elements exist
     const eq1Input = document.getElementById('equation1Input');
     const eq2Input = document.getElementById('equation2Input');
     
     if (!eq1Input || !eq2Input) {
-        console.error('Equation input elements not found');
+        console.error('PracticeMode: Equation input elements not found');
+        showResult('Error: Input fields not found. Please refresh the page.', 'error');
         return;
     }
     
     const eq1 = eq1Input.value.trim();
     const eq2 = eq2Input.value.trim();
     
+    if (!eq1 || !eq2) {
+        showResult('Please enter both equations.', 'error');
+        return;
+    }
+    
     try {
+        // Parse equations
         const line1 = parseEquation(eq1);
         const line2 = parseEquation(eq2);
         const relationship = determineRelationship(line1, line2);
-        const relationshipDistractors = generateRelationshipDistractors(relationship);
         
+        // Generate multiple choice options
+        const relationshipDistractors = generateRelationshipDistractors(relationship);
         const options = [
             { label: 'A', value: relationship, correct: true },
             { label: 'B', value: relationshipDistractors[0], correct: false },
@@ -2050,37 +2237,44 @@ function handleRelationshipCalculate() {
         
         const correctLabel = options.find(opt => opt.correct).label;
         
+        // Store question data
         currentQuestionData = {
             type: 'relationship',
             options: options,
             correctLabel: correctLabel
         };
         
-        const container = document.getElementById('relationshipQuestionContainer');
-        const submitBtn = document.getElementById('relationshipSubmit');
-        const resultArea = document.getElementById('relationshipResult');
+        // Validate required elements exist
+        const requiredElements = [
+            'relationshipQuestionContainer',
+            'relationshipOptions',
+            'relationshipSubmit',
+            'relationshipResult'
+        ];
         
-        if (!container || !submitBtn || !resultArea) {
-            console.error('Required elements not found for relationship questions');
+        if (!PracticeMode.validateElements(requiredElements)) {
             showResult('Error: UI elements not found. Please refresh the page.', 'error');
             return;
         }
         
-        container.style.setProperty('display', 'block', 'important');
-        const questionText = container.querySelector('.question-text');
-        if (questionText) {
-            questionText.textContent = 'What is the relationship between these two lines?';
+        // Show container using PracticeMode utility
+        if (!PracticeMode.showContainer('relationshipQuestionContainer', 'relationshipSubmit')) {
+            showResult('Error: Could not display multiple choice. Please refresh the page.', 'error');
+            return;
         }
-        console.log('Displaying multiple choice for relationship question in mode:', gameState.mode);
-        console.log('Container display style:', container.style.display);
-        renderRadioOptions('relationshipOptions', options, 'relationship', null);
-        submitBtn.style.setProperty('display', 'block', 'important');
+        
+        // Display multiple choice options
+        PracticeMode.displayMultipleChoice('relationshipOptions', options, 'relationship', 'What is the relationship between these two lines?');
+        
+        // Clear result area
+        const resultArea = document.getElementById('relationshipResult');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
+        console.log(`PracticeMode: Relationship question displayed successfully in ${gameState.mode} mode`);
     } catch (error) {
-        console.error('Error in handleRelationshipCalculate:', error);
+        console.error('PracticeMode: Error in handleRelationshipCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -2090,28 +2284,21 @@ function handleRelationshipSubmit() {
         return;
     }
     
+    // Get selected answer
     const selected = document.querySelector('input[name="relationship"]:checked');
     if (!selected) {
         showResult('Please select an answer.', 'error');
         return;
     }
     
-    const isCorrect = selected.value === currentQuestionData.correctLabel;
+    // Process answer using PracticeMode utility
+    const selectedAnswers = { relationship: selected.value };
+    const correctAnswers = { relationship: currentQuestionData.correctLabel };
+    const optionContainerIds = ['relationshipOptions'];
+    const answerResult = PracticeMode.processAnswer('relationship', selectedAnswers, correctAnswers, optionContainerIds);
     
-    document.querySelectorAll('#relationshipOptions input').forEach(radio => {
-        radio.disabled = true;
-    });
-    
-    document.querySelectorAll('#relationshipOptions .radio-option').forEach(opt => {
-        const radio = opt.querySelector('input');
-        if (radio.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        } else if (radio.checked && radio.dataset.correct === 'false') {
-            opt.classList.add('incorrect');
-        }
-    });
-    
-    if (isCorrect) {
+    // Generate feedback
+    if (answerResult.isCorrect) {
         showResult('Correct! ✓', 'success');
         updateStats('relationship', true);
     } else {
@@ -2124,21 +2311,31 @@ function handleRelationshipSubmit() {
 }
 
 function handleParallelCalculate() {
+    // Validate input elements exist
     const equationInput = document.getElementById('parallelEquationInput');
     const pointInput = document.getElementById('parallelPointInput');
     
     if (!equationInput || !pointInput) {
-        console.error('Parallel input elements not found');
+        console.error('PracticeMode: Parallel input elements not found');
+        showResult('Error: Input fields not found. Please refresh the page.', 'error');
         return;
     }
     
     const equation = equationInput.value.trim();
     const pointStr = pointInput.value.trim();
     
+    if (!equation || !pointStr) {
+        showResult('Please enter both the base equation and a point.', 'error');
+        return;
+    }
+    
     try {
+        // Parse inputs
         const baseLine = parseEquation(equation);
         const point = parsePoint(pointStr);
         const resultLine = findParallelLine(baseLine, point);
+        
+        // Generate multiple choice options
         const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, true);
         const correctEq = formatEquation(resultLine);
         
@@ -2151,37 +2348,44 @@ function handleParallelCalculate() {
         
         const correctLabel = options.find(opt => opt.correct).label;
         
+        // Store question data
         currentQuestionData = {
             type: 'parallel',
             options: options,
             correctLabel: correctLabel
         };
         
-        const container = document.getElementById('parallelQuestionContainer');
-        const submitBtn = document.getElementById('parallelSubmit');
-        const resultArea = document.getElementById('parallelResult');
+        // Validate required elements exist
+        const requiredElements = [
+            'parallelQuestionContainer',
+            'parallelOptions',
+            'parallelSubmit',
+            'parallelResult'
+        ];
         
-        if (!container || !submitBtn || !resultArea) {
-            console.error('Required elements not found for parallel questions');
+        if (!PracticeMode.validateElements(requiredElements)) {
             showResult('Error: UI elements not found. Please refresh the page.', 'error');
             return;
         }
         
-        container.style.setProperty('display', 'block', 'important');
-        const questionText = container.querySelector('.question-text');
-        if (questionText) {
-            questionText.textContent = 'Which equation represents a line parallel to the base line that passes through the given point?';
+        // Show container using PracticeMode utility
+        if (!PracticeMode.showContainer('parallelQuestionContainer', 'parallelSubmit')) {
+            showResult('Error: Could not display multiple choice. Please refresh the page.', 'error');
+            return;
         }
-        console.log('Displaying multiple choice for parallel question in mode:', gameState.mode);
-        console.log('Container display style:', container.style.display);
-        renderRadioOptions('parallelOptions', options, 'parallel', null);
-        submitBtn.style.setProperty('display', 'block', 'important');
+        
+        // Display multiple choice options
+        PracticeMode.displayMultipleChoice('parallelOptions', options, 'parallel', 'Which equation represents a line parallel to the base line that passes through the given point?');
+        
+        // Clear result area
+        const resultArea = document.getElementById('parallelResult');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
+        console.log(`PracticeMode: Parallel question displayed successfully in ${gameState.mode} mode`);
     } catch (error) {
-        console.error('Error in handleParallelCalculate:', error);
+        console.error('PracticeMode: Error in handleParallelCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -2191,28 +2395,21 @@ function handleParallelSubmit() {
         return;
     }
     
+    // Get selected answer
     const selected = document.querySelector('input[name="parallel"]:checked');
     if (!selected) {
         showResult('Please select an answer.', 'error');
         return;
     }
     
-    const isCorrect = selected.value === currentQuestionData.correctLabel;
+    // Process answer using PracticeMode utility
+    const selectedAnswers = { parallel: selected.value };
+    const correctAnswers = { parallel: currentQuestionData.correctLabel };
+    const optionContainerIds = ['parallelOptions'];
+    const answerResult = PracticeMode.processAnswer('parallel', selectedAnswers, correctAnswers, optionContainerIds);
     
-    document.querySelectorAll('#parallelOptions input').forEach(radio => {
-        radio.disabled = true;
-    });
-    
-    document.querySelectorAll('#parallelOptions .radio-option').forEach(opt => {
-        const radio = opt.querySelector('input');
-        if (radio.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        } else if (radio.checked && radio.dataset.correct === 'false') {
-            opt.classList.add('incorrect');
-        }
-    });
-    
-    if (isCorrect) {
+    // Generate feedback
+    if (answerResult.isCorrect) {
         showResult('Correct! ✓', 'success');
         updateStats('parallel', true);
     } else {
@@ -2225,21 +2422,31 @@ function handleParallelSubmit() {
 }
 
 function handlePerpendicularCalculate() {
+    // Validate input elements exist
     const equationInput = document.getElementById('perpendicularEquationInput');
     const pointInput = document.getElementById('perpendicularPointInput');
     
     if (!equationInput || !pointInput) {
-        console.error('Perpendicular input elements not found');
+        console.error('PracticeMode: Perpendicular input elements not found');
+        showResult('Error: Input fields not found. Please refresh the page.', 'error');
         return;
     }
     
     const equation = equationInput.value.trim();
     const pointStr = pointInput.value.trim();
     
+    if (!equation || !pointStr) {
+        showResult('Please enter both the base equation and a point.', 'error');
+        return;
+    }
+    
     try {
+        // Parse inputs
         const baseLine = parseEquation(equation);
         const point = parsePoint(pointStr);
         const resultLine = findPerpendicularLine(baseLine, point);
+        
+        // Generate multiple choice options
         const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, false);
         const correctEq = formatEquation(resultLine);
         
@@ -2252,37 +2459,44 @@ function handlePerpendicularCalculate() {
         
         const correctLabel = options.find(opt => opt.correct).label;
         
+        // Store question data
         currentQuestionData = {
             type: 'perpendicular',
             options: options,
             correctLabel: correctLabel
         };
         
-        const container = document.getElementById('perpendicularQuestionContainer');
-        const submitBtn = document.getElementById('perpendicularSubmit');
-        const resultArea = document.getElementById('perpendicularResult');
+        // Validate required elements exist
+        const requiredElements = [
+            'perpendicularQuestionContainer',
+            'perpendicularOptions',
+            'perpendicularSubmit',
+            'perpendicularResult'
+        ];
         
-        if (!container || !submitBtn || !resultArea) {
-            console.error('Required elements not found for perpendicular questions');
+        if (!PracticeMode.validateElements(requiredElements)) {
             showResult('Error: UI elements not found. Please refresh the page.', 'error');
             return;
         }
         
-        container.style.setProperty('display', 'block', 'important');
-        const questionText = container.querySelector('.question-text');
-        if (questionText) {
-            questionText.textContent = 'Which equation represents a line perpendicular to the base line that passes through the given point?';
+        // Show container using PracticeMode utility
+        if (!PracticeMode.showContainer('perpendicularQuestionContainer', 'perpendicularSubmit')) {
+            showResult('Error: Could not display multiple choice. Please refresh the page.', 'error');
+            return;
         }
-        console.log('Displaying multiple choice for perpendicular question in mode:', gameState.mode);
-        console.log('Container display style:', container.style.display);
-        renderRadioOptions('perpendicularOptions', options, 'perpendicular', null);
-        submitBtn.style.setProperty('display', 'block', 'important');
+        
+        // Display multiple choice options
+        PracticeMode.displayMultipleChoice('perpendicularOptions', options, 'perpendicular', 'Which equation represents a line perpendicular to the base line that passes through the given point?');
+        
+        // Clear result area
+        const resultArea = document.getElementById('perpendicularResult');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
         gameState.questionAnswered = false;
+        console.log(`PracticeMode: Perpendicular question displayed successfully in ${gameState.mode} mode`);
     } catch (error) {
-        console.error('Error in handlePerpendicularCalculate:', error);
+        console.error('PracticeMode: Error in handlePerpendicularCalculate:', error);
         showResult('Error: ' + error.message, 'error');
     }
 }
@@ -2292,28 +2506,21 @@ function handlePerpendicularSubmit() {
         return;
     }
     
+    // Get selected answer
     const selected = document.querySelector('input[name="perpendicular"]:checked');
     if (!selected) {
         showResult('Please select an answer.', 'error');
         return;
     }
     
-    const isCorrect = selected.value === currentQuestionData.correctLabel;
+    // Process answer using PracticeMode utility
+    const selectedAnswers = { perpendicular: selected.value };
+    const correctAnswers = { perpendicular: currentQuestionData.correctLabel };
+    const optionContainerIds = ['perpendicularOptions'];
+    const answerResult = PracticeMode.processAnswer('perpendicular', selectedAnswers, correctAnswers, optionContainerIds);
     
-    document.querySelectorAll('#perpendicularOptions input').forEach(radio => {
-        radio.disabled = true;
-    });
-    
-    document.querySelectorAll('#perpendicularOptions .radio-option').forEach(opt => {
-        const radio = opt.querySelector('input');
-        if (radio.dataset.correct === 'true') {
-            opt.classList.add('correct');
-        } else if (radio.checked && radio.dataset.correct === 'false') {
-            opt.classList.add('incorrect');
-        }
-    });
-    
-    if (isCorrect) {
+    // Generate feedback
+    if (answerResult.isCorrect) {
         showResult('Correct! ✓', 'success');
         updateStats('perpendicular', true);
     } else {
