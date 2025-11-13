@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Multiple Choice Fix</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background: #d4edda; }
+        .fail { background: #f8d7da; }
+        code { background: #f4f4f4; padding: 2px 5px; }
+    </style>
+</head>
+<body>
+    <h1>Multiple Choice Fix Verification</h1>
+    
+    <div class="test">
+        <h2>Test 1: Check if setProperty exists in app.js</h2>
+        <p id="test1">Loading...</p>
+    </div>
+    
+    <div class="test">
+        <h2>Test 2: Check container display logic</h2>
+        <p id="test2">Loading...</p>
+    </div>
+    
+    <div class="test">
+        <h2>Instructions</h2>
+        <ol>
+            <li>Open <code>dist/index.html</code> in browser</li>
+            <li>Open DevTools (F12) → Console</li>
+            <li>Set mode to Practice</li>
+            <li>Enter: <code>(2,3),(5,9)</code> in slope input</li>
+            <li>Click Calculate</li>
+            <li>Look for console log: "Displaying multiple choice for slope question in mode: practice"</li>
+            <li>Check if multiple choice containers appear</li>
+        </ol>
+    </div>
+    
+    <script>
+        // Test 1: Check if app.js has setProperty
+        fetch('dist/app.js')
+            .then(r => r.text())
+            .then(text => {
+                const hasSetProperty = text.includes("setProperty('display', 'block', 'important')");
+                const test1 = document.getElementById('test1');
+                if (hasSetProperty) {
+                    test1.innerHTML = '<strong class="pass">✅ PASS:</strong> setProperty found in dist/app.js';
+                    test1.parentElement.classList.add('pass');
+                } else {
+                    test1.innerHTML = '<strong class="fail">❌ FAIL:</strong> setProperty NOT found';
+                    test1.parentElement.classList.add('fail');
+                }
+            })
+            .catch(e => {
+                document.getElementById('test1').innerHTML = '<strong class="fail">❌ ERROR:</strong> ' + e.message;
+            });
+        
+        // Test 2: Count occurrences
+        fetch('dist/app.js')
+            .then(r => r.text())
+            .then(text => {
+                const count = (text.match(/setProperty\('display', 'block', 'important'\)/g) || []).length;
+                const test2 = document.getElementById('test2');
+                if (count >= 8) {
+                    test2.innerHTML = `<strong class="pass">✅ PASS:</strong> Found ${count} occurrences of setProperty (expected 8+)`;
+                    test2.parentElement.classList.add('pass');
+                } else {
+                    test2.innerHTML = `<strong class="fail">❌ FAIL:</strong> Found only ${count} occurrences (expected 8+)`;
+                    test2.parentElement.classList.add('fail');
+                }
+            });
+    </script>
+</body>
+</html>
