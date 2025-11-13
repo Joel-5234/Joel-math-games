@@ -1946,6 +1946,7 @@ function handleSlopeCalculate() {
         if (valueText) valueText.textContent = 'What is the slope?';
         if (classificationText) classificationText.textContent = 'What is the classification?';
         
+        console.log('Displaying multiple choice for slope question in mode:', gameState.mode);
         renderRadioOptions('slopeValueOptions', slopeOptions, 'slopeValue', null);
         renderRadioOptions('slopeClassificationOptions', classificationOptions, 'slopeClassification', null);
         
@@ -2069,6 +2070,7 @@ function handleRelationshipCalculate() {
         if (questionText) {
             questionText.textContent = 'What is the relationship between these two lines?';
         }
+        console.log('Displaying multiple choice for relationship question in mode:', gameState.mode);
         renderRadioOptions('relationshipOptions', options, 'relationship', null);
         submitBtn.style.display = 'block';
         resultArea.textContent = '';
@@ -2168,6 +2170,7 @@ function handleParallelCalculate() {
         if (questionText) {
             questionText.textContent = 'Which equation represents a line parallel to the base line that passes through the given point?';
         }
+        console.log('Displaying multiple choice for parallel question in mode:', gameState.mode);
         renderRadioOptions('parallelOptions', options, 'parallel', null);
         submitBtn.style.display = 'block';
         resultArea.textContent = '';
@@ -2267,6 +2270,7 @@ function handlePerpendicularCalculate() {
         if (questionText) {
             questionText.textContent = 'Which equation represents a line perpendicular to the base line that passes through the given point?';
         }
+        console.log('Displaying multiple choice for perpendicular question in mode:', gameState.mode);
         renderRadioOptions('perpendicularOptions', options, 'perpendicular', null);
         submitBtn.style.display = 'block';
         resultArea.textContent = '';
