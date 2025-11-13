@@ -451,21 +451,23 @@ f) Available in all modes (Practice, Challenge, Session)
 g) Answer validation simplified to direct option comparison
 h) Visual feedback: correct option highlighted in green, wrong selection in red
 
-10.9 Fraction and Decimal Answer Format
-a) All numeric answers (slopes and slopes in equations) displayed as "fraction (decimal)" format
-   - Example: "2/3 (0.667)" or "1/2 (0.5)"
+10.9 Fraction-Only Answer Format
+a) All numeric answers (slopes and slopes in equations) displayed as fraction format only (no decimal)
+   - Example: "2/3" or "1/2" (not "2/3 (0.667)")
 b) Fractions are automatically simplified (e.g., 4/8 → 1/2)
 c) Applies to:
    - Slope values in multiple choice options
    - Slopes in equation options (parallel/perpendicular questions)
-   - Distractors also use fraction (decimal) format
+   - Intercepts and rate of change values when applicable
+   - Distractors also use fraction-only format
 d) Special cases handled:
-   - Integers: "2 (2.0)" or just "2"
-   - Zero: "0 (0.0)" or just "0"
-   - Undefined: "undefined" (no decimal)
-   - Very complex fractions may show as decimal only
+   - Integers: Display as whole number (e.g., "2", not "2/1")
+   - Zero: Display as "0"
+   - Undefined: Display as "undefined" (no fraction, no decimal)
+   - Very complex fractions: May use fraction approximation or decimal fallback if denominator too large
 e) Formatting consistent across all modes (Practice, Challenge, Session)
-f) Answer validation compares numeric values, not string formats
+f) Answer validation compares numeric values, parsing fraction strings to numbers
+g) Fraction conversion uses tolerance-based approach with maximum denominator limit (e.g., 100) for readability
 
 10.10 Practice Mode Code Rewrite
 a) Complete rewrite of Practice mode handlers from scratch

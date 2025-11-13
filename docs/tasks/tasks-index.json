@@ -63,8 +63,8 @@
     {
       "id": "milestone-11",
       "name": "Fraction and Decimal Answer Format",
-      "status": "pending",
-      "description": "Display all numeric answers (slopes and slopes in equations) in both fraction and decimal formats: 'fraction (decimal)' (e.g., '2/3 (0.667)')"
+      "status": "cancelled",
+      "description": "Display all numeric answers (slopes and slopes in equations) in both fraction and decimal formats: 'fraction (decimal)' (e.g., '2/3 (0.667)') - Replaced by Milestone 15 (fraction-only format)"
     },
     {
       "id": "milestone-12",
@@ -83,6 +83,12 @@
       "name": "Vertical Navigation Bar",
       "status": "completed",
       "description": "Convert horizontal tab navigation to vertical sidebar navigation on the left, with responsive dropdown menu for mobile/tablet devices"
+    },
+    {
+      "id": "milestone-15",
+      "name": "Fraction-Only Answer Format",
+      "status": "pending",
+      "description": "Display all numeric answers (slopes and slopes in equations) in fraction format only, without decimal equivalents: 'fraction' (e.g., '2/3' instead of '2/3 (0.667)')"
     }
   ]
 }
