@@ -59,6 +59,12 @@
       "name": "Multiple Choice Answer Format",
       "status": "completed",
       "description": "Replace text input fields with multiple choice (radio buttons) for all problem types across all game modes"
+    },
+    {
+      "id": "milestone-11",
+      "name": "Fraction and Decimal Answer Format",
+      "status": "pending",
+      "description": "Display all numeric answers (slopes and slopes in equations) in both fraction and decimal formats: 'fraction (decimal)' (e.g., '2/3 (0.667)')"
     }
   ]
 }

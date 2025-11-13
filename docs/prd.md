@@ -33,7 +33,8 @@ Behavior
 • Generate 3 plausible wrong answers (distractors) for each question
 • Display as radio button multiple choice
 Output
-• Show slope as a rounded number in multiple choice format
+• Show slope as "fraction (decimal)" format in multiple choice (e.g., "2/3 (0.667)")
+• Fractions are simplified (e.g., 4/8 → 1/2)
 • Show classification text in multiple choice format
 • Mark answer status for gamification (correct vs error due to bad input)
 
@@ -62,7 +63,7 @@ Input
 • One text field for base equation
 • One text field for point in format (x,y)
 • Multiple choice answer: 4 radio button options (A, B, C, D)
-  - Options show full equations (e.g., "y = 2x + 3", "y = 2x - 5", etc.)
+  - Options show full equations with slopes in fraction (decimal) format (e.g., "y = 2/3x + 1 (slope: 0.667)", "y = 2x - 5", etc.)
 Behavior
 • Parse equation to get slope or vertical type
 • Compute line parallel to base that passes through the point
@@ -71,6 +72,7 @@ Behavior
 • Generate 3 plausible wrong equations (distractors)
 Output
 • Display final equation in slope intercept form when possible
+• Slopes shown as "fraction (decimal)" format
 • For vertical, display x = c
 • Show as multiple choice with full equation options
 
@@ -79,7 +81,7 @@ Input
 • One text field for base equation
 • One text field for point in format (x,y)
 • Multiple choice answer: 4 radio button options (A, B, C, D)
-  - Options show full equations (e.g., "y = -0.5x + 5", "y = -0.5x - 3", etc.)
+  - Options show full equations with slopes in fraction (decimal) format (e.g., "y = -1/2x + 5 (slope: -0.5)", "y = -0.5x - 3", etc.)
 Behavior
 • Parse equation
 • Compute perpendicular line
@@ -89,6 +91,7 @@ Behavior
 • Generate 3 plausible wrong equations (distractors)
 Output
 • Display final equation in slope intercept form when possible
+• Slopes shown as "fraction (decimal)" format
 • For vertical, display x = c
 • Show as multiple choice with full equation options
 
@@ -354,4 +357,20 @@ e) Full equations shown as options for parallel/perpendicular questions
 f) Available in all modes (Practice, Challenge, Session)
 g) Answer validation simplified to direct option comparison
 h) Visual feedback: correct option highlighted in green, wrong selection in red
+
+10.9 Fraction and Decimal Answer Format
+a) All numeric answers (slopes and slopes in equations) displayed as "fraction (decimal)" format
+   - Example: "2/3 (0.667)" or "1/2 (0.5)"
+b) Fractions are automatically simplified (e.g., 4/8 → 1/2)
+c) Applies to:
+   - Slope values in multiple choice options
+   - Slopes in equation options (parallel/perpendicular questions)
+   - Distractors also use fraction (decimal) format
+d) Special cases handled:
+   - Integers: "2 (2.0)" or just "2"
+   - Zero: "0 (0.0)" or just "0"
+   - Undefined: "undefined" (no decimal)
+   - Very complex fractions may show as decimal only
+e) Formatting consistent across all modes (Practice, Challenge, Session)
+f) Answer validation compares numeric values, not string formats
 
