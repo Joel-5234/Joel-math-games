@@ -64,7 +64,18 @@
                             <label for="slopeInput">Points:</label>
                             <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
                         </div>
-                        <button id="slopeSubmit" class="submit-button">Calculate</button>
+                        <button id="slopeCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="slopeQuestionsContainer" style="display: none;">
+                            <div id="slopeValueQuestion" class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="slopeValueOptions"></div>
+                            </div>
+                            <div id="slopeClassificationQuestion" class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="slopeClassificationOptions"></div>
+                            </div>
+                            <button id="slopeSubmit" class="submit-button" style="display: none;">Submit Answers</button>
+                        </div>
                         <div id="slopeResult" class="result-area"></div>
                     </div>
                     <div id="slope-hint-panel" class="hint-panel">
@@ -96,7 +107,14 @@
                             <label for="equation2Input">Equation 2:</label>
                             <input type="text" id="equation2Input" placeholder="y = 2x - 5" class="input-field">
                         </div>
-                        <button id="relationshipSubmit" class="submit-button">Check Relationship</button>
+                        <button id="relationshipCalculateBtn" class="submit-button">Check Relationship</button>
+                        <div id="relationshipQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="relationshipOptions"></div>
+                            </div>
+                            <button id="relationshipSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
                         <div id="relationshipResult" class="result-area"></div>
                     </div>
                     <div id="relationship-hint-panel" class="hint-panel">
@@ -128,7 +146,14 @@
                             <label for="parallelPointInput">Point:</label>
                             <input type="text" id="parallelPointInput" placeholder="(4,5)" class="input-field">
                         </div>
-                        <button id="parallelSubmit" class="submit-button">Calculate</button>
+                        <button id="parallelCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="parallelQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="parallelOptions"></div>
+                            </div>
+                            <button id="parallelSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
                         <div id="parallelResult" class="result-area"></div>
                     </div>
                     <div id="parallel-hint-panel" class="hint-panel">
@@ -160,7 +185,14 @@
                             <label for="perpendicularPointInput">Point:</label>
                             <input type="text" id="perpendicularPointInput" placeholder="(4,5)" class="input-field">
                         </div>
-                        <button id="perpendicularSubmit" class="submit-button">Calculate</button>
+                        <button id="perpendicularCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="perpendicularQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="perpendicularOptions"></div>
+                            </div>
+                            <button id="perpendicularSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
                         <div id="perpendicularResult" class="result-area"></div>
                     </div>
                     <div id="perpendicular-hint-panel" class="hint-panel">

@@ -53,6 +53,12 @@
       "name": "Test Celebration Buttons",
       "status": "completed",
       "description": "Add 'Test Confetti' and 'Test Fireworks' buttons to allow manual testing of celebration animations"
+    },
+    {
+      "id": "milestone-10",
+      "name": "Multiple Choice Answer Format",
+      "status": "completed",
+      "description": "Replace text input fields with multiple choice (radio buttons) for all problem types across all game modes"
     }
   ]
 }

@@ -818,12 +818,35 @@ function displayChallengeQuestion() {
         
         if (question.type === 'slope') {
             questionDisplay.innerHTML = `<p class="challenge-question-text">Find the slope and classification for the line through points: <strong>${question.display}</strong></p>`;
-            inputContainer.innerHTML = `
-                <div class="input-group">
-                    <label for="challengeSlopeInput">Your Answer (format: Slope: X, Classification: Y):</label>
-                    <input type="text" id="challengeSlopeInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="Slope: 2, Classification: rising">
-                </div>
-            `;
+            
+            // Display two separate multiple choice questions
+            let slopeHtml = '<div class="multiple-choice-question"><p class="question-text">What is the slope?</p><div class="radio-group" id="challengeSlopeValueOptions"></div></div>';
+            let classificationHtml = '<div class="multiple-choice-question"><p class="question-text">What is the classification?</p><div class="radio-group" id="challengeSlopeClassificationOptions"></div></div>';
+            
+            inputContainer.innerHTML = slopeHtml + classificationHtml;
+            
+            // Render options
+            if (question.slopeQuestion && question.classificationQuestion) {
+                renderRadioOptions('challengeSlopeValueOptions', question.slopeQuestion.options, 'challengeSlopeValue', null);
+                renderRadioOptions('challengeSlopeClassificationOptions', question.classificationQuestion.options, 'challengeSlopeClassification', null);
+                
+                // Restore selected answers if answered
+                if (userAnswer && questionState === 'answered') {
+                    const answers = userAnswer.split(',');
+                    if (answers[0]) {
+                        const slopeRadio = document.querySelector(`input[name="challengeSlopeValue"][value="${answers[0].trim()}"]`);
+                        if (slopeRadio) slopeRadio.checked = true;
+                    }
+                    if (answers[1]) {
+                        const classificationRadio = document.querySelector(`input[name="challengeSlopeClassification"][value="${answers[1].trim()}"]`);
+                        if (classificationRadio) classificationRadio.checked = true;
+                    }
+                    // Disable all if answered
+                    document.querySelectorAll('#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input').forEach(radio => {
+                        radio.disabled = true;
+                    });
+                }
+            }
         } else if (question.type === 'relationship') {
             questionDisplay.innerHTML = `
                 <p class="challenge-question-text">Determine the relationship between:</p>
@@ -831,35 +854,90 @@ function displayChallengeQuestion() {
                 <p><strong>Equation 2:</strong> ${question.display.eq2}</p>
             `;
             inputContainer.innerHTML = `
-                <div class="input-group">
-                    <label for="challengeRelationshipInput">Your Answer (parallel, perpendicular, neither, or same):</label>
-                    <input type="text" id="challengeRelationshipInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="parallel">
+                <div class="multiple-choice-question">
+                    <p class="question-text">What is the relationship between these two lines?</p>
+                    <div class="radio-group" id="challengeRelationshipOptions"></div>
                 </div>
             `;
+            
+            if (question.options) {
+                renderRadioOptions('challengeRelationshipOptions', question.options, 'challengeRelationship', null);
+                
+                // Restore selected answer if answered
+                if (userAnswer && questionState === 'answered') {
+                    const radio = document.querySelector(`input[name="challengeRelationship"][value="${userAnswer}"]`);
+                    if (radio) radio.checked = true;
+                    document.querySelectorAll('#challengeRelationshipOptions input').forEach(r => r.disabled = true);
+                }
+            }
         } else if (question.type === 'parallel') {
             questionDisplay.innerHTML = `
                 <p class="challenge-question-text">Find the equation of a line parallel to <strong>${question.display.equation}</strong> that passes through point <strong>${question.display.point}</strong></p>
             `;
             inputContainer.innerHTML = `
-                <div class="input-group">
-                    <label for="challengeParallelInput">Your Answer:</label>
-                    <input type="text" id="challengeParallelInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="y = 2x + 3">
+                <div class="multiple-choice-question">
+                    <p class="question-text">Which equation represents a line parallel to the base line that passes through the given point?</p>
+                    <div class="radio-group" id="challengeParallelOptions"></div>
                 </div>
             `;
+            
+            if (question.options) {
+                renderRadioOptions('challengeParallelOptions', question.options, 'challengeParallel', null);
+                
+                // Restore selected answer if answered
+                if (userAnswer && questionState === 'answered') {
+                    const radio = document.querySelector(`input[name="challengeParallel"][value="${userAnswer}"]`);
+                    if (radio) radio.checked = true;
+                    document.querySelectorAll('#challengeParallelOptions input').forEach(r => r.disabled = true);
+                }
+            }
         } else if (question.type === 'perpendicular') {
             questionDisplay.innerHTML = `
                 <p class="challenge-question-text">Find the equation of a line perpendicular to <strong>${question.display.equation}</strong> that passes through point <strong>${question.display.point}</strong></p>
             `;
             inputContainer.innerHTML = `
-                <div class="input-group">
-                    <label for="challengePerpendicularInput">Your Answer:</label>
-                    <input type="text" id="challengePerpendicularInput" class="input-field" value="${userAnswer}" ${questionState === 'answered' || questionState === 'gave-up' ? 'disabled' : ''} placeholder="y = -0.5x + 5">
+                <div class="multiple-choice-question">
+                    <p class="question-text">Which equation represents a line perpendicular to the base line that passes through the given point?</p>
+                    <div class="radio-group" id="challengePerpendicularOptions"></div>
                 </div>
             `;
+            
+            if (question.options) {
+                renderRadioOptions('challengePerpendicularOptions', question.options, 'challengePerpendicular', null);
+                
+                // Restore selected answer if answered
+                if (userAnswer && questionState === 'answered') {
+                    const radio = document.querySelector(`input[name="challengePerpendicular"][value="${userAnswer}"]`);
+                    if (radio) radio.checked = true;
+                    document.querySelectorAll('#challengePerpendicularOptions input').forEach(r => r.disabled = true);
+                }
+            }
         }
         
-        // Show answer if gave up
+        // Show answer if gave up - highlight correct options
         if (questionState === 'gave-up') {
+            // Disable all radio buttons
+            document.querySelectorAll('#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input, #challengeRelationshipOptions input, #challengeParallelOptions input, #challengePerpendicularOptions input').forEach(radio => {
+                if (radio) radio.disabled = true;
+            });
+            
+            // Highlight correct answers
+            if (question.type === 'slope') {
+                document.querySelectorAll('#challengeSlopeValueOptions .radio-option, #challengeSlopeClassificationOptions .radio-option').forEach(opt => {
+                    const radio = opt.querySelector('input');
+                    if (radio && radio.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            } else {
+                document.querySelectorAll(`#challenge${question.type.charAt(0).toUpperCase() + question.type.slice(1)}Options .radio-option`).forEach(opt => {
+                    const radio = opt.querySelector('input');
+                    if (radio && radio.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
             const resultArea = document.getElementById('challengeResult');
             if (resultArea) {
                 resultArea.textContent = `Correct Answer: ${question.correctAnswer}`;
@@ -963,82 +1041,122 @@ function submitChallengeAnswer() {
     let userInput = '';
     let isCorrect = false;
     
-    // Get user input based on question type
+    // Get user input based on question type (multiple choice)
     if (question.type === 'slope') {
-        const input = document.getElementById('challengeSlopeInput');
-        if (input) {
-            userInput = input.value.trim();
-            // Parse user answer
-            const correctResult = question.data.result;
-            const correctSlope = correctResult.slope === Infinity ? 'undefined' : correctResult.slope.toString();
-            const correctClassification = correctResult.classification;
-            
-            // Extract slope and classification from user input
-            const slopeMatch = userInput.match(/slope[:\s]+(undefined|(-?\d+\.?\d*))/i);
-            const classificationMatch = userInput.match(/classification[:\s]+(\w+)/i);
-            
-            if (slopeMatch && classificationMatch) {
-                const userSlope = slopeMatch[1].toLowerCase();
-                const userClassification = classificationMatch[1].toLowerCase();
-                
-                // Check slope (handle undefined/vertical case)
-                let slopeCorrect = false;
-                if (correctSlope === 'undefined' || correctSlope === 'Infinity') {
-                    slopeCorrect = userSlope === 'undefined' || userSlope === 'infinity';
-                } else {
-                    const userSlopeNum = parseFloat(userSlope);
-                    const correctSlopeNum = parseFloat(correctSlope);
-                    slopeCorrect = Math.abs(userSlopeNum - correctSlopeNum) < 0.01;
-                }
-                
-                // Check classification
-                const classificationCorrect = userClassification === correctClassification.toLowerCase();
-                
-                isCorrect = slopeCorrect && classificationCorrect;
-            } else {
-                // Fallback: try to parse as two points and calculate
-                try {
-                    const pointSeparator = /\)\s*,\s*\(/;
-                    const parts = userInput.split(pointSeparator);
-                    if (parts.length === 2) {
-                        const p1Str = parts[0] + ')';
-                        const p2Str = '(' + parts[1];
-                        const p1 = parsePoint(p1Str);
-                        const p2 = parsePoint(p2Str);
-                        const result = calculateSlope(p1, p2);
-                        isCorrect = (result.slope === Infinity ? correctResult.slope === Infinity : 
-                                    Math.abs(result.slope - correctResult.slope) < 0.01) &&
-                                    result.classification === correctResult.classification;
-                    }
-                } catch (e) {
-                    isCorrect = false;
-                }
+        const slopeSelected = document.querySelector('input[name="challengeSlopeValue"]:checked');
+        const classificationSelected = document.querySelector('input[name="challengeSlopeClassification"]:checked');
+        
+        if (!slopeSelected || !classificationSelected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select answers for both questions.';
+                resultArea.className = 'result-area error';
             }
+            return;
         }
+        
+        userInput = `${slopeSelected.value}, ${classificationSelected.value}`;
+        const slopeCorrect = slopeSelected.value === question.slopeQuestion.correctAnswer;
+        const classificationCorrect = classificationSelected.value === question.classificationQuestion.correctAnswer;
+        isCorrect = slopeCorrect && classificationCorrect;
+        
+        // Disable and highlight
+        document.querySelectorAll('#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input').forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll('#challengeSlopeValueOptions .radio-option, #challengeSlopeClassificationOptions .radio-option').forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
+        
     } else if (question.type === 'relationship') {
-        const input = document.getElementById('challengeRelationshipInput');
-        if (input) {
-            userInput = input.value.trim().toLowerCase();
-            const correctRel = question.data.relationship.toLowerCase();
-            isCorrect = userInput === correctRel;
-        }
-    } else if (question.type === 'parallel' || question.type === 'perpendicular') {
-        const inputId = question.type === 'parallel' ? 'challengeParallelInput' : 'challengePerpendicularInput';
-        const input = document.getElementById(inputId);
-        if (input) {
-            userInput = input.value.trim();
-            try {
-                const userLine = parseEquation(userInput);
-                const correctLine = question.data.resultLine;
-                isCorrect = (userLine.kind === correctLine.kind) &&
-                           (userLine.kind === 'vertical' ? 
-                            Math.abs(userLine.x0 - correctLine.x0) < 0.01 :
-                            Math.abs(userLine.m - correctLine.m) < 0.01 && 
-                            Math.abs(userLine.b - correctLine.b) < 0.01);
-            } catch (e) {
-                isCorrect = false;
+        const selected = document.querySelector('input[name="challengeRelationship"]:checked');
+        if (!selected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select an answer.';
+                resultArea.className = 'result-area error';
             }
+            return;
         }
+        
+        userInput = selected.value;
+        isCorrect = selected.value === question.correctAnswerLabel;
+        
+        // Disable and highlight
+        document.querySelectorAll('#challengeRelationshipOptions input').forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll('#challengeRelationshipOptions .radio-option').forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
+        
+    } else if (question.type === 'parallel') {
+        const selected = document.querySelector('input[name="challengeParallel"]:checked');
+        if (!selected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select an answer.';
+                resultArea.className = 'result-area error';
+            }
+            return;
+        }
+        
+        userInput = selected.value;
+        isCorrect = selected.value === question.correctAnswerLabel;
+        
+        // Disable and highlight
+        document.querySelectorAll('#challengeParallelOptions input').forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll('#challengeParallelOptions .radio-option').forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
+        
+    } else if (question.type === 'perpendicular') {
+        const selected = document.querySelector('input[name="challengePerpendicular"]:checked');
+        if (!selected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select an answer.';
+                resultArea.className = 'result-area error';
+            }
+            return;
+        }
+        
+        userInput = selected.value;
+        isCorrect = selected.value === question.correctAnswerLabel;
+        
+        // Disable and highlight
+        document.querySelectorAll('#challengePerpendicularOptions input').forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll('#challengePerpendicularOptions .radio-option').forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
     }
     
     // Store answer and correctness
@@ -1618,18 +1736,75 @@ function hideHints(hintType) {
     }
 }
 
-// Problem Type Handlers
-function handleSlopeProblem() {
-    // Prevent spam clicking - check if question already answered
-    if (gameState.questionAnswered) {
-        return;
-    }
+// Helper function to render radio options
+function renderRadioOptions(containerId, options, name, onSelect) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
     
+    container.innerHTML = '';
+    options.forEach(option => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'radio-option';
+        
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = name;
+        radio.id = `${name}_${option.label}`;
+        radio.value = option.label;
+        radio.dataset.correct = option.correct;
+        radio.dataset.value = option.value;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `${name}_${option.label}`;
+        label.textContent = `${option.label}. ${option.value}`;
+        
+        radio.addEventListener('change', () => {
+            // Update visual state
+            container.querySelectorAll('.radio-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            optionDiv.classList.add('selected');
+            if (onSelect) onSelect(option.label);
+        });
+        
+        optionDiv.appendChild(radio);
+        optionDiv.appendChild(label);
+        container.appendChild(optionDiv);
+    });
+}
+
+// Store current question data for validation
+let currentQuestionData = null;
+
+// Reset question state when switching tabs or starting new question
+function resetQuestionState() {
+    gameState.questionAnswered = false;
+    currentQuestionData = null;
+    
+    // Hide multiple choice containers
+    document.getElementById('slopeQuestionsContainer')?.style.setProperty('display', 'none');
+    document.getElementById('relationshipQuestionContainer')?.style.setProperty('display', 'none');
+    document.getElementById('parallelQuestionContainer')?.style.setProperty('display', 'none');
+    document.getElementById('perpendicularQuestionContainer')?.style.setProperty('display', 'none');
+    
+    // Hide submit buttons
+    document.getElementById('slopeSubmit')?.style.setProperty('display', 'none');
+    document.getElementById('relationshipSubmit')?.style.setProperty('display', 'none');
+    document.getElementById('parallelSubmit')?.style.setProperty('display', 'none');
+    document.getElementById('perpendicularSubmit')?.style.setProperty('display', 'none');
+    
+    // Clear result areas
+    document.querySelectorAll('.result-area').forEach(area => {
+        area.textContent = '';
+        area.className = 'result-area';
+    });
+}
+
+// Problem Type Handlers
+function handleSlopeCalculate() {
     const input = document.getElementById('slopeInput').value.trim();
     
     try {
-        // Match two points in the format (x,y), (x,y) or (x,y),(x,y)
-        // Split on '),' pattern which separates the two points
         const pointSeparator = /\)\s*,\s*\(/;
         const parts = input.split(pointSeparator);
         
@@ -1637,37 +1812,126 @@ function handleSlopeProblem() {
             throw new Error('Please enter two points in the format: (x1,y1), (x2,y2)');
         }
         
-        // Add back the closing parenthesis to first part and opening to second part
         const p1Str = parts[0] + ')';
         const p2Str = '(' + parts[1];
         
         const p1 = parsePoint(p1Str);
         const p2 = parsePoint(p2Str);
-        const result = calculateSlope(p1, p2);
         
-        let message;
-        if (result.slope === Infinity) {
-            message = `Slope: Undefined (Vertical Line)\nClassification: ${result.classification}`;
-        } else {
-            message = `Slope: ${result.slope}\nClassification: ${result.classification}`;
-        }
+        // Generate question with multiple choice
+        const question = generateSlopeQuestion();
+        question.data.p1 = p1;
+        question.data.p2 = p2;
+        question.data.result = calculateSlope(p1, p2);
         
-        showResult(message, 'success');
-        gameState.questionAnswered = true; // Mark question as answered
-        updateStats('slope', true);
+        // Update question data
+        const result = question.data.result;
+        const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
+        const slopeDistractors = generateSlopeDistractors(result.slope);
+        const classificationDistractors = generateClassificationDistractors(result.classification);
+        
+        const slopeOptions = [
+            { label: 'A', value: slopeValue, correct: true },
+            { label: 'B', value: slopeDistractors[0], correct: false },
+            { label: 'C', value: slopeDistractors[1], correct: false },
+            { label: 'D', value: slopeDistractors[2], correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const classificationOptions = [
+            { label: 'A', value: result.classification, correct: true },
+            { label: 'B', value: classificationDistractors[0], correct: false },
+            { label: 'C', value: classificationDistractors[1], correct: false },
+            { label: 'D', value: classificationDistractors[2], correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        currentQuestionData = {
+            type: 'slope',
+            slopeOptions: slopeOptions,
+            classificationOptions: classificationOptions,
+            correctSlopeLabel: slopeOptions.find(opt => opt.correct).label,
+            correctClassificationLabel: classificationOptions.find(opt => opt.correct).label
+        };
+        
+        // Display questions
+        document.getElementById('slopeQuestionsContainer').style.display = 'block';
+        document.getElementById('slopeValueQuestion').querySelector('.question-text').textContent = 'What is the slope?';
+        document.getElementById('slopeClassificationQuestion').querySelector('.question-text').textContent = 'What is the classification?';
+        
+        renderRadioOptions('slopeValueOptions', slopeOptions, 'slopeValue', null);
+        renderRadioOptions('slopeClassificationOptions', classificationOptions, 'slopeClassification', null);
+        
+        document.getElementById('slopeSubmit').style.display = 'block';
+        document.getElementById('slopeResult').textContent = '';
+        document.getElementById('slopeResult').className = 'result-area';
+        
+        gameState.questionAnswered = false;
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
-        gameState.questionAnswered = true; // Mark question as answered even on error
-        updateStats('slope', false);
     }
 }
 
-function handleRelationshipProblem() {
-    // Prevent spam clicking - check if question already answered
-    if (gameState.questionAnswered) {
+function handleSlopeSubmit() {
+    if (gameState.questionAnswered || !currentQuestionData) {
         return;
     }
     
+    const slopeSelected = document.querySelector('input[name="slopeValue"]:checked');
+    const classificationSelected = document.querySelector('input[name="slopeClassification"]:checked');
+    
+    if (!slopeSelected || !classificationSelected) {
+        showResult('Please select answers for both questions.', 'error');
+        return;
+    }
+    
+    const slopeCorrect = slopeSelected.value === currentQuestionData.correctSlopeLabel;
+    const classificationCorrect = classificationSelected.value === currentQuestionData.correctClassificationLabel;
+    const bothCorrect = slopeCorrect && classificationCorrect;
+    
+    // Disable all radio buttons
+    document.querySelectorAll('#slopeValueOptions input, #slopeClassificationOptions input').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    // Highlight correct/incorrect
+    document.querySelectorAll('#slopeValueOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
+    
+    document.querySelectorAll('#slopeClassificationOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
+    
+    let message = '';
+    if (bothCorrect) {
+        message = 'Correct! ✓\nBoth answers are correct.';
+        showResult(message, 'success');
+        updateStats('slope', true);
+    } else {
+        message = 'Incorrect.\n';
+        if (!slopeCorrect) {
+            message += `Correct slope: ${currentQuestionData.slopeOptions.find(opt => opt.correct).value} (${currentQuestionData.correctSlopeLabel})\n`;
+        }
+        if (!classificationCorrect) {
+            message += `Correct classification: ${currentQuestionData.classificationOptions.find(opt => opt.correct).value} (${currentQuestionData.correctClassificationLabel})`;
+        }
+        showResult(message, 'error');
+        updateStats('slope', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+function handleRelationshipCalculate() {
     const eq1 = document.getElementById('equation1Input').value.trim();
     const eq2 = document.getElementById('equation2Input').value.trim();
     
@@ -1675,30 +1939,75 @@ function handleRelationshipProblem() {
         const line1 = parseEquation(eq1);
         const line2 = parseEquation(eq2);
         const relationship = determineRelationship(line1, line2);
+        const relationshipDistractors = generateRelationshipDistractors(relationship);
         
-        const line1Formatted = formatEquation(line1);
-        const line2Formatted = formatEquation(line2);
+        const options = [
+            { label: 'A', value: relationship, correct: true },
+            { label: 'B', value: relationshipDistractors[0], correct: false },
+            { label: 'C', value: relationshipDistractors[1], correct: false },
+            { label: 'D', value: relationshipDistractors[2], correct: false }
+        ].sort(() => Math.random() - 0.5);
         
-        let message = `Equation 1: ${line1Formatted}\n`;
-        message += `Equation 2: ${line2Formatted}\n`;
-        message += `Relationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
+        const correctLabel = options.find(opt => opt.correct).label;
         
-        showResult(message, 'success');
-        gameState.questionAnswered = true; // Mark question as answered
-        updateStats('relationship', true);
+        currentQuestionData = {
+            type: 'relationship',
+            options: options,
+            correctLabel: correctLabel
+        };
+        
+        document.getElementById('relationshipQuestionContainer').style.display = 'block';
+        document.querySelector('#relationshipQuestionContainer .question-text').textContent = 'What is the relationship between these two lines?';
+        renderRadioOptions('relationshipOptions', options, 'relationship', null);
+        document.getElementById('relationshipSubmit').style.display = 'block';
+        document.getElementById('relationshipResult').textContent = '';
+        document.getElementById('relationshipResult').className = 'result-area';
+        
+        gameState.questionAnswered = false;
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
-        gameState.questionAnswered = true; // Mark question as answered even on error
-        updateStats('relationship', false);
     }
 }
 
-function handleParallelProblem() {
-    // Prevent spam clicking - check if question already answered
-    if (gameState.questionAnswered) {
+function handleRelationshipSubmit() {
+    if (gameState.questionAnswered || !currentQuestionData) {
         return;
     }
     
+    const selected = document.querySelector('input[name="relationship"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const isCorrect = selected.value === currentQuestionData.correctLabel;
+    
+    document.querySelectorAll('#relationshipOptions input').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    document.querySelectorAll('#relationshipOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
+    
+    if (isCorrect) {
+        showResult('Correct! ✓', 'success');
+        updateStats('relationship', true);
+    } else {
+        const correctOption = currentQuestionData.options.find(opt => opt.correct);
+        showResult(`Incorrect. Correct answer: ${correctOption.value} (${correctOption.label})`, 'error');
+        updateStats('relationship', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+function handleParallelCalculate() {
     const equation = document.getElementById('parallelEquationInput').value.trim();
     const pointStr = document.getElementById('parallelPointInput').value.trim();
     
@@ -1706,24 +2015,76 @@ function handleParallelProblem() {
         const baseLine = parseEquation(equation);
         const point = parsePoint(pointStr);
         const resultLine = findParallelLine(baseLine, point);
-        const equationFormatted = formatEquation(resultLine);
+        const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, true);
+        const correctEq = formatEquation(resultLine);
         
-        showResult(`Parallel line: ${equationFormatted}`, 'success');
-        gameState.questionAnswered = true; // Mark question as answered
-        updateStats('parallel', true);
+        const options = [
+            { label: 'A', value: correctEq, correct: true },
+            { label: 'B', value: equationDistractors[0], correct: false },
+            { label: 'C', value: equationDistractors[1], correct: false },
+            { label: 'D', value: equationDistractors[2], correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctLabel = options.find(opt => opt.correct).label;
+        
+        currentQuestionData = {
+            type: 'parallel',
+            options: options,
+            correctLabel: correctLabel
+        };
+        
+        document.getElementById('parallelQuestionContainer').style.display = 'block';
+        document.querySelector('#parallelQuestionContainer .question-text').textContent = 'Which equation represents a line parallel to the base line that passes through the given point?';
+        renderRadioOptions('parallelOptions', options, 'parallel', null);
+        document.getElementById('parallelSubmit').style.display = 'block';
+        document.getElementById('parallelResult').textContent = '';
+        document.getElementById('parallelResult').className = 'result-area';
+        
+        gameState.questionAnswered = false;
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
-        gameState.questionAnswered = true; // Mark question as answered even on error
-        updateStats('parallel', false);
     }
 }
 
-function handlePerpendicularProblem() {
-    // Prevent spam clicking - check if question already answered
-    if (gameState.questionAnswered) {
+function handleParallelSubmit() {
+    if (gameState.questionAnswered || !currentQuestionData) {
         return;
     }
     
+    const selected = document.querySelector('input[name="parallel"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const isCorrect = selected.value === currentQuestionData.correctLabel;
+    
+    document.querySelectorAll('#parallelOptions input').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    document.querySelectorAll('#parallelOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
+    
+    if (isCorrect) {
+        showResult('Correct! ✓', 'success');
+        updateStats('parallel', true);
+    } else {
+        const correctOption = currentQuestionData.options.find(opt => opt.correct);
+        showResult(`Incorrect. Correct answer: ${correctOption.value} (${correctOption.label})`, 'error');
+        updateStats('parallel', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+function handlePerpendicularCalculate() {
     const equation = document.getElementById('perpendicularEquationInput').value.trim();
     const pointStr = document.getElementById('perpendicularPointInput').value.trim();
     
@@ -1731,16 +2092,73 @@ function handlePerpendicularProblem() {
         const baseLine = parseEquation(equation);
         const point = parsePoint(pointStr);
         const resultLine = findPerpendicularLine(baseLine, point);
-        const equationFormatted = formatEquation(resultLine);
+        const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, false);
+        const correctEq = formatEquation(resultLine);
         
-        showResult(`Perpendicular line: ${equationFormatted}`, 'success');
-        gameState.questionAnswered = true; // Mark question as answered
-        updateStats('perpendicular', true);
+        const options = [
+            { label: 'A', value: correctEq, correct: true },
+            { label: 'B', value: equationDistractors[0], correct: false },
+            { label: 'C', value: equationDistractors[1], correct: false },
+            { label: 'D', value: equationDistractors[2], correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctLabel = options.find(opt => opt.correct).label;
+        
+        currentQuestionData = {
+            type: 'perpendicular',
+            options: options,
+            correctLabel: correctLabel
+        };
+        
+        document.getElementById('perpendicularQuestionContainer').style.display = 'block';
+        document.querySelector('#perpendicularQuestionContainer .question-text').textContent = 'Which equation represents a line perpendicular to the base line that passes through the given point?';
+        renderRadioOptions('perpendicularOptions', options, 'perpendicular', null);
+        document.getElementById('perpendicularSubmit').style.display = 'block';
+        document.getElementById('perpendicularResult').textContent = '';
+        document.getElementById('perpendicularResult').className = 'result-area';
+        
+        gameState.questionAnswered = false;
     } catch (error) {
         showResult('Error: ' + error.message, 'error');
-        gameState.questionAnswered = true; // Mark question as answered even on error
+    }
+}
+
+function handlePerpendicularSubmit() {
+    if (gameState.questionAnswered || !currentQuestionData) {
+        return;
+    }
+    
+    const selected = document.querySelector('input[name="perpendicular"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const isCorrect = selected.value === currentQuestionData.correctLabel;
+    
+    document.querySelectorAll('#perpendicularOptions input').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    document.querySelectorAll('#perpendicularOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
+    
+    if (isCorrect) {
+        showResult('Correct! ✓', 'success');
+        updateStats('perpendicular', true);
+    } else {
+        const correctOption = currentQuestionData.options.find(opt => opt.correct);
+        showResult(`Incorrect. Correct answer: ${correctOption.value} (${correctOption.label})`, 'error');
         updateStats('perpendicular', false);
     }
+    
+    gameState.questionAnswered = true;
 }
 
 // LocalStorage Functions
@@ -1956,33 +2374,50 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI();
     });
     
-    // Problem type submit buttons
-    document.getElementById('slopeSubmit').addEventListener('click', () => {
+    // Practice mode - Calculate buttons (generate questions)
+    document.getElementById('slopeCalculateBtn')?.addEventListener('click', () => {
         startQuestionTimer();
-        handleSlopeProblem();
+        handleSlopeCalculate();
     });
     
-    document.getElementById('relationshipSubmit').addEventListener('click', () => {
+    document.getElementById('relationshipCalculateBtn')?.addEventListener('click', () => {
         startQuestionTimer();
-        handleRelationshipProblem();
+        handleRelationshipCalculate();
     });
     
-    document.getElementById('parallelSubmit').addEventListener('click', () => {
+    document.getElementById('parallelCalculateBtn')?.addEventListener('click', () => {
         startQuestionTimer();
-        handleParallelProblem();
+        handleParallelCalculate();
     });
     
-    document.getElementById('perpendicularSubmit').addEventListener('click', () => {
+    document.getElementById('perpendicularCalculateBtn')?.addEventListener('click', () => {
         startQuestionTimer();
-        handlePerpendicularProblem();
+        handlePerpendicularCalculate();
+    });
+    
+    // Practice mode - Submit buttons (submit multiple choice answers)
+    document.getElementById('slopeSubmit')?.addEventListener('click', () => {
+        handleSlopeSubmit();
+    });
+    
+    document.getElementById('relationshipSubmit')?.addEventListener('click', () => {
+        handleRelationshipSubmit();
+    });
+    
+    document.getElementById('parallelSubmit')?.addEventListener('click', () => {
+        handleParallelSubmit();
+    });
+    
+    document.getElementById('perpendicularSubmit')?.addEventListener('click', () => {
+        handlePerpendicularSubmit();
     });
     
     // Start timer on input and reset question answered flag when input changes
     document.querySelectorAll('.input-field').forEach(input => {
         input.addEventListener('focus', startQuestionTimer);
         input.addEventListener('input', () => {
-            // Reset question answered flag when user changes input (new question)
-            gameState.questionAnswered = false;
+            // Reset question state when user changes input (new question)
+            resetQuestionState();
         });
     });
     
@@ -2081,4 +2516,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startSessionTimer();
     }
 });
+
+
 
