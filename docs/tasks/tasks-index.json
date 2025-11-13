@@ -65,6 +65,12 @@
       "name": "Fraction and Decimal Answer Format",
       "status": "pending",
       "description": "Display all numeric answers (slopes and slopes in equations) in both fraction and decimal formats: 'fraction (decimal)' (e.g., '2/3 (0.667)')"
+    },
+    {
+      "id": "milestone-12",
+      "name": "Complete Practice Mode Rewrite",
+      "status": "pending",
+      "description": "Completely rewrite Practice mode code from scratch to fix multiple choice display issues and improve code structure while maintaining all existing functionality"
     }
   ]
 }
