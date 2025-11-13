@@ -27,6 +27,7 @@ body {
 /* Header */
 .header {
     grid-column: 1 / -1;
+    grid-row: 1;
     background: white;
     padding: 20px 30px;
     border-radius: 10px;
@@ -36,6 +37,7 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
+    width: 100%;
 }
 
 .header h1 {
@@ -97,16 +99,20 @@ body {
 /* Tabs */
 /* Navigation Sidebar */
 .nav-sidebar {
-    display: block;
+    display: block !important;
     background: white;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px 0;
     height: fit-content;
+    min-height: 400px;
     position: sticky;
     top: 20px;
     grid-column: 1;
     grid-row: 2;
+    visibility: visible;
+    opacity: 1;
+    z-index: 10;
 }
 
 /* Mobile Menu Toggle Button */
@@ -871,8 +877,8 @@ body {
         grid-template-columns: 1fr 300px;
     }
     
-    .nav-sidebar {
-        display: none;
+    .nav-sidebar:not(.active) {
+        display: none !important;
         position: fixed;
         top: 0;
         left: 0;
