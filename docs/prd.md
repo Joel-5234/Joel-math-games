@@ -1,5 +1,5 @@
 Product Requirements Document
-Parallel & Perpendicular Lines Web Trainer
+St. Benedict's Prep - 8th Grade Math
 	1.	Product overview
 Parallel & Perpendicular Lines Web Trainer is a browser-based app built with HTML, CSS, and JavaScript.
 It helps students practice nine types of line problems and turns practice into a timed, achievement-based game.

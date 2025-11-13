@@ -1,7 +1,7 @@
 {
-  "name": "parallel-perpendicular-lines-trainer",
+  "name": "st-benedicts-prep-8th-grade-math",
   "version": "1.0.0",
-  "description": "A browser-based educational game for practicing line equations",
+  "description": "St. Benedict's Prep - 8th Grade Math: A browser-based educational game for practicing line equations",
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",

@@ -3,7 +3,7 @@
 
 import { test, expect } from '@playwright/test';
 
-test.describe('Parallel & Perpendicular Lines Web Trainer', () => {
+test.describe("St. Benedict's Prep - 8th Grade Math", () => {
   test('should load the app', async ({ page }) => {
     await page.goto('/');
     // Wait for page to load
@@ -11,6 +11,8 @@ test.describe('Parallel & Perpendicular Lines Web Trainer', () => {
     // Check for key elements instead of title (more reliable)
     await expect(page.locator('#modeSelector')).toBeVisible();
     await expect(page.locator('.nav-sidebar')).toBeVisible();
+    // Verify title
+    await expect(page).toHaveTitle(/St\. Benedict's Prep.*8th Grade Math/i);
   });
 
   // Add more tests here as you develop the app

@@ -1,4 +1,4 @@
-# Parallel & Perpendicular Lines Web Trainer
+# St. Benedict's Prep - 8th Grade Math
 
 A browser-based educational game built with HTML, CSS, and JavaScript to help students practice line equations and relationships.
 
