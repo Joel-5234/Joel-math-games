@@ -1,6 +1,6 @@
 # Playwright Test Suite
 
-This directory contains end-to-end UI tests for the Parallel & Perpendicular Lines Trainer application.
+This directory contains end-to-end UI tests for the St. Benedict's Prep - 8th Grade Math application.
 
 ## Test Files
 
