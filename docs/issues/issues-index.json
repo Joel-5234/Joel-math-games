@@ -34,6 +34,13 @@
       "status": "fixed",
       "filename": "issue-005-20251112-194712.md",
       "date": "2025-11-12T19:47:12"
+    },
+    {
+      "id": "006",
+      "description": "Multiple choice not appearing in Practice and Session modes",
+      "status": "in_progress",
+      "filename": "issue-006-20251113-013706.md",
+      "date": "2025-11-13T01:37:06"
     }
   ]
 }

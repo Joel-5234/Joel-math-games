@@ -1939,7 +1939,7 @@ function handleSlopeCalculate() {
             return;
         }
         
-        container.style.display = 'block';
+        container.style.setProperty('display', 'block', 'important');
         const valueText = valueQuestion.querySelector('.question-text');
         const classificationText = classificationQuestion.querySelector('.question-text');
         
@@ -1947,10 +1947,11 @@ function handleSlopeCalculate() {
         if (classificationText) classificationText.textContent = 'What is the classification?';
         
         console.log('Displaying multiple choice for slope question in mode:', gameState.mode);
+        console.log('Container display style:', container.style.display);
         renderRadioOptions('slopeValueOptions', slopeOptions, 'slopeValue', null);
         renderRadioOptions('slopeClassificationOptions', classificationOptions, 'slopeClassification', null);
         
-        submitBtn.style.display = 'block';
+        submitBtn.style.setProperty('display', 'block', 'important');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
@@ -2065,14 +2066,15 @@ function handleRelationshipCalculate() {
             return;
         }
         
-        container.style.display = 'block';
+        container.style.setProperty('display', 'block', 'important');
         const questionText = container.querySelector('.question-text');
         if (questionText) {
             questionText.textContent = 'What is the relationship between these two lines?';
         }
         console.log('Displaying multiple choice for relationship question in mode:', gameState.mode);
+        console.log('Container display style:', container.style.display);
         renderRadioOptions('relationshipOptions', options, 'relationship', null);
-        submitBtn.style.display = 'block';
+        submitBtn.style.setProperty('display', 'block', 'important');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
@@ -2165,14 +2167,15 @@ function handleParallelCalculate() {
             return;
         }
         
-        container.style.display = 'block';
+        container.style.setProperty('display', 'block', 'important');
         const questionText = container.querySelector('.question-text');
         if (questionText) {
             questionText.textContent = 'Which equation represents a line parallel to the base line that passes through the given point?';
         }
         console.log('Displaying multiple choice for parallel question in mode:', gameState.mode);
+        console.log('Container display style:', container.style.display);
         renderRadioOptions('parallelOptions', options, 'parallel', null);
-        submitBtn.style.display = 'block';
+        submitBtn.style.setProperty('display', 'block', 'important');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
@@ -2265,14 +2268,15 @@ function handlePerpendicularCalculate() {
             return;
         }
         
-        container.style.display = 'block';
+        container.style.setProperty('display', 'block', 'important');
         const questionText = container.querySelector('.question-text');
         if (questionText) {
             questionText.textContent = 'Which equation represents a line perpendicular to the base line that passes through the given point?';
         }
         console.log('Displaying multiple choice for perpendicular question in mode:', gameState.mode);
+        console.log('Container display style:', container.style.display);
         renderRadioOptions('perpendicularOptions', options, 'perpendicular', null);
-        submitBtn.style.display = 'block';
+        submitBtn.style.setProperty('display', 'block', 'important');
         resultArea.textContent = '';
         resultArea.className = 'result-area';
         
