@@ -825,27 +825,60 @@ function displayChallengeQuestion() {
             
             inputContainer.innerHTML = slopeHtml + classificationHtml;
             
-            // Render options
-            if (question.slopeQuestion && question.classificationQuestion) {
-                renderRadioOptions('challengeSlopeValueOptions', question.slopeQuestion.options, 'challengeSlopeValue', null);
-                renderRadioOptions('challengeSlopeClassificationOptions', question.classificationQuestion.options, 'challengeSlopeClassification', null);
+            // Render options - ensure question has the new structure
+            if (!question.slopeQuestion || !question.classificationQuestion) {
+                // Regenerate question with multiple choice structure if missing
+                const result = question.data.result;
+                const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
+                const slopeDistractors = generateSlopeDistractors(result.slope);
+                const classificationDistractors = generateClassificationDistractors(result.classification);
                 
-                // Restore selected answers if answered
-                if (userAnswer && questionState === 'answered') {
-                    const answers = userAnswer.split(',');
-                    if (answers[0]) {
-                        const slopeRadio = document.querySelector(`input[name="challengeSlopeValue"][value="${answers[0].trim()}"]`);
-                        if (slopeRadio) slopeRadio.checked = true;
-                    }
-                    if (answers[1]) {
-                        const classificationRadio = document.querySelector(`input[name="challengeSlopeClassification"][value="${answers[1].trim()}"]`);
-                        if (classificationRadio) classificationRadio.checked = true;
-                    }
-                    // Disable all if answered
-                    document.querySelectorAll('#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input').forEach(radio => {
-                        radio.disabled = true;
-                    });
+                const slopeOptions = [
+                    { label: 'A', value: slopeValue, correct: true },
+                    { label: 'B', value: slopeDistractors[0], correct: false },
+                    { label: 'C', value: slopeDistractors[1], correct: false },
+                    { label: 'D', value: slopeDistractors[2], correct: false }
+                ].sort(() => Math.random() - 0.5);
+                
+                const classificationOptions = [
+                    { label: 'A', value: result.classification, correct: true },
+                    { label: 'B', value: classificationDistractors[0], correct: false },
+                    { label: 'C', value: classificationDistractors[1], correct: false },
+                    { label: 'D', value: classificationDistractors[2], correct: false }
+                ].sort(() => Math.random() - 0.5);
+                
+                question.slopeQuestion = {
+                    question: 'What is the slope?',
+                    options: slopeOptions,
+                    correctAnswer: slopeOptions.find(opt => opt.correct).label
+                };
+                
+                question.classificationQuestion = {
+                    question: 'What is the classification?',
+                    options: classificationOptions,
+                    correctAnswer: classificationOptions.find(opt => opt.correct).label
+                };
+            }
+            
+            // Render options
+            renderRadioOptions('challengeSlopeValueOptions', question.slopeQuestion.options, 'challengeSlopeValue', null);
+            renderRadioOptions('challengeSlopeClassificationOptions', question.classificationQuestion.options, 'challengeSlopeClassification', null);
+            
+            // Restore selected answers if answered
+            if (userAnswer && questionState === 'answered') {
+                const answers = userAnswer.split(',');
+                if (answers[0]) {
+                    const slopeRadio = document.querySelector(`input[name="challengeSlopeValue"][value="${answers[0].trim()}"]`);
+                    if (slopeRadio) slopeRadio.checked = true;
                 }
+                if (answers[1]) {
+                    const classificationRadio = document.querySelector(`input[name="challengeSlopeClassification"][value="${answers[1].trim()}"]`);
+                    if (classificationRadio) classificationRadio.checked = true;
+                }
+                // Disable all if answered
+                document.querySelectorAll('#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input').forEach(radio => {
+                    radio.disabled = true;
+                });
             }
         } else if (question.type === 'relationship') {
             questionDisplay.innerHTML = `
@@ -860,15 +893,26 @@ function displayChallengeQuestion() {
                 </div>
             `;
             
-            if (question.options) {
-                renderRadioOptions('challengeRelationshipOptions', question.options, 'challengeRelationship', null);
-                
-                // Restore selected answer if answered
-                if (userAnswer && questionState === 'answered') {
-                    const radio = document.querySelector(`input[name="challengeRelationship"][value="${userAnswer}"]`);
-                    if (radio) radio.checked = true;
-                    document.querySelectorAll('#challengeRelationshipOptions input').forEach(r => r.disabled = true);
-                }
+            // Ensure question has options structure
+            if (!question.options) {
+                const relationship = question.data.relationship;
+                const relationshipDistractors = generateRelationshipDistractors(relationship);
+                question.options = [
+                    { label: 'A', value: relationship, correct: true },
+                    { label: 'B', value: relationshipDistractors[0], correct: false },
+                    { label: 'C', value: relationshipDistractors[1], correct: false },
+                    { label: 'D', value: relationshipDistractors[2], correct: false }
+                ].sort(() => Math.random() - 0.5);
+                question.correctAnswerLabel = question.options.find(opt => opt.correct).label;
+            }
+            
+            renderRadioOptions('challengeRelationshipOptions', question.options, 'challengeRelationship', null);
+            
+            // Restore selected answer if answered
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeRelationship"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeRelationshipOptions input').forEach(r => r.disabled = true);
             }
         } else if (question.type === 'parallel') {
             questionDisplay.innerHTML = `
@@ -881,15 +925,27 @@ function displayChallengeQuestion() {
                 </div>
             `;
             
-            if (question.options) {
-                renderRadioOptions('challengeParallelOptions', question.options, 'challengeParallel', null);
-                
-                // Restore selected answer if answered
-                if (userAnswer && questionState === 'answered') {
-                    const radio = document.querySelector(`input[name="challengeParallel"][value="${userAnswer}"]`);
-                    if (radio) radio.checked = true;
-                    document.querySelectorAll('#challengeParallelOptions input').forEach(r => r.disabled = true);
-                }
+            // Ensure question has options structure
+            if (!question.options) {
+                const resultLine = question.data.resultLine;
+                const equationDistractors = generateEquationDistractors(resultLine, question.data.baseLine, question.data.point, true);
+                const correctEq = formatEquation(resultLine);
+                question.options = [
+                    { label: 'A', value: correctEq, correct: true },
+                    { label: 'B', value: equationDistractors[0], correct: false },
+                    { label: 'C', value: equationDistractors[1], correct: false },
+                    { label: 'D', value: equationDistractors[2], correct: false }
+                ].sort(() => Math.random() - 0.5);
+                question.correctAnswerLabel = question.options.find(opt => opt.correct).label;
+            }
+            
+            renderRadioOptions('challengeParallelOptions', question.options, 'challengeParallel', null);
+            
+            // Restore selected answer if answered
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeParallel"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeParallelOptions input').forEach(r => r.disabled = true);
             }
         } else if (question.type === 'perpendicular') {
             questionDisplay.innerHTML = `
@@ -902,15 +958,27 @@ function displayChallengeQuestion() {
                 </div>
             `;
             
-            if (question.options) {
-                renderRadioOptions('challengePerpendicularOptions', question.options, 'challengePerpendicular', null);
-                
-                // Restore selected answer if answered
-                if (userAnswer && questionState === 'answered') {
-                    const radio = document.querySelector(`input[name="challengePerpendicular"][value="${userAnswer}"]`);
-                    if (radio) radio.checked = true;
-                    document.querySelectorAll('#challengePerpendicularOptions input').forEach(r => r.disabled = true);
-                }
+            // Ensure question has options structure
+            if (!question.options) {
+                const resultLine = question.data.resultLine;
+                const equationDistractors = generateEquationDistractors(resultLine, question.data.baseLine, question.data.point, false);
+                const correctEq = formatEquation(resultLine);
+                question.options = [
+                    { label: 'A', value: correctEq, correct: true },
+                    { label: 'B', value: equationDistractors[0], correct: false },
+                    { label: 'C', value: equationDistractors[1], correct: false },
+                    { label: 'D', value: equationDistractors[2], correct: false }
+                ].sort(() => Math.random() - 0.5);
+                question.correctAnswerLabel = question.options.find(opt => opt.correct).label;
+            }
+            
+            renderRadioOptions('challengePerpendicularOptions', question.options, 'challengePerpendicular', null);
+            
+            // Restore selected answer if answered
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengePerpendicular"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengePerpendicularOptions input').forEach(r => r.disabled = true);
             }
         }
         
@@ -2416,8 +2484,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.input-field').forEach(input => {
         input.addEventListener('focus', startQuestionTimer);
         input.addEventListener('input', () => {
-            // Reset question answered flag when user changes input (new question)
-            gameState.questionAnswered = false;
+            // Reset question state when user changes input (new question)
+            resetQuestionState();
         });
     });
     
