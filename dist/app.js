@@ -768,6 +768,10 @@ function initializeChallenge(problemType, setSize) {
 }
 
 function resetChallenge() {
+    // Stop timer when resetting challenge
+    stopQuestionTimer();
+    gameState.questionStartTime = null;
+    
     challengeState = {
         active: false,
         setSize: null,
@@ -820,6 +824,10 @@ function startChallenge(setSize) {
     const tabName = activeTab ? activeTab.dataset.tab : 'slope';
     const problemType = mapTabToProblemType(tabName);
     
+    // Stop any existing timer and reset for challenge mode
+    stopQuestionTimer();
+    gameState.questionStartTime = null;
+    
     initializeChallenge(problemType, setSize);
     hideChallengeSetupModal();
     displayChallengeQuestion();
@@ -852,6 +860,16 @@ function displayChallengeQuestion() {
     const question = challengeState.questions[challengeState.currentQuestionIndex];
     const questionState = challengeState.questionStates[challengeState.currentQuestionIndex];
     const userAnswer = challengeState.answers[challengeState.currentQuestionIndex] || '';
+    
+    // Reset and start timer for this question (only if not already answered)
+    if (questionState !== 'answered' && questionState !== 'gave-up') {
+        stopQuestionTimer();
+        gameState.questionStartTime = Date.now();
+        gameState.questionTimer = setInterval(updateTimer, 100);
+    } else {
+        // Stop timer if question is already answered
+        stopQuestionTimer();
+    }
     
     // Update question counter
     const questionCounter = document.getElementById('challengeQuestionCounter');
@@ -1226,11 +1244,15 @@ function navigateChallengeQuestion(direction) {
 }
 
 function skipChallengeQuestion() {
+    // Stop timer when skipping
+    stopQuestionTimer();
     challengeState.questionStates[challengeState.currentQuestionIndex] = 'skipped';
     navigateChallengeQuestion('next');
 }
 
 function giveUpChallengeQuestion() {
+    // Stop timer when giving up
+    stopQuestionTimer();
     const question = challengeState.questions[challengeState.currentQuestionIndex];
     challengeState.questionStates[challengeState.currentQuestionIndex] = 'gave-up';
     challengeState.correctAnswers[challengeState.currentQuestionIndex] = false;
@@ -1265,6 +1287,9 @@ function submitChallengeAnswer() {
     if (questionState === 'answered' || questionState === 'gave-up') {
         return; // Already answered
     }
+    
+    // Stop timer when answer is submitted
+    stopQuestionTimer();
     
     let userInput = '';
     let isCorrect = false;
