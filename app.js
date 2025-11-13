@@ -253,6 +253,138 @@ function roundToDecimal(num, decimals = 2) {
     return Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 }
 
+// Fraction Conversion Utilities (Milestone 15)
+function gcd(a, b) {
+    // Greatest Common Divisor using Euclidean algorithm
+    a = Math.abs(a);
+    b = Math.abs(b);
+    while (b !== 0) {
+        const temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+function simplifyFraction(numerator, denominator) {
+    // Simplify fraction using GCD
+    if (denominator === 0) return { numerator: 0, denominator: 1 };
+    if (numerator === 0) return { numerator: 0, denominator: 1 };
+    
+    const sign = (numerator < 0) !== (denominator < 0) ? -1 : 1;
+    const absNum = Math.abs(numerator);
+    const absDen = Math.abs(denominator);
+    const divisor = gcd(absNum, absDen);
+    
+    return {
+        numerator: sign * (absNum / divisor),
+        denominator: absDen / divisor
+    };
+}
+
+function decimalToFraction(decimal, tolerance = 0.0001, maxDenominator = 100) {
+    // Convert decimal to fraction using continued fractions
+    if (decimal === 0) return { numerator: 0, denominator: 1 };
+    if (Math.abs(decimal) >= 1) {
+        // Handle integers and numbers >= 1
+        const wholePart = Math.floor(Math.abs(decimal));
+        const fractionalPart = Math.abs(decimal) - wholePart;
+        if (fractionalPart < tolerance) {
+            return { numerator: decimal < 0 ? -wholePart : wholePart, denominator: 1 };
+        }
+    }
+    
+    // Common fraction lookup table
+    const commonFractions = [
+        { decimal: 0.5, num: 1, den: 2 },
+        { decimal: 0.25, num: 1, den: 4 },
+        { decimal: 0.75, num: 3, den: 4 },
+        { decimal: 0.333, num: 1, den: 3 },
+        { decimal: 0.667, num: 2, den: 3 },
+        { decimal: 0.2, num: 1, den: 5 },
+        { decimal: 0.4, num: 2, den: 5 },
+        { decimal: 0.6, num: 3, den: 5 },
+        { decimal: 0.8, num: 4, den: 5 },
+        { decimal: 0.125, num: 1, den: 8 },
+        { decimal: 0.375, num: 3, den: 8 },
+        { decimal: 0.625, num: 5, den: 8 },
+        { decimal: 0.875, num: 7, den: 8 }
+    ];
+    
+    // Check common fractions first
+    for (const frac of commonFractions) {
+        if (Math.abs(Math.abs(decimal) - frac.decimal) < tolerance) {
+            return { numerator: decimal < 0 ? -frac.num : frac.num, denominator: frac.den };
+        }
+    }
+    
+    // Use continued fractions algorithm
+    let h1 = 1, h2 = 0, k1 = 0, k2 = 1;
+    let b = Math.abs(decimal);
+    const sign = decimal < 0 ? -1 : 1;
+    
+    for (let i = 0; i < 20; i++) {
+        const a = Math.floor(b);
+        const aux = h1;
+        h1 = a * h1 + h2;
+        h2 = aux;
+        const aux2 = k1;
+        k1 = a * k1 + k2;
+        k2 = aux2;
+        
+        if (k1 > maxDenominator) break;
+        
+        const approx = h1 / k1;
+        if (Math.abs(Math.abs(decimal) - approx) < tolerance) {
+            return simplifyFraction(sign * h1, k1);
+        }
+        
+        b = 1 / (b - a);
+        if (b === Infinity) break;
+    }
+    
+    // If we get here, try simple denominator approach
+    for (let den = 2; den <= maxDenominator; den++) {
+        const num = Math.round(Math.abs(decimal) * den);
+        const approx = num / den;
+        if (Math.abs(Math.abs(decimal) - approx) < tolerance) {
+            return simplifyFraction(sign * num, den);
+        }
+    }
+    
+    // Fallback: return null if conversion fails
+    return null;
+}
+
+function formatSlopeValue(slope) {
+    // Format slope as fraction only (no decimal)
+    if (slope === Infinity || slope === -Infinity) {
+        return 'undefined';
+    }
+    
+    if (slope === 0) {
+        return '0';
+    }
+    
+    // Check if it's already an integer
+    if (Math.abs(slope - Math.round(slope)) < 0.0001) {
+        return Math.round(slope).toString();
+    }
+    
+    // Try to convert to fraction
+    const fraction = decimalToFraction(slope, 0.001, 100);
+    if (fraction) {
+        const simplified = simplifyFraction(fraction.numerator, fraction.denominator);
+        if (simplified.denominator === 1) {
+            return simplified.numerator.toString();
+        }
+        return `${simplified.numerator}/${simplified.denominator}`;
+    }
+    
+    // Fallback to decimal if fraction conversion fails
+    return roundToDecimal(slope, 2).toString();
+}
+
 // Math Logic Functions
 function calculateSlope(p1, p2) {
     if (p1.x === p2.x && p1.y === p2.y) {
@@ -337,6 +469,10 @@ function formatEquation(line) {
     }
     
     let equation = 'y = ';
+    
+    // Format slope as fraction
+    const slopeStr = formatSlopeValue(line.m);
+    
     if (line.m === 0) {
         equation += line.b;
     } else if (line.m === 1) {
@@ -344,7 +480,12 @@ function formatEquation(line) {
     } else if (line.m === -1) {
         equation += `-x`;
     } else {
-        equation += `${line.m}x`;
+        // Use fraction format for slope
+        if (slopeStr.includes('/')) {
+            equation += `(${slopeStr})x`;
+        } else {
+            equation += `${slopeStr}x`;
+        }
     }
     
     if (line.b !== 0) {
@@ -367,30 +508,30 @@ function randomFloat(min, max, decimals = 1) {
 // Distractor Generation Functions for Multiple Choice
 function generateSlopeDistractors(correctSlope) {
     const distractors = new Set();
-    const correct = correctSlope === Infinity ? 'undefined' : roundToDecimal(correctSlope, 1).toString();
+    const correct = correctSlope === Infinity ? 'undefined' : formatSlopeValue(correctSlope);
     
     // Generate wrong answers: wrong sign, calculation errors, common mistakes
     while (distractors.size < 3) {
         let distractor;
         if (correctSlope === Infinity) {
             // For vertical lines, wrong answers are numeric slopes
-            distractor = roundToDecimal(randomFloat(-5, 5), 1).toString();
+            distractor = formatSlopeValue(randomFloat(-5, 5));
         } else if (correctSlope === 0) {
             // For horizontal lines, wrong answers are non-zero slopes
             const val = randomInt(-5, 5) || 1;
-            distractor = val.toString();
+            distractor = formatSlopeValue(val);
         } else {
             // Common mistakes: wrong sign, off by small amount, reciprocal
             const mistakeType = randomInt(0, 2);
             if (mistakeType === 0) {
                 // Wrong sign
-                distractor = roundToDecimal(-correctSlope, 1).toString();
+                distractor = formatSlopeValue(-correctSlope);
             } else if (mistakeType === 1) {
                 // Off by small amount
-                distractor = roundToDecimal(correctSlope + randomFloat(-1, 1), 1).toString();
+                distractor = formatSlopeValue(correctSlope + randomFloat(-1, 1));
             } else {
                 // Reciprocal or other calculation error
-                distractor = correctSlope !== 0 ? roundToDecimal(1 / correctSlope, 1).toString() : '1';
+                distractor = correctSlope !== 0 ? formatSlopeValue(1 / correctSlope) : '1';
             }
         }
         
@@ -464,13 +605,13 @@ function generateSlopeQuestion() {
     const result = calculateSlope(p1, p2);
     
     // Generate two separate questions: slope value and classification
-    const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
-    const slopeDistractors = generateSlopeDistractors(result.slope);
-    const classificationDistractors = generateClassificationDistractors(result.classification);
-    
-    // Create options for slope question
-    const slopeOptions = [
-        { label: 'A', value: slopeValue, correct: true },
+        const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
+        const slopeDistractors = generateSlopeDistractors(result.slope);
+        const classificationDistractors = generateClassificationDistractors(result.classification);
+        
+        // Create options for slope question
+        const slopeOptions = [
+            { label: 'A', value: slopeValue, correct: true },
         { label: 'B', value: slopeDistractors[0], correct: false },
         { label: 'C', value: slopeDistractors[1], correct: false },
         { label: 'D', value: slopeDistractors[2], correct: false }
@@ -2317,7 +2458,7 @@ function handleSlopeCalculate() {
         const result = calculateSlope(p1, p2);
         
         // Generate multiple choice options
-        const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
+        const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
         const slopeDistractors = generateSlopeDistractors(result.slope);
         const classificationDistractors = generateClassificationDistractors(result.classification);
         
@@ -3094,19 +3235,19 @@ function generateRateOfChangeDistractors(correctRate, rates) {
     // Wrong interval calculations
     for (const r of rates) {
         if (r.rate !== correctRate && r.rate !== null) {
-            distractors.push(r.rate);
+            distractors.push(formatSlopeValue(r.rate));
         }
     }
     
     // Sign errors
     if (correctRate !== null) {
-        distractors.push(-correctRate);
+        distractors.push(formatSlopeValue(-correctRate));
     }
     
     // Calculation mistakes
     if (correctRate !== null) {
-        distractors.push(correctRate + 1);
-        distractors.push(correctRate - 1);
+        distractors.push(formatSlopeValue(correctRate + 1));
+        distractors.push(formatSlopeValue(correctRate - 1));
     }
     
     return distractors.slice(0, 3);
@@ -3291,10 +3432,10 @@ function handleRateOfChangeCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: targetRate.rate.toString(), correct: true },
-            { label: 'B', value: (distractors[0] || 0).toString(), correct: false },
-            { label: 'C', value: (distractors[1] || 1).toString(), correct: false },
-            { label: 'D', value: (distractors[2] || -1).toString(), correct: false }
+            { label: 'A', value: formatSlopeValue(targetRate.rate), correct: true },
+            { label: 'B', value: distractors[0] || formatSlopeValue(0), correct: false },
+            { label: 'C', value: distractors[1] || formatSlopeValue(1), correct: false },
+            { label: 'D', value: distractors[2] || formatSlopeValue(-1), correct: false }
         ].sort(() => Math.random() - 0.5);
         
         const correctIndex = options.findIndex(opt => opt.correct);
@@ -3581,10 +3722,10 @@ function generateRateOfChangeQuestion() {
     
     const distractors = generateRateOfChangeDistractors(targetRate.rate, rates);
     const options = [
-        { label: 'A', value: targetRate.rate.toString(), correct: true },
-        { label: 'B', value: (distractors[0] || 0).toString(), correct: false },
-        { label: 'C', value: (distractors[1] || 1).toString(), correct: false },
-        { label: 'D', value: (distractors[2] || -1).toString(), correct: false }
+        { label: 'A', value: formatSlopeValue(targetRate.rate), correct: true },
+        { label: 'B', value: distractors[0] || formatSlopeValue(0), correct: false },
+        { label: 'C', value: distractors[1] || formatSlopeValue(1), correct: false },
+        { label: 'D', value: distractors[2] || formatSlopeValue(-1), correct: false }
     ].sort(() => Math.random() - 0.5);
     
     const correctIndex = options.findIndex(opt => opt.correct);

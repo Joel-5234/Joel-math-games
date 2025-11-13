@@ -1,0 +1,86 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "St. Benedict's Prep - 8th Grade Math" [level=1] [ref=e4]
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]: "Mode:"
+          - combobox [ref=e8] [cursor=pointer]:
+            - option "Practice" [selected]
+            - option "Challenge"
+            - option "Session"
+        - generic [ref=e9]:
+          - generic [ref=e10]: "Score:"
+          - generic [ref=e11]: "0"
+        - generic [ref=e12]:
+          - generic [ref=e13]: "Streak:"
+          - generic [ref=e14]: "0"
+        - generic [ref=e15]:
+          - generic [ref=e16]: "Best Streak:"
+          - generic [ref=e17]: "0"
+        - generic [ref=e18]:
+          - generic [ref=e19]: "Timer:"
+          - generic [ref=e20]: 5s
+    - navigation [ref=e21]:
+      - generic [ref=e22]:
+        - button "Slope & Description" [ref=e23] [cursor=pointer]
+        - button "Line Relationship" [ref=e24] [cursor=pointer]
+        - button "Parallel Line" [ref=e25] [cursor=pointer]
+        - button "Perpendicular Line" [ref=e26] [cursor=pointer]
+        - button "Intercepts" [ref=e27] [cursor=pointer]
+        - button "Rate of Change" [ref=e28] [cursor=pointer]
+        - button "Linear Functions" [ref=e29] [cursor=pointer]
+        - button "Standard Form" [ref=e30] [cursor=pointer]
+    - main [ref=e31]:
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - heading "Parallel Line Through a Point" [level=2] [ref=e36]
+          - button "💡 Get Hint" [ref=e37] [cursor=pointer]
+        - paragraph [ref=e38]: Enter a base equation and a point in format (x,y)
+        - generic [ref=e39]:
+          - generic [ref=e40]: "Base Equation:"
+          - textbox "Base Equation:" [ref=e41]:
+            - /placeholder: y = 2x + 3
+            - text: y = 2/3x + 1
+        - generic [ref=e42]:
+          - generic [ref=e43]: "Point:"
+          - textbox "Point:" [ref=e44]:
+            - /placeholder: (4,5)
+            - text: (3, 3)
+        - button "Calculate" [active] [ref=e45] [cursor=pointer]
+        - generic [ref=e46]: "Error: Invalid equation format. Supported: y=mx+b, Ax+By=C, x=c, y=c"
+    - complementary [ref=e47]:
+      - generic [ref=e48]:
+        - heading "Session Info" [level=3] [ref=e49]
+        - generic [ref=e50]:
+          - paragraph [ref=e51]: "Questions: 0"
+          - paragraph [ref=e52]: "Correct: 0"
+          - paragraph [ref=e53]: "Accuracy: 0%"
+      - generic [ref=e54]:
+        - heading "Achievements" [level=3] [ref=e55]
+        - button "View All" [ref=e56] [cursor=pointer]
+      - generic [ref=e57]:
+        - heading "Help" [level=3] [ref=e58]
+        - generic [ref=e59]:
+          - paragraph [ref=e60]:
+            - strong [ref=e61]: "Practice Mode:"
+            - text: No time limit, track your time
+          - paragraph [ref=e62]:
+            - strong [ref=e63]: "Challenge Mode:"
+            - text: Pre-generated question sets with navigation
+          - paragraph [ref=e64]:
+            - strong [ref=e65]: "Session Mode:"
+            - text: 10 minute practice session
+      - generic [ref=e66]:
+        - heading "Developer Tools" [level=3] [ref=e67]
+        - generic [ref=e68]:
+          - button "🎉 Test Confetti" [ref=e69] [cursor=pointer]
+          - button "🎆 Test Fireworks" [ref=e70] [cursor=pointer]
+  - generic [ref=e72]:
+    - heading "🎉 Achievement Unlocked!" [level=3] [ref=e73]
+    - paragraph
+    - paragraph
+```

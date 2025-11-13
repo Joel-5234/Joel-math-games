@@ -87,7 +87,7 @@
     {
       "id": "milestone-15",
       "name": "Fraction-Only Answer Format",
-      "status": "pending",
+      "status": "completed",
       "description": "Display all numeric answers (slopes and slopes in equations) in fraction format only, without decimal equivalents: 'fraction' (e.g., '2/3' instead of '2/3 (0.667)')"
     }
   ]
