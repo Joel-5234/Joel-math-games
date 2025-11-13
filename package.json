@@ -5,7 +5,14 @@
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "test:quick": "playwright test --project=chromium --workers=1 tests/ui/example.spec.js tests/ui/vertical-navigation.spec.js",
+    "test:basic": "playwright test --project=chromium --workers=1 tests/ui/slope-parsing.spec.js tests/ui/multiple-choice-display.spec.js tests/ui/spam-click-prevention.spec.js",
+    "test:challenge": "playwright test --project=chromium --workers=1 tests/ui/challenge-hints.spec.js tests/ui/challenge-mode-basic-types.spec.js tests/ui/challenge-mode-new-types.spec.js",
+    "test:ui-components": "playwright test --project=chromium --workers=1 tests/ui/vertical-navigation.spec.js tests/ui/multiple-choice-display.spec.js",
+    "test:challenge-basic": "playwright test --project=chromium --workers=1 tests/ui/challenge-mode-basic-types.spec.js",
+    "test:challenge-new": "playwright test --project=chromium --workers=1 tests/ui/challenge-mode-new-types.spec.js",
+    "test:all": "playwright test --project=chromium --workers=2"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0"

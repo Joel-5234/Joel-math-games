@@ -1,11 +1,12 @@
-// @ts-check
-const { test, expect } = require('@playwright/test');
+// Playwright tests for Challenge Mode Hints functionality
+
+import { test, expect } from '@playwright/test';
 
 test.describe('Challenge Mode Hints', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('http://localhost:8080');
+        await page.goto('/');
         // Wait for page to load
-        await page.waitForSelector('#modeSelector');
+        await page.waitForSelector('#modeSelector', { timeout: 10000 });
     });
 
     test('hint button should be visible in challenge mode', async ({ page }) => {

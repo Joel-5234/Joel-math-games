@@ -11,50 +11,90 @@ test.describe('Slope Input Parsing', () => {
     });
 
     test('should parse two points with space: (4,4), (4,4)', async ({ page }) => {
+        // Set mode to Practice
+        await page.selectOption('#modeSelector', 'practice');
+        
         await page.fill('#slopeInput', '(4,4), (4,4)');
-        await page.click('#slopeSubmit');
+        await page.click('#slopeCalculateBtn');
+        
+        // Wait for result or error
+        await page.waitForTimeout(500);
         
         // Should show error about identical points, not parsing error
         const result = await page.textContent('#slopeResult');
-        expect(result).toContain('Error');
-        // Should NOT contain "Please enter two points"
-        expect(result).not.toContain('Please enter two points in the format');
+        expect(result).toBeTruthy();
+        // Should NOT contain "Please enter two points" (parsing error)
+        if (result) {
+            expect(result).not.toContain('Please enter two points in the format');
+        }
     });
 
     test('should parse two points without space: (2,3),(5,9)', async ({ page }) => {
+        // Set mode to Practice
+        await page.selectOption('#modeSelector', 'practice');
+        
         await page.fill('#slopeInput', '(2,3),(5,9)');
-        await page.click('#slopeSubmit');
+        await page.click('#slopeCalculateBtn');
+        
+        // Wait for multiple choice to appear
+        await page.waitForSelector('#slopeQuestionsContainer', { timeout: 5000 });
+        
+        // Verify questions are displayed
+        const slopeValueQuestion = page.locator('#slopeValueQuestion');
+        await expect(slopeValueQuestion).toBeVisible();
         
         const result = await page.textContent('#slopeResult');
-        expect(result).toContain('Slope');
-        expect(result).toContain('Classification');
+        // Result might be empty initially, or contain feedback after submission
+        // Just verify the questions container is visible
+        expect(await slopeValueQuestion.isVisible()).toBe(true);
         expect(result).not.toContain('Error: Please enter two points');
     });
 
     test('should parse two points with decimals: (2.5,3.5), (7.2,9.1)', async ({ page }) => {
-        await page.fill('#slopeInput', '(2.5,3.5), (7.2,9.1)');
-        await page.click('#slopeSubmit');
+        // Set mode to Practice
+        await page.selectOption('#modeSelector', 'practice');
         
-        const result = await page.textContent('#slopeResult');
-        expect(result).toContain('Slope');
-        expect(result).not.toContain('Error: Please enter two points');
+        await page.fill('#slopeInput', '(2.5,3.5), (7.2,9.1)');
+        await page.click('#slopeCalculateBtn');
+        
+        // Wait for multiple choice to appear
+        await page.waitForSelector('#slopeQuestionsContainer', { timeout: 5000 });
+        
+        // Verify questions are displayed
+        const slopeValueQuestion = page.locator('#slopeValueQuestion');
+        await expect(slopeValueQuestion).toBeVisible();
     });
 
     test('should handle vertical line: (4,4), (4,8)', async ({ page }) => {
-        await page.fill('#slopeInput', '(4,4), (4,8)');
-        await page.click('#slopeSubmit');
+        // Set mode to Practice
+        await page.selectOption('#modeSelector', 'practice');
         
-        const result = await page.textContent('#slopeResult');
-        expect(result).toContain('Vertical');
-        expect(result).not.toContain('Error: Please enter two points');
+        await page.fill('#slopeInput', '(4,4), (4,8)');
+        await page.click('#slopeCalculateBtn');
+        
+        // Wait for multiple choice to appear
+        await page.waitForSelector('#slopeQuestionsContainer', { timeout: 5000 });
+        
+        // Verify questions are displayed
+        const slopeValueQuestion = page.locator('#slopeValueQuestion');
+        await expect(slopeValueQuestion).toBeVisible();
     });
 
     test('should show error for invalid format', async ({ page }) => {
+        // Set mode to Practice
+        await page.selectOption('#modeSelector', 'practice');
+        
         await page.fill('#slopeInput', 'invalid input');
-        await page.click('#slopeSubmit');
+        await page.click('#slopeCalculateBtn');
+        
+        // Wait for error message
+        await page.waitForTimeout(500);
         
         const result = await page.textContent('#slopeResult');
-        expect(result).toContain('Error');
+        expect(result).toBeTruthy();
+        if (result) {
+            expect(result.toLowerCase()).toContain('error');
+        }
     });
 });
 

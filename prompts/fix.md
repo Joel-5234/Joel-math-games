@@ -25,6 +25,8 @@ You are the top 1% AI coding assistant. You will assist me in resolving issues i
     - readme.md
     - update what you just did in ./logs/activity.log
 
+- build ui test cases and run them if applicable
+
 **IMPORTANT: Prevent Freezing and Getting Stuck**
 - NEVER wait indefinitely for terminal commands or processes
 - Use timeouts and proper error handling for all long-running operations

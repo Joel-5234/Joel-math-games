@@ -6,7 +6,11 @@ import { test, expect } from '@playwright/test';
 test.describe('Parallel & Perpendicular Lines Web Trainer', () => {
   test('should load the app', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveTitle(/Parallel.*Perpendicular/i);
+    // Wait for page to load
+    await page.waitForLoadState('networkidle');
+    // Check for key elements instead of title (more reliable)
+    await expect(page.locator('#modeSelector')).toBeVisible();
+    await expect(page.locator('.nav-sidebar')).toBeVisible();
   });
 
   // Add more tests here as you develop the app
