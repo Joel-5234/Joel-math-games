@@ -1480,7 +1480,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        isCorrect = selected.value === question.correctAnswerLabel;
+        // Use dataset.correct for reliable comparison instead of label comparison
+        isCorrect = selected.dataset.correct === 'true';
         
         // Disable and highlight
         document.querySelectorAll('#challengeRelationshipOptions input').forEach(radio => {
@@ -1508,7 +1509,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        isCorrect = selected.value === question.correctAnswerLabel;
+        // Use dataset.correct for reliable comparison instead of label comparison
+        isCorrect = selected.dataset.correct === 'true';
         
         // Disable and highlight
         document.querySelectorAll('#challengeParallelOptions input').forEach(radio => {
@@ -1536,7 +1538,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        isCorrect = selected.value === question.correctAnswerLabel;
+        // Use dataset.correct for reliable comparison instead of label comparison
+        isCorrect = selected.dataset.correct === 'true';
         
         // Disable and highlight
         document.querySelectorAll('#challengePerpendicularOptions input').forEach(radio => {
@@ -1579,7 +1582,8 @@ function submitChallengeAnswer() {
         }
         
         userInput = selected.value;
-        isCorrect = selected.value === question.correctAnswerLabel;
+        // Use dataset.correct for reliable comparison instead of label comparison
+        isCorrect = selected.dataset.correct === 'true';
         
         // Disable and highlight
         document.querySelectorAll(`#${optionId} input`).forEach(radio => {
