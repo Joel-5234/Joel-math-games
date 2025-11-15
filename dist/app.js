@@ -2308,24 +2308,23 @@ function hideHints(hintType) {
     }
 }
 
-// Helper function to sort options alphabetically by label (A, B, C, D)
-function sortOptionsByLabel(options) {
-    return [...options].sort((a, b) => {
-        // Sort by label: A, B, C, D
-        return a.label.localeCompare(b.label);
-    });
-}
-
 // Helper function to render radio options
 function renderRadioOptions(containerId, options, name, onSelect) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // Sort options alphabetically by label before rendering
-    const sortedOptions = sortOptionsByLabel(options);
+    // Reassign labels A, B, C, D to options in their current order
+    // Options are already shuffled in generators, this ensures labels are always alphabetical
+    // while keeping the correct answer at a random position
+    const labels = ['A', 'B', 'C', 'D'];
+    options.forEach((option, index) => {
+        if (index < labels.length) {
+            option.label = labels[index];
+        }
+    });
     
     container.innerHTML = '';
-    sortedOptions.forEach(option => {
+    options.forEach(option => {
         const optionDiv = document.createElement('div');
         optionDiv.className = 'radio-option';
         

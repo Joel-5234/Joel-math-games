@@ -1,5 +1,7 @@
 // Playwright tests for Multiple Choice Option Ordering (Issue #012)
-// Tests that options are displayed in alphabetical order (A, B, C, D)
+// Tests that:
+// 1. Options are displayed in alphabetical order (A, B, C, D)
+// 2. Correct answer is randomized (not always at the same position)
 
 import { test, expect } from '@playwright/test';
 
@@ -83,6 +85,49 @@ test.describe('Multiple Choice Option Ordering', () => {
     
     // Verify they are in alphabetical order
     expect(letters).toEqual(['A', 'B', 'C', 'D']);
+  });
+
+  test('should randomize correct answer position in Challenge mode', async ({ page }) => {
+    // Switch to Challenge mode
+    await page.selectOption('#modeSelector', 'challenge');
+    await page.waitForSelector('#challengeSetupModal', { timeout: 3000 });
+    
+    // Start a challenge with 10 questions to test randomization
+    await page.click('button[data-size="10"]');
+    await page.waitForSelector('#challengeQuestionDisplay', { timeout: 3000 });
+    
+    // Track which positions have the correct answer
+    const correctPositions = new Set();
+    
+    // Go through multiple questions
+    for (let i = 0; i < 5; i++) {
+      await page.waitForTimeout(500);
+      
+      // Find the correct answer by checking data-correct attribute
+      const correctOption = await page.locator('.radio-option input[data-correct="true"]').first();
+      
+      if (await correctOption.count() > 0) {
+        const correctId = await correctOption.getAttribute('id');
+        // Extract the label from the ID (e.g., "challengeAnswer_B" -> "B")
+        const match = correctId.match(/_([A-D])$/);
+        if (match) {
+          correctPositions.add(match[1]);
+        }
+      }
+      
+      // Skip to next question (if not the last one)
+      if (i < 4) {
+        const skipButton = page.locator('#skipChallengeBtn');
+        if (await skipButton.isVisible()) {
+          await skipButton.click();
+          await page.waitForTimeout(500);
+        }
+      }
+    }
+    
+    // Verify that correct answers appeared at multiple positions
+    // (With 5 questions, we should see at least 2 different positions with high probability)
+    expect(correctPositions.size).toBeGreaterThanOrEqual(2);
   });
 });
 
