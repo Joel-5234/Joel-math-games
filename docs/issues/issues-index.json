@@ -72,10 +72,11 @@
     },
     {
       "id": "012",
-      "description": "Multiple Choice Options Not in Alphabetical Order",
+      "description": "Multiple Choice Options Not in Alphabetical Order (Revised: Randomize correct answer position)",
       "status": "fixed",
       "filename": "issue-012-20251115-105847.md",
-      "date": "2025-11-15T10:58:47"
+      "date": "2025-11-15T10:58:47",
+      "revised": "2025-11-15T11:11:00"
     }
   ]
 }
