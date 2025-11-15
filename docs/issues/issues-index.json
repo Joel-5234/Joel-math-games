@@ -69,6 +69,13 @@
       "status": "fixed",
       "filename": "issue-010-20251112-213956.md",
       "date": "2025-11-12T21:39:56"
+    },
+    {
+      "id": "012",
+      "description": "Multiple Choice Options Not in Alphabetical Order",
+      "status": "fixed",
+      "filename": "issue-012-20251115-105847.md",
+      "date": "2025-11-15T10:58:47"
     }
   ]
 }
