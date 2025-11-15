@@ -19,11 +19,11 @@ test.describe('Vertical Navigation Sidebar', () => {
     await expect(sidebar).toHaveCSS('display', 'block');
   });
 
-  test('should display all 9 tabs in sidebar', async ({ page }) => {
+  test('should display all 10 tabs in sidebar', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
     
     const tabs = page.locator('.tab-button');
-    await expect(tabs).toHaveCount(9);
+    await expect(tabs).toHaveCount(10);
     
     // Verify all expected tabs are present
     const tabTexts = await tabs.allTextContents();
@@ -35,6 +35,8 @@ test.describe('Vertical Navigation Sidebar', () => {
     expect(tabTexts).toContain('Rate of Change');
     expect(tabTexts).toContain('Linear Functions');
     expect(tabTexts).toContain('Standard Form');
+    expect(tabTexts).toContain('Point-Slope Form');
+    expect(tabTexts).toContain('Absolute Value');
   });
 
   test('should have vertical flex layout for tabs', async ({ page }) => {

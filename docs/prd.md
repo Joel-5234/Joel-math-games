@@ -2,10 +2,10 @@ Product Requirements Document
 St. Benedict's Prep - 8th Grade Math
 	1.	Product overview
 Parallel & Perpendicular Lines Web Trainer is a browser-based app built with HTML, CSS, and JavaScript.
-It helps students practice nine types of line problems and turns practice into a timed, achievement-based game.
+It helps students practice ten types of line problems and turns practice into a timed, achievement-based game.
 The app runs fully client-side and stores progress locally in the browser.
 	2.	Objectives
-a) Help students answer nine core homework question types on lines:
+a) Help students answer ten core homework question types on lines:
 	1.	Slope and line description through two points
 	2.	Relationship between two equations
 	3.	Parallel line through a point
@@ -14,6 +14,8 @@ a) Help students answer nine core homework question types on lines:
 	6.	Rate of change (from tables)
 	7.	Identifying linear functions (from tables)
 	8.	Converting to standard form
+	9.	Point-slope form drills
+	10.	Absolute value line graphs
 
 b) Improve speed and accuracy with a timer, streaks, and achievements.
 
@@ -274,7 +276,7 @@ a) Header
 • Score, streak, timer display
 b) Navigation
 • Vertical sidebar navigation on the left (desktop)
-• Fixed width sidebar (220-250px) with all nine problem type tabs
+• Fixed width sidebar (220-250px) with all ten problem type tabs
 • Active tab indicated by left border highlight
 • Mobile/tablet: Collapsible dropdown menu with hamburger icon
 c) Main content
@@ -511,7 +513,7 @@ e) Responsive design:
    - Tablet/Mobile: Collapsible dropdown menu
    - Hamburger menu icon for mobile
    - Dropdown closes when tab is selected
-f) All 9 problem type tabs accessible in sidebar
+f) All 10 problem type tabs accessible in sidebar
 g) Smooth transitions and hover effects maintained
 
 10.13 Study Guide Aligned Slope-Intercept and Point-Slope Drills

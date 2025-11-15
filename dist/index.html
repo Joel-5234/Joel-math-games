@@ -61,6 +61,8 @@
                 <button class="tab-button" data-tab="rateofchange">Rate of Change</button>
                 <button class="tab-button" data-tab="linearfunction">Linear Functions</button>
                 <button class="tab-button" data-tab="standardform">Standard Form</button>
+                <button class="tab-button" data-tab="pointslope">Point-Slope Form</button>
+                <button class="tab-button" data-tab="absolutevalue">Absolute Value</button>
             </div>
         </nav>
 
@@ -77,12 +79,89 @@
                                 💡 Get Hint
                             </button>
                         </div>
-                        <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
-                        <div class="input-group">
-                            <label for="slopeInput">Points:</label>
-                            <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                        <!-- Mode selector for different slope-intercept variants -->
+                        <div class="mode-selector-group" style="margin-bottom: 15px;">
+                            <label>Practice Mode:</label>
+                            <select id="slopeModeSelector" class="mode-selector-small">
+                                <option value="twoPoints">From Two Points</option>
+                                <option value="mAndB">From m and b</option>
+                                <option value="mAndPoint">From m and Point</option>
+                            </select>
                         </div>
-                        <button id="slopeCalculateBtn" class="submit-button">Calculate</button>
+                        
+                        <!-- Two Points Mode (default) -->
+                        <div id="slopeTwoPointsMode" class="slope-mode">
+                            <p class="instructions">Enter two points in the format: (x1,y1),(x2,y2)</p>
+                            <div class="input-group">
+                                <label for="slopeInput">Points:</label>
+                                <input type="text" id="slopeInput" placeholder="(2,3),(5,9)" class="input-field">
+                            </div>
+                            <button id="slopeCalculateBtn" class="submit-button">Calculate</button>
+                        </div>
+                        
+                        <!-- From m and b Mode -->
+                        <div id="slopeMAndBMode" class="slope-mode" style="display: none;">
+                            <p class="instructions">Enter slope (m) and y-intercept (b). Use fractions like 2/3 or integers.</p>
+                            <div class="input-group">
+                                <label for="slopeInterceptMInput">Slope (m):</label>
+                                <input type="text" id="slopeInterceptMInput" placeholder="2/3 or 2" class="input-field">
+                            </div>
+                            <div class="input-group">
+                                <label for="slopeInterceptBInput">y-intercept (b):</label>
+                                <input type="text" id="slopeInterceptBInput" placeholder="5 or -3" class="input-field">
+                            </div>
+                            <button id="slopeInterceptMBCalculateBtn" class="submit-button">Calculate</button>
+                            <div id="slopeInterceptMBQuestionContainer" style="display: none;">
+                                <div class="multiple-choice-question">
+                                    <p class="question-text"></p>
+                                    <div class="radio-group" id="slopeInterceptMBOptions"></div>
+                                </div>
+                                <button id="slopeInterceptMBSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                            </div>
+                        </div>
+                        
+                        <!-- From m and Point Mode -->
+                        <div id="slopeMAndPointMode" class="slope-mode" style="display: none;">
+                            <p class="instructions">Enter slope (m) and a point (x,y). Use fractions like 2/3 or integers.</p>
+                            <div class="input-group">
+                                <label for="slopeInterceptMPointMInput">Slope (m):</label>
+                                <input type="text" id="slopeInterceptMPointMInput" placeholder="2/3 or 2" class="input-field">
+                            </div>
+                            <div class="input-group">
+                                <label for="slopeInterceptMPointInput">Point:</label>
+                                <input type="text" id="slopeInterceptMPointInput" placeholder="(3, 5)" class="input-field">
+                            </div>
+                            <button id="slopeInterceptMPointCalculateBtn" class="submit-button">Calculate</button>
+                            <div id="slopeInterceptMPointQuestionContainer" style="display: none;">
+                                <div class="multiple-choice-question">
+                                    <p class="question-text"></p>
+                                    <div class="radio-group" id="slopeInterceptMPointOptions"></div>
+                                </div>
+                                <button id="slopeInterceptMPointSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Two-Point Form Mode (Section 4.11) -->
+                        <div id="slopeTwoPointMode" class="slope-mode" style="display: none;">
+                            <p class="instructions">Enter two points to find the slope-intercept form equation.</p>
+                            <div class="input-group">
+                                <label for="twoPointP1Input">Point 1:</label>
+                                <input type="text" id="twoPointP1Input" placeholder="(2, 3)" class="input-field">
+                            </div>
+                            <div class="input-group">
+                                <label for="twoPointP2Input">Point 2:</label>
+                                <input type="text" id="twoPointP2Input" placeholder="(5, 9)" class="input-field">
+                            </div>
+                            <button id="twoPointCalculateBtn" class="submit-button">Calculate</button>
+                            <div id="twoPointQuestionContainer" style="display: none;">
+                                <div class="multiple-choice-question">
+                                    <p class="question-text"></p>
+                                    <div class="radio-group" id="twoPointOptions"></div>
+                                </div>
+                                <button id="twoPointSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                            </div>
+                        </div>
+                        
                         <div id="slopeQuestionsContainer" style="display: none;">
                             <div id="slopeValueQuestion" class="multiple-choice-question">
                                 <p class="question-text"></p>
@@ -360,6 +439,83 @@
                             <button class="close-hint" data-hint-panel="standardform-hint-panel">&times;</button>
                         </div>
                         <div id="standardform-hint-content" class="hint-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Type 9: Point-Slope Form -->
+            <div id="pointslope-panel" class="problem-panel">
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Point-Slope Form</h2>
+                            <button class="hint-button" data-hint="pointslope" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter slope (m) and a point (x,y) to build point-slope form equation.</p>
+                        <div class="input-group">
+                            <label for="pointSlopeMInput">Slope (m):</label>
+                            <input type="text" id="pointSlopeMInput" placeholder="2/3 or 2" class="input-field">
+                        </div>
+                        <div class="input-group">
+                            <label for="pointSlopePointInput">Point:</label>
+                            <input type="text" id="pointSlopePointInput" placeholder="(3, 5)" class="input-field">
+                        </div>
+                        <button id="pointSlopeCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="pointSlopeQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="pointSlopeOptions"></div>
+                            </div>
+                            <button id="pointSlopeSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
+                        <div id="pointSlopeResult" class="result-area"></div>
+                    </div>
+                    <div id="pointslope-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="pointslope-hint-panel">&times;</button>
+                        </div>
+                        <div id="pointslope-hint-content" class="hint-content"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem Type 10: Absolute Value Graphs -->
+            <div id="absolutevalue-panel" class="problem-panel">
+                <div class="problem-layout">
+                    <div class="problem-card">
+                        <div class="problem-header">
+                            <h2>Absolute Value Graphs</h2>
+                            <button class="hint-button" data-hint="absolutevalue" title="Get hints">
+                                💡 Get Hint
+                            </button>
+                        </div>
+                        <p class="instructions">Enter an absolute value equation in the format: y = a|bx + c| + d</p>
+                        <div class="input-group">
+                            <label for="absoluteValueInput">Equation:</label>
+                            <input type="text" id="absoluteValueInput" placeholder="y = 2|3x + 1| - 5" class="input-field">
+                        </div>
+                        <button id="absoluteValueCalculateBtn" class="submit-button">Calculate</button>
+                        <div id="absoluteValueGraphContainer" style="display: none;">
+                            <canvas id="absoluteValueGraph" width="400" height="400"></canvas>
+                        </div>
+                        <div id="absoluteValueQuestionContainer" style="display: none;">
+                            <div class="multiple-choice-question">
+                                <p class="question-text"></p>
+                                <div class="radio-group" id="absoluteValueOptions"></div>
+                            </div>
+                            <button id="absoluteValueSubmit" class="submit-button" style="display: none;">Submit Answer</button>
+                        </div>
+                        <div id="absoluteValueResult" class="result-area"></div>
+                    </div>
+                    <div id="absolutevalue-hint-panel" class="hint-panel">
+                        <div class="hint-header">
+                            <h3>💡 Hints</h3>
+                            <button class="close-hint" data-hint-panel="absolutevalue-hint-panel">&times;</button>
+                        </div>
+                        <div id="absolutevalue-hint-content" class="hint-content"></div>
                     </div>
                 </div>
             </div>
