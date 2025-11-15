@@ -642,43 +642,37 @@ function generateSlopeQuestion() {
         const slopeDistractors = generateSlopeDistractors(result.slope);
         const classificationDistractors = generateClassificationDistractors(result.classification);
         
-        // Create options for slope question
+        // Create options for slope question (no labels yet, will be assigned in renderRadioOptions)
         const slopeOptions = [
-            { label: 'A', value: slopeValue, correct: true },
-        { label: 'B', value: slopeDistractors[0], correct: false },
-        { label: 'C', value: slopeDistractors[1], correct: false },
-        { label: 'D', value: slopeDistractors[2], correct: false }
+            { value: slopeValue, correct: true },
+            { value: slopeDistractors[0], correct: false },
+            { value: slopeDistractors[1], correct: false },
+            { value: slopeDistractors[2], correct: false }
     ].sort(() => Math.random() - 0.5); // Shuffle options
     
-    const correctSlopeIndex = slopeOptions.findIndex(opt => opt.correct);
-    const correctSlopeLabel = slopeOptions[correctSlopeIndex].label;
-    
-    // Create options for classification question
+    // Create options for classification question (no labels yet, will be assigned in renderRadioOptions)
     const classificationOptions = [
-        { label: 'A', value: result.classification, correct: true },
-        { label: 'B', value: classificationDistractors[0], correct: false },
-        { label: 'C', value: classificationDistractors[1], correct: false },
-        { label: 'D', value: classificationDistractors[2], correct: false }
+        { value: result.classification, correct: true },
+        { value: classificationDistractors[0], correct: false },
+        { value: classificationDistractors[1], correct: false },
+        { value: classificationDistractors[2], correct: false }
     ].sort(() => Math.random() - 0.5); // Shuffle options
-    
-    const correctClassificationIndex = classificationOptions.findIndex(opt => opt.correct);
-    const correctClassificationLabel = classificationOptions[correctClassificationIndex].label;
     
     return {
         type: 'slope',
         question: `Find the slope and classification for the line through points (${p1.x},${p1.y}) and (${p2.x},${p2.y})`,
         display: `(${p1.x},${p1.y}), (${p2.x},${p2.y})`,
-        correctAnswer: `Slope: ${slopeValue} (${correctSlopeLabel})\nClassification: ${result.classification} (${correctClassificationLabel})`,
+        correctAnswer: `Slope: ${slopeValue}\nClassification: ${result.classification}`,
         data: { p1, p2, result },
         slopeQuestion: {
             question: `What is the slope?`,
             options: slopeOptions,
-            correctAnswer: correctSlopeLabel
+            correctAnswer: slopeValue
         },
         classificationQuestion: {
             question: `What is the classification?`,
             options: classificationOptions,
-            correctAnswer: correctClassificationLabel
+            correctAnswer: result.classification
         }
     };
 }
@@ -748,18 +742,15 @@ function generateRelationshipQuestion() {
     const relationship = determineRelationship(line1, line2);
     const relationshipDistractors = generateRelationshipDistractors(relationship);
     
-    // Create options for relationship question
+    // Create options for relationship question (no labels yet, will be assigned in renderRadioOptions)
     const options = [
-        { label: 'A', value: relationship, correct: true },
-        { label: 'B', value: relationshipDistractors[0], correct: false },
-        { label: 'C', value: relationshipDistractors[1], correct: false },
-        { label: 'D', value: relationshipDistractors[2], correct: false }
+        { value: relationship, correct: true },
+        { value: relationshipDistractors[0], correct: false },
+        { value: relationshipDistractors[1], correct: false },
+        { value: relationshipDistractors[2], correct: false }
     ].sort(() => Math.random() - 0.5); // Shuffle options
     
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
-    
-    const correctAnswer = `Equation 1: ${formatEquation(line1)}\nEquation 2: ${formatEquation(line2)}\nRelationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)} (${correctLabel})`;
+    const correctAnswer = `Equation 1: ${formatEquation(line1)}\nEquation 2: ${formatEquation(line2)}\nRelationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
     
     return {
         type: 'relationship',
@@ -768,7 +759,7 @@ function generateRelationshipQuestion() {
         correctAnswer: correctAnswer,
         data: { line1, line2, relationship },
         options: options,
-        correctAnswerLabel: correctLabel
+        correctAnswerValue: relationship
     };
 }
 
@@ -801,18 +792,15 @@ function generateParallelQuestion() {
     const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, true);
     const correctEq = formatEquation(resultLine);
     
-    // Create options for parallel question
+    // Create options for parallel question (no labels yet, will be assigned in renderRadioOptions)
     const options = [
-        { label: 'A', value: correctEq, correct: true },
-        { label: 'B', value: equationDistractors[0], correct: false },
-        { label: 'C', value: equationDistractors[1], correct: false },
-        { label: 'D', value: equationDistractors[2], correct: false }
+        { value: correctEq, correct: true },
+        { value: equationDistractors[0], correct: false },
+        { value: equationDistractors[1], correct: false },
+        { value: equationDistractors[2], correct: false }
     ].sort(() => Math.random() - 0.5); // Shuffle options
     
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
-    
-    const correctAnswer = `Parallel line: ${correctEq} (${correctLabel})`;
+    const correctAnswer = `Parallel line: ${correctEq}`;
     
     return {
         type: 'parallel',
@@ -821,7 +809,7 @@ function generateParallelQuestion() {
         correctAnswer: correctAnswer,
         data: { baseLine, point, resultLine },
         options: options,
-        correctAnswerLabel: correctLabel
+        correctAnswerValue: correctEq
     };
 }
 
@@ -854,18 +842,15 @@ function generatePerpendicularQuestion() {
     const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, false);
     const correctEq = formatEquation(resultLine);
     
-    // Create options for perpendicular question
+    // Create options for perpendicular question (no labels yet, will be assigned in renderRadioOptions)
     const options = [
-        { label: 'A', value: correctEq, correct: true },
-        { label: 'B', value: equationDistractors[0], correct: false },
-        { label: 'C', value: equationDistractors[1], correct: false },
-        { label: 'D', value: equationDistractors[2], correct: false }
+        { value: correctEq, correct: true },
+        { value: equationDistractors[0], correct: false },
+        { value: equationDistractors[1], correct: false },
+        { value: equationDistractors[2], correct: false }
     ].sort(() => Math.random() - 0.5); // Shuffle options
     
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
-    
-    const correctAnswer = `Perpendicular line: ${correctEq} (${correctLabel})`;
+    const correctAnswer = `Perpendicular line: ${correctEq}`;
     
     return {
         type: 'perpendicular',
@@ -874,7 +859,7 @@ function generatePerpendicularQuestion() {
         correctAnswer: correctAnswer,
         data: { baseLine, point, resultLine },
         options: options,
-        correctAnswerLabel: correctLabel
+        correctAnswerValue: correctEq
     };
 }
 
@@ -1514,9 +1499,10 @@ function submitChallengeAnswer() {
             return;
         }
         
-        userInput = `${slopeSelected.value}, ${classificationSelected.value}`;
-        const slopeCorrect = slopeSelected.value === question.slopeQuestion.correctAnswer;
-        const classificationCorrect = classificationSelected.value === question.classificationQuestion.correctAnswer;
+        userInput = `${slopeSelected.dataset.value}, ${classificationSelected.dataset.value}`;
+        // Use dataset.correct for reliable comparison - ensure it's explicitly checked as string
+        const slopeCorrect = String(slopeSelected.dataset.correct) === 'true';
+        const classificationCorrect = String(classificationSelected.dataset.correct) === 'true';
         isCorrect = slopeCorrect && classificationCorrect;
         
         // Disable and highlight
