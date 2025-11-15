@@ -89,6 +89,12 @@
       "name": "Fraction-Only Answer Format",
       "status": "completed",
       "description": "Display all numeric answers (slopes and slopes in equations) in fraction format only, without decimal equivalents: 'fraction' (e.g., '2/3' instead of '2/3 (0.667)')"
+    },
+    {
+      "id": "milestone-16",
+      "name": "Study Guide Aligned Slope-Intercept and Point-Slope Drills",
+      "status": "pending",
+      "description": "Enhance existing problem types and add new study-guide aligned features: slope-intercept drills (from m and b, from m and point, graphing), point-slope form drills, two-point form conversion, parallel/perpendicular with graph labeling, absolute value graphs, and signed-number practice"
     }
   ]
 }

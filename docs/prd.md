@@ -514,3 +514,49 @@ e) Responsive design:
 f) All 9 problem type tabs accessible in sidebar
 g) Smooth transitions and hover effects maintained
 
+10.13 Study Guide Aligned Slope-Intercept and Point-Slope Drills
+a) Enhanced slope-intercept drills (Section 4.9):
+   - From slope and y-intercept: Build y = mx + b from given m and b
+   - From slope and one point: Convert point-slope to slope-intercept form
+   - Graph from slope-intercept form: Match equation to graph or graph by clicking points
+b) Point-slope form drills (Section 4.10):
+   - Build point-slope form from slope and point: y - y1 = m(x - x1)
+   - Graph from point-slope form: Convert and graph, with multiple choice graph options
+c) Two-point form to slope-intercept (Section 4.11):
+   - Convert two points to slope-intercept form
+   - Calculate slope and intercept from two points
+d) Parallel/Perpendicular with graph labeling (Section 4.12):
+   - Enhanced parallel and perpendicular problems with graph display
+   - Multiple choice includes both equation and graph thumbnail
+   - Line labeling ("Base line", "New line") on graphs
+e) Absolute value line graphs (Section 4.13):
+   - New problem type: y = a|bx + c| + d
+   - Three question variants:
+     - Which graph matches equation (4 graph options)
+     - What is the vertex (4 coordinate options)
+     - Is graph opening up or down (4 textual options)
+   - V-shaped graph rendering
+f) Point-slope to slope-intercept conversion with signed-number practice (Section 4.14):
+   - Advanced conversion handling extra constant terms
+   - Step-by-step hints showing conversion process
+   - Signed-number micro-practice integrated into hints
+   - "Practice this step" button in hint panels for relevant problems
+   - Micro-drill mode for signed-number operations (integers and fractions)
+g) All features use:
+   - Multiple choice format (A, B, C, D)
+   - Fraction-only format for numeric answers
+   - Canvas-based graph rendering (separate from intercept graph component)
+   - Integration with existing hint system
+   - Support for Practice, Challenge, and Session modes
+h) Graph component enhancements:
+   - Multiple lines on same graph
+   - Graph thumbnails for multiple choice options
+   - Line labeling and point highlighting
+   - V-shaped absolute value graphs
+   - Interactive point clicking for graphing variant
+i) Hint system enhancements:
+   - Step-by-step breakdown hints
+   - "Show steps" mode for conversions
+   - "Practice this step" overlay for signed-number practice
+   - Integration with existing hint penalties and limits
+
