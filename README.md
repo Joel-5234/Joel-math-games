@@ -57,7 +57,17 @@ The app features gamification with timers, streaks, achievements, and local prog
 
 ## 🎮 Features
 
-- **Four Problem Types**: Comprehensive practice for line equations
+- **Ten Problem Types**: Comprehensive practice for line equations
+  - Slope and line description (with variants: two points, m and b, m and point)
+  - Relationship between two equations
+  - Parallel line through a point
+  - Perpendicular line through a point
+  - Finding intercepts
+  - Rate of change
+  - Identifying linear functions
+  - Converting to standard form
+  - Point-slope form drills
+  - Absolute value line graphs
 - **Practice Mode**: Timed practice with scoring
 - **Challenge Mode**: Countdown timer with time bonuses
 - **Session Mode**: Extended practice sessions
