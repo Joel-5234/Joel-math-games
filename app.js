@@ -181,6 +181,39 @@ const hints = {
             "All coefficients should be integers. Multiply by denominators to eliminate fractions.",
             "Standard form makes it easy to find intercepts: x-intercept = C/A, y-intercept = C/B."
         ]
+    },
+    pointslope: {
+        steps: [
+            "1. Identify the slope (m) and a point (x₁, y₁)",
+            "2. Use the point-slope form: y - y₁ = m(x - x₁)",
+            "3. Pay attention to signs: if point is (3, 5), use y - 5, not y + 5",
+            "4. If point is negative, use addition: for (-2, -3), use y + 3 = m(x + 2)",
+            "5. To convert to slope-intercept: distribute m, then solve for y"
+        ],
+        formula: "Point-Slope Form: y - y₁ = m(x - x₁)\n\nWhere:\n• m = slope\n• (x₁, y₁) = point on the line\n\nConversion to Slope-Intercept:\n• y - y₁ = m(x - x₁)\n• y - y₁ = mx - mx₁\n• y = mx - mx₁ + y₁\n• y = mx + b (where b = y₁ - mx₁)",
+        concepts: [
+            "Point-slope form is useful when you know a point and the slope.",
+            "The signs are important: y - y₁ means subtract the y-coordinate of the point.",
+            "If the point has negative coordinates, the equation uses addition: y + |y₁| = m(x + |x₁|).",
+            "You can convert point-slope to slope-intercept form by distributing and solving for y."
+        ]
+    },
+    absolutevalue: {
+        steps: [
+            "1. Identify the form: y = a|bx + c| + d",
+            "2. Find the vertex: solve bx + c = 0 for x",
+            "3. Calculate vertex x: x = -c/b",
+            "4. Calculate vertex y: substitute x into equation",
+            "5. Determine direction: if a > 0, opens up; if a < 0, opens down",
+            "6. The graph is V-shaped with the vertex as the turning point"
+        ],
+        formula: "Absolute Value Graph: y = a|bx + c| + d\n\nVertex:\n• x-coordinate: Solve bx + c = 0 → x = -c/b\n• y-coordinate: y = a|b(-c/b) + c| + d = d\n• Vertex: (-c/b, d)\n\nDirection:\n• If a > 0: Opens UP (V shape)\n• If a < 0: Opens DOWN (inverted V)",
+        concepts: [
+            "Absolute value graphs are V-shaped with a vertex (turning point).",
+            "The vertex occurs where the expression inside the absolute value equals zero.",
+            "The sign of 'a' determines if the V opens up (positive) or down (negative).",
+            "The graph is symmetric about a vertical line through the vertex."
+        ]
     }
 };
 
@@ -867,6 +900,8 @@ function generateChallengeQuestions(problemType, count) {
     const generators = {
         slope: generateSlopeQuestion,
         relationship: generateRelationshipQuestion,
+        pointSlope: generatePointSlopeQuestion,
+        absoluteValue: generateAbsoluteValueQuestion,
         parallel: generateParallelQuestion,
         perpendicular: generatePerpendicularQuestion,
         intercept: generateInterceptQuestion,
@@ -952,6 +987,8 @@ function mapTabToProblemType(tabName) {
         'relationship': 'relationship',
         'parallel': 'parallel',
         'perpendicular': 'perpendicular',
+        'pointslope': 'pointSlope',
+        'absolutevalue': 'absoluteValue',
         'intercepts': 'intercept',
         'rateofchange': 'rateOfChange',
         'linearfunction': 'linearFunction',
@@ -1297,12 +1334,40 @@ function displayChallengeQuestion() {
                 if (radio) radio.checked = true;
                 document.querySelectorAll('#challengeStandardFormOptions input').forEach(r => r.disabled = true);
             }
+        } else if (question.type === 'pointSlope') {
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>`;
+            inputContainer.innerHTML = `
+                <div class="multiple-choice-question">
+                    <p class="question-text">${question.question}</p>
+                    <div class="radio-group" id="challengePointSlopeOptions"></div>
+                </div>
+            `;
+            renderRadioOptions('challengePointSlopeOptions', question.options, 'challengePointSlope', null);
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengePointSlope"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengePointSlopeOptions input').forEach(r => r.disabled = true);
+            }
+        } else if (question.type === 'absoluteValue') {
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>`;
+            inputContainer.innerHTML = `
+                <div class="multiple-choice-question">
+                    <p class="question-text">${question.question}</p>
+                    <div class="radio-group" id="challengeAbsoluteValueOptions"></div>
+                </div>
+            `;
+            renderRadioOptions('challengeAbsoluteValueOptions', question.options, 'challengeAbsoluteValue', null);
+            if (userAnswer && questionState === 'answered') {
+                const radio = document.querySelector(`input[name="challengeAbsoluteValue"][value="${userAnswer}"]`);
+                if (radio) radio.checked = true;
+                document.querySelectorAll('#challengeAbsoluteValueOptions input').forEach(r => r.disabled = true);
+            }
         }
         
         // Show answer if gave up - highlight correct options
         if (questionState === 'gave-up') {
             // Disable all radio buttons
-            const allRadioSelectors = '#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input, #challengeRelationshipOptions input, #challengeParallelOptions input, #challengePerpendicularOptions input, #challengeInterceptOptions input, #challengeRateOfChangeOptions input, #challengeLinearFunctionOptions input, #challengeStandardFormOptions input';
+            const allRadioSelectors = '#challengeSlopeValueOptions input, #challengeSlopeClassificationOptions input, #challengeRelationshipOptions input, #challengeParallelOptions input, #challengePerpendicularOptions input, #challengeInterceptOptions input, #challengeRateOfChangeOptions input, #challengeLinearFunctionOptions input, #challengeStandardFormOptions input, #challengePointSlopeOptions input, #challengeAbsoluteValueOptions input';
             document.querySelectorAll(allRadioSelectors).forEach(radio => {
                 if (radio) radio.disabled = true;
             });
@@ -1591,6 +1656,60 @@ function submitChallengeAnswer() {
         });
         
         document.querySelectorAll(`#${optionId} .radio-option`).forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
+    } else if (question.type === 'pointSlope') {
+        const selected = document.querySelector('input[name="challengePointSlope"]:checked');
+        if (!selected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select an answer.';
+                resultArea.className = 'result-area error';
+            }
+            return;
+        }
+        
+        userInput = selected.value;
+        isCorrect = String(selected.dataset.correct) === 'true';
+        
+        // Disable and highlight
+        document.querySelectorAll('#challengePointSlopeOptions input').forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll('#challengePointSlopeOptions .radio-option').forEach(opt => {
+            const radio = opt.querySelector('input');
+            if (radio.dataset.correct === 'true') {
+                opt.classList.add('correct');
+            } else if (radio.checked && radio.dataset.correct === 'false') {
+                opt.classList.add('incorrect');
+            }
+        });
+    } else if (question.type === 'absoluteValue') {
+        const selected = document.querySelector('input[name="challengeAbsoluteValue"]:checked');
+        if (!selected) {
+            const resultArea = document.getElementById('challengeResult');
+            if (resultArea) {
+                resultArea.textContent = 'Please select an answer.';
+                resultArea.className = 'result-area error';
+            }
+            return;
+        }
+        
+        userInput = selected.value;
+        isCorrect = String(selected.dataset.correct) === 'true';
+        
+        // Disable and highlight
+        document.querySelectorAll('#challengeAbsoluteValueOptions input').forEach(radio => {
+            radio.disabled = true;
+        });
+        
+        document.querySelectorAll('#challengeAbsoluteValueOptions .radio-option').forEach(opt => {
             const radio = opt.querySelector('input');
             if (radio.dataset.correct === 'true') {
                 opt.classList.add('correct');
@@ -2015,6 +2134,8 @@ const hintTypeToPanelId = {
     parallel: 'parallel-hint-panel',
     perpendicular: 'perpendicular-hint-panel',
     intercepts: 'intercepts-hint-panel',
+    pointslope: 'pointslope-hint-panel',
+    absolutevalue: 'absolutevalue-hint-panel',
     rateofchange: 'rateofchange-hint-panel',
     linearfunction: 'linearfunction-hint-panel',
     standardform: 'standardform-hint-panel'
@@ -2028,7 +2149,9 @@ const hintTypeToContentId = {
     intercepts: 'intercepts-hint-content',
     rateofchange: 'rateofchange-hint-content',
     linearfunction: 'linearfunction-hint-content',
-    standardform: 'standardform-hint-content'
+    standardform: 'standardform-hint-content',
+    pointslope: 'pointslope-hint-content',
+    absolutevalue: 'absolutevalue-hint-content'
 };
 
 function showHints(hintType) {
@@ -2404,6 +2527,11 @@ const PracticeMode = {
         currentRateOfChangeData = null;
         currentLinearFunctionData = null;
         currentStandardFormData = null;
+        currentSlopeInterceptMBData = null;
+        currentSlopeInterceptMPointData = null;
+        currentTwoPointData = null;
+        currentPointSlopeData = null;
+        currentAbsoluteValueData = null;
         
         // Hide all containers
         this.hideContainer('slopeQuestionsContainer', 'slopeSubmit');
@@ -2415,6 +2543,12 @@ const PracticeMode = {
         this.hideContainer('rateOfChangeQuestionContainer', 'rateOfChangeSubmit');
         this.hideContainer('linearFunctionQuestionContainer', 'linearFunctionSubmit');
         this.hideContainer('standardFormQuestionContainer', 'standardFormSubmit');
+        this.hideContainer('slopeInterceptMBQuestionContainer', 'slopeInterceptMBSubmit');
+        this.hideContainer('slopeInterceptMPointQuestionContainer', 'slopeInterceptMPointSubmit');
+        this.hideContainer('twoPointQuestionContainer', 'twoPointSubmit');
+        this.hideContainer('pointSlopeQuestionContainer', 'pointSlopeSubmit');
+        this.hideContainer('absoluteValueQuestionContainer', 'absoluteValueSubmit');
+        this.hideContainer('absoluteValueGraphContainer', null);
     
     // Clear result areas
     document.querySelectorAll('.result-area').forEach(area => {
@@ -3045,6 +3179,329 @@ function drawGraph(canvasId, line, xIntercept, yIntercept) {
     ctx.fillText('y', toCanvasX(0) + 5, padding - 10);
 }
 
+// ============================================================================
+// MILESTONE 16: Enhanced Graph Component (Canvas-Based)
+// ============================================================================
+
+// Enhanced graph component for multiple lines, thumbnails, and advanced features
+function drawGraphThumbnail(canvasId, line, options = {}) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width || 200;
+    const height = canvas.height || 200;
+    const padding = 20;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Set bounds
+    const xMin = options.xMin !== undefined ? options.xMin : -10;
+    const xMax = options.xMax !== undefined ? options.xMax : 10;
+    const yMin = options.yMin !== undefined ? options.yMin : -10;
+    const yMax = options.yMax !== undefined ? options.yMax : 10;
+    const xRange = xMax - xMin;
+    const yRange = yMax - yMin;
+    
+    // Helper to convert graph coordinates to canvas coordinates
+    const toCanvasX = (x) => padding + ((x - xMin) / xRange) * graphWidth;
+    const toCanvasY = (y) => padding + graphHeight - ((y - yMin) / yRange) * graphHeight;
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, toCanvasY(0));
+    ctx.lineTo(width - padding, toCanvasY(0));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(0), padding);
+    ctx.lineTo(toCanvasX(0), height - padding);
+    ctx.stroke();
+    
+    // Draw line
+    if (line.kind === 'vertical') {
+        ctx.strokeStyle = options.color || '#0066cc';
+        ctx.lineWidth = options.lineWidth || 2;
+        ctx.beginPath();
+        ctx.moveTo(toCanvasX(line.x0), padding);
+        ctx.lineTo(toCanvasX(line.x0), height - padding);
+        ctx.stroke();
+    } else {
+        ctx.strokeStyle = options.color || '#0066cc';
+        ctx.lineWidth = options.lineWidth || 2;
+        ctx.beginPath();
+        let firstPoint = true;
+        for (let x = xMin; x <= xMax; x += 0.2) {
+            const y = line.m * x + line.b;
+            if (y >= yMin && y <= yMax) {
+                if (firstPoint) {
+                    ctx.moveTo(toCanvasX(x), toCanvasY(y));
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(toCanvasX(x), toCanvasY(y));
+                }
+            }
+        }
+        ctx.stroke();
+    }
+    
+    // Draw label if provided
+    if (options.label) {
+        ctx.fillStyle = options.labelColor || '#000';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(options.label, padding + 5, padding + 12);
+    }
+}
+
+function drawMultipleLines(canvasId, lines, labels = []) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 40;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Set bounds
+    const xMin = -10, xMax = 10;
+    const yMin = -10, yMax = 10;
+    const xRange = xMax - xMin;
+    const yRange = yMax - yMin;
+    
+    // Helper to convert graph coordinates to canvas coordinates
+    const toCanvasX = (x) => padding + ((x - xMin) / xRange) * graphWidth;
+    const toCanvasY = (y) => padding + graphHeight - ((y - yMin) / yRange) * graphHeight;
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding, toCanvasY(0));
+    ctx.lineTo(width - padding, toCanvasY(0));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(0), padding);
+    ctx.lineTo(toCanvasX(0), height - padding);
+    ctx.stroke();
+    
+    // Draw grid lines
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1;
+    for (let x = xMin; x <= xMax; x++) {
+        if (x !== 0) {
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(x), padding);
+            ctx.lineTo(toCanvasX(x), height - padding);
+            ctx.stroke();
+        }
+    }
+    for (let y = yMin; y <= yMax; y++) {
+        if (y !== 0) {
+            ctx.beginPath();
+            ctx.moveTo(padding, toCanvasY(y));
+            ctx.lineTo(width - padding, toCanvasY(y));
+            ctx.stroke();
+        }
+    }
+    
+    // Draw each line with different colors
+    const colors = ['#0066cc', '#cc6600', '#00cc66', '#cc0066'];
+    lines.forEach((line, index) => {
+        const color = colors[index % colors.length];
+        const label = labels[index] || '';
+        
+        if (line.kind === 'vertical') {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(line.x0), padding);
+            ctx.lineTo(toCanvasX(line.x0), height - padding);
+            ctx.stroke();
+        } else {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            let firstPoint = true;
+            for (let x = xMin; x <= xMax; x += 0.1) {
+                const y = line.m * x + line.b;
+                if (y >= yMin && y <= yMax) {
+                    if (firstPoint) {
+                        ctx.moveTo(toCanvasX(x), toCanvasY(y));
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(toCanvasX(x), toCanvasY(y));
+                    }
+                }
+            }
+            ctx.stroke();
+        }
+        
+        // Draw label
+        if (label) {
+            ctx.fillStyle = color;
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            // Position label near a point on the line
+            const labelX = xMin + (xMax - xMin) * 0.7;
+            const labelY = line.kind === 'vertical' ? yMax - 1 : line.m * labelX + line.b;
+            if (labelY >= yMin && labelY <= yMax) {
+                ctx.fillText(label, toCanvasX(labelX) + 5, toCanvasY(labelY) - 5);
+            }
+        }
+    });
+    
+    // Draw axis labels
+    ctx.fillStyle = '#000';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('x', width - padding + 10, toCanvasY(0) + 5);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', toCanvasX(0) + 5, padding - 10);
+}
+
+function drawAbsoluteValueGraph(canvasId, a, b, c, d) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 40;
+    const graphWidth = width - 2 * padding;
+    const graphHeight = height - 2 * padding;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Calculate vertex: solve bx + c = 0 for x
+    const vertexX = -c / b;
+    const vertexY = a * Math.abs(b * vertexX + c) + d;
+    
+    // Set bounds to include vertex
+    const xMin = Math.min(-10, vertexX - 5);
+    const xMax = Math.max(10, vertexX + 5);
+    const yMin = Math.min(-10, vertexY - 5);
+    const yMax = Math.max(10, vertexY + 5);
+    const xRange = xMax - xMin;
+    const yRange = yMax - yMin;
+    
+    // Helper to convert graph coordinates to canvas coordinates
+    const toCanvasX = (x) => padding + ((x - xMin) / xRange) * graphWidth;
+    const toCanvasY = (y) => padding + graphHeight - ((y - yMin) / yRange) * graphHeight;
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding, toCanvasY(0));
+    ctx.lineTo(width - padding, toCanvasY(0));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(toCanvasX(0), padding);
+    ctx.lineTo(toCanvasX(0), height - padding);
+    ctx.stroke();
+    
+    // Draw grid lines
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1;
+    for (let x = Math.floor(xMin); x <= Math.ceil(xMax); x++) {
+        if (x !== 0) {
+            ctx.beginPath();
+            ctx.moveTo(toCanvasX(x), padding);
+            ctx.lineTo(toCanvasX(x), height - padding);
+            ctx.stroke();
+        }
+    }
+    for (let y = Math.floor(yMin); y <= Math.ceil(yMax); y++) {
+        if (y !== 0) {
+            ctx.beginPath();
+            ctx.moveTo(padding, toCanvasY(y));
+            ctx.lineTo(width - padding, toCanvasY(y));
+            ctx.stroke();
+        }
+    }
+    
+    // Draw V-shaped absolute value graph
+    ctx.strokeStyle = '#0066cc';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    // Left side of vertex (bx + c < 0, so |bx + c| = -(bx + c))
+    for (let x = xMin; x <= vertexX; x += 0.1) {
+        const absValue = -(b * x + c);
+        const y = a * absValue + d;
+        if (y >= yMin && y <= yMax) {
+            if (x === xMin) {
+                ctx.moveTo(toCanvasX(x), toCanvasY(y));
+            } else {
+                ctx.lineTo(toCanvasX(x), toCanvasY(y));
+            }
+        }
+    }
+    
+    // Right side of vertex (bx + c >= 0, so |bx + c| = bx + c)
+    for (let x = vertexX; x <= xMax; x += 0.1) {
+        const absValue = b * x + c;
+        const y = a * absValue + d;
+        if (y >= yMin && y <= yMax) {
+            ctx.lineTo(toCanvasX(x), toCanvasY(y));
+        }
+    }
+    
+    ctx.stroke();
+    
+    // Highlight vertex
+    ctx.fillStyle = '#ff0000';
+    ctx.beginPath();
+    ctx.arc(toCanvasX(vertexX), toCanvasY(vertexY), 6, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.font = '12px Arial';
+    ctx.fillText(`(${roundToDecimal(vertexX, 1)}, ${roundToDecimal(vertexY, 1)})`, toCanvasX(vertexX) + 8, toCanvasY(vertexY) - 8);
+    
+    // Draw axis labels
+    ctx.fillStyle = '#000';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('x', width - padding + 10, toCanvasY(0) + 5);
+    ctx.textAlign = 'left';
+    ctx.fillText('y', toCanvasX(0) + 5, padding - 10);
+    
+    return { vertexX, vertexY };
+}
+
+// Helper function to get canvas coordinates from click
+function getCanvasCoordinates(canvasId, clickX, clickY, bounds = { xMin: -10, xMax: 10, yMin: -10, yMax: 10 }) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
+    
+    const rect = canvas.getBoundingClientRect();
+    const padding = 40;
+    const graphWidth = canvas.width - 2 * padding;
+    const graphHeight = canvas.height - 2 * padding;
+    
+    const xRange = bounds.xMax - bounds.xMin;
+    const yRange = bounds.yMax - bounds.yMin;
+    
+    const canvasX = clickX - rect.left;
+    const canvasY = clickY - rect.top;
+    
+    const graphX = bounds.xMin + ((canvasX - padding) / graphWidth) * xRange;
+    const graphY = bounds.yMax - ((canvasY - padding) / graphHeight) * yRange;
+    
+    return { x: graphX, y: graphY };
+}
+
 // Intercept Calculation Functions
 function findXIntercept(line) {
     if (line.kind === 'vertical') {
@@ -3288,6 +3745,61 @@ function generateStandardFormDistractors(correctEq, correctA, correctB, correctC
     distractors.push(`y = ${-correctA / correctB}x + ${correctC / correctB}`);
     
     return distractors.slice(0, 3);
+}
+
+// ============================================================================
+// MILESTONE 16: Distractor Generators for New Features
+// ============================================================================
+
+function generateSlopeInterceptDistractors(correctEq, m, b) {
+    const distractors = [];
+    
+    // Wrong sign on m
+    const wrongM = -m;
+    distractors.push(buildSlopeInterceptFromMB(wrongM, b));
+    
+    // Wrong sign on b
+    const wrongB = -b;
+    distractors.push(buildSlopeInterceptFromMB(m, wrongB));
+    
+    // Swapped m and b
+    distractors.push(buildSlopeInterceptFromMB(b, m));
+    
+    return distractors.filter(d => d !== correctEq).slice(0, 3);
+}
+
+function generatePointSlopeDistractors(correctEq, m, point) {
+    const distractors = [];
+    
+    // Wrong sign on (x - x1)
+    const wrongXPoint = { x: -point.x, y: point.y };
+    distractors.push(buildPointSlopeForm(m, wrongXPoint));
+    
+    // Wrong sign on (y - y1)
+    const wrongYPoint = { x: point.x, y: -point.y };
+    distractors.push(buildPointSlopeForm(m, wrongYPoint));
+    
+    // Wrong coordinates
+    const wrongPoint = { x: point.x + 1, y: point.y + 1 };
+    distractors.push(buildPointSlopeForm(m, wrongPoint));
+    
+    return distractors.filter(d => d !== correctEq).slice(0, 3);
+}
+
+function generateAbsoluteValueDistractors(correctVertex, correctDirection) {
+    const distractors = [];
+    
+    // Wrong vertex coordinates
+    distractors.push(`(${correctVertex.x + 1}, ${correctVertex.y})`);
+    distractors.push(`(${correctVertex.x}, ${correctVertex.y + 1})`);
+    distractors.push(`(${correctVertex.x - 1}, ${correctVertex.y - 1})`);
+    
+    return distractors.filter(d => d !== `(${correctVertex.x}, ${correctVertex.y})`).slice(0, 3);
+}
+
+function generateAbsoluteValueDirectionDistractors(correctDirection) {
+    const allDirections = ['up', 'down'];
+    return allDirections.filter(d => d !== correctDirection).concat(['neither', 'both']).slice(0, 3);
 }
 
 // Handler Functions for New Problem Types
@@ -3570,6 +4082,512 @@ function handleLinearFunctionSubmit() {
     gameState.questionAnswered = true;
 }
 
+// ============================================================================
+// MILESTONE 16: Handler Functions for New Features
+// ============================================================================
+
+// Section 4.9.1: From slope and y-intercept
+let currentSlopeInterceptMBData = null;
+
+function handleSlopeInterceptMBCalculate() {
+    try {
+        const mInput = document.getElementById('slopeInterceptMInput');
+        const bInput = document.getElementById('slopeInterceptBInput');
+        
+        if (!mInput || !bInput) {
+            showResult('Error: Input fields not found.', 'error');
+            return;
+        }
+        
+        const mStr = mInput.value.trim();
+        const bStr = bInput.value.trim();
+        
+        if (!mStr || !bStr) {
+            showResult('Please enter both slope (m) and y-intercept (b).', 'error');
+            return;
+        }
+        
+        // Parse m and b (handle fractions)
+        let m = parseFraction(mStr);
+        let b = parseFraction(bStr);
+        
+        if (isNaN(m) || isNaN(b)) {
+            showResult('Invalid input. Please enter numbers or fractions (e.g., 2/3).', 'error');
+            return;
+        }
+        
+        // Build equation
+        const correctEq = buildSlopeInterceptFromMB(m, b);
+        
+        // Generate distractors
+        const distractors = generateSlopeInterceptDistractors(correctEq, m, b);
+        
+        // Create options
+        const options = [
+            { label: 'A', value: correctEq, correct: true },
+            { label: 'B', value: distractors[0] || 'y = x', correct: false },
+            { label: 'C', value: distractors[1] || 'y = -x', correct: false },
+            { label: 'D', value: distractors[2] || 'y = 2x + 1', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        const correctLabel = options[correctIndex].label;
+        
+        currentSlopeInterceptMBData = { m, b, correctEq, correctLabel, options };
+        
+        // Display question
+        PracticeMode.showContainer('slopeInterceptMBQuestionContainer', 'slopeInterceptMBSubmit');
+        const questionText = document.querySelector('#slopeInterceptMBQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `What is the equation of the line with slope ${formatSlopeValue(m)} and y-intercept ${formatSlopeValue(b)}?`;
+        }
+        PracticeMode.displayMultipleChoice('slopeInterceptMBOptions', options, 'slopeInterceptMB', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleSlopeInterceptMBSubmit() {
+    if (gameState.questionAnswered || !currentSlopeInterceptMBData) return;
+    
+    const selected = document.querySelector('input[name="slopeInterceptMB"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { slopeInterceptMB: selected.value };
+    const correctAnswers = { slopeInterceptMB: currentSlopeInterceptMBData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('slopeInterceptMB', selectedAnswers, correctAnswers, ['slopeInterceptMBOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult(`Correct! The equation is ${currentSlopeInterceptMBData.correctEq} (${currentSlopeInterceptMBData.correctLabel})`, 'success');
+        updateStats('slope', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentSlopeInterceptMBData.correctEq} (${currentSlopeInterceptMBData.correctLabel})`, 'error');
+        updateStats('slope', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+// Helper function to parse fraction strings
+function parseFraction(str) {
+    str = str.trim();
+    if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length === 2) {
+            const num = parseFloat(parts[0]);
+            const den = parseFloat(parts[1]);
+            if (den !== 0) return num / den;
+        }
+    }
+    return parseFloat(str);
+}
+
+// Section 4.9.2: From slope and one point
+let currentSlopeInterceptMPointData = null;
+
+function handleSlopeInterceptMPointCalculate() {
+    try {
+        const mInput = document.getElementById('slopeInterceptMPointMInput');
+        const pointInput = document.getElementById('slopeInterceptMPointInput');
+        
+        if (!mInput || !pointInput) {
+            showResult('Error: Input fields not found.', 'error');
+            return;
+        }
+        
+        const mStr = mInput.value.trim();
+        const pointStr = pointInput.value.trim();
+        
+        if (!mStr || !pointStr) {
+            showResult('Please enter both slope (m) and a point (x,y).', 'error');
+            return;
+        }
+        
+        // Parse m and point
+        let m = parseFraction(mStr);
+        const point = parsePoint(pointStr);
+        
+        if (isNaN(m)) {
+            showResult('Invalid slope. Please enter a number or fraction.', 'error');
+            return;
+        }
+        
+        // Build equation
+        const correctEq = buildSlopeInterceptFromMPoint(m, point);
+        const line = twoPointToSlopeIntercept(point, { x: point.x + 1, y: point.y + m });
+        
+        // Generate distractors
+        const distractors = [];
+        // Same slope, wrong intercept
+        const wrongB1 = point.y - m * point.x + randomInt(-3, 3) || 1;
+        distractors.push(buildSlopeInterceptFromMB(m, wrongB1));
+        // Wrong slope from sign mistake
+        distractors.push(buildSlopeInterceptFromMB(-m, point.y - (-m) * point.x));
+        // Arithmetic error
+        const wrongB2 = point.y - m * point.x + randomInt(-2, 2) || 1;
+        distractors.push(buildSlopeInterceptFromMB(m, wrongB2));
+        
+        // Create options
+        const options = [
+            { label: 'A', value: correctEq, correct: true },
+            { label: 'B', value: distractors[0] || 'y = x', correct: false },
+            { label: 'C', value: distractors[1] || 'y = -x', correct: false },
+            { label: 'D', value: distractors[2] || 'y = 2x + 1', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        const correctLabel = options[correctIndex].label;
+        
+        currentSlopeInterceptMPointData = { m, point, correctEq, correctLabel, options, line };
+        
+        // Display question
+        PracticeMode.showContainer('slopeInterceptMPointQuestionContainer', 'slopeInterceptMPointSubmit');
+        const questionText = document.querySelector('#slopeInterceptMPointQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `What is the equation of the line with slope ${formatSlopeValue(m)} that passes through point (${point.x}, ${point.y})?`;
+        }
+        PracticeMode.displayMultipleChoice('slopeInterceptMPointOptions', options, 'slopeInterceptMPoint', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleSlopeInterceptMPointSubmit() {
+    if (gameState.questionAnswered || !currentSlopeInterceptMPointData) return;
+    
+    const selected = document.querySelector('input[name="slopeInterceptMPoint"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { slopeInterceptMPoint: selected.value };
+    const correctAnswers = { slopeInterceptMPoint: currentSlopeInterceptMPointData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('slopeInterceptMPoint', selectedAnswers, correctAnswers, ['slopeInterceptMPointOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult(`Correct! The equation is ${currentSlopeInterceptMPointData.correctEq} (${currentSlopeInterceptMPointData.correctLabel})`, 'success');
+        updateStats('slope', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentSlopeInterceptMPointData.correctEq} (${currentSlopeInterceptMPointData.correctLabel})`, 'error');
+        updateStats('slope', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+// Section 4.11: Two-Point Form to Slope-Intercept
+let currentTwoPointData = null;
+
+function handleTwoPointCalculate() {
+    try {
+        const p1Input = document.getElementById('twoPointP1Input');
+        const p2Input = document.getElementById('twoPointP2Input');
+        
+        if (!p1Input || !p2Input) {
+            showResult('Error: Input fields not found.', 'error');
+            return;
+        }
+        
+        const p1Str = p1Input.value.trim();
+        const p2Str = p2Input.value.trim();
+        
+        if (!p1Str || !p2Str) {
+            showResult('Please enter both points in the format (x,y).', 'error');
+            return;
+        }
+        
+        const p1 = parsePoint(p1Str);
+        const p2 = parsePoint(p2Str);
+        
+        // Convert to slope-intercept
+        const line = twoPointToSlopeIntercept(p1, p2);
+        const correctEq = formatEquation(line);
+        
+        // Generate distractors
+        const distractors = [];
+        // Slope with sign error
+        if (line.kind === 'slope') {
+            const wrongM = -line.m;
+            const wrongB = p1.y - wrongM * p1.x;
+            distractors.push(formatEquation({ kind: 'slope', m: wrongM, b: wrongB }));
+            // Correct slope but wrong intercept
+            const wrongB2 = line.b + randomInt(-3, 3) || 1;
+            distractors.push(formatEquation({ kind: 'slope', m: line.m, b: wrongB2 }));
+            // Equation that passes through only one point
+            const wrongM2 = line.m + randomFloat(-0.5, 0.5);
+            distractors.push(formatEquation({ kind: 'slope', m: wrongM2, b: p1.y - wrongM2 * p1.x }));
+        }
+        
+        // Create options
+        const options = [
+            { label: 'A', value: correctEq, correct: true },
+            { label: 'B', value: distractors[0] || 'y = x', correct: false },
+            { label: 'C', value: distractors[1] || 'y = -x', correct: false },
+            { label: 'D', value: distractors[2] || 'y = 2x + 1', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        const correctLabel = options[correctIndex].label;
+        
+        currentTwoPointData = { p1, p2, line, correctEq, correctLabel, options };
+        
+        // Display question
+        PracticeMode.showContainer('twoPointQuestionContainer', 'twoPointSubmit');
+        const questionText = document.querySelector('#twoPointQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `What is the equation of the line passing through points (${p1.x}, ${p1.y}) and (${p2.x}, ${p2.y})?`;
+        }
+        PracticeMode.displayMultipleChoice('twoPointOptions', options, 'twoPoint', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleTwoPointSubmit() {
+    if (gameState.questionAnswered || !currentTwoPointData) return;
+    
+    const selected = document.querySelector('input[name="twoPoint"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { twoPoint: selected.value };
+    const correctAnswers = { twoPoint: currentTwoPointData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('twoPoint', selectedAnswers, correctAnswers, ['twoPointOptions']);
+    
+    if (answerResult.isCorrect) {
+        showResult(`Correct! The equation is ${currentTwoPointData.correctEq} (${currentTwoPointData.correctLabel})`, 'success');
+        updateStats('slope', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentTwoPointData.correctEq} (${currentTwoPointData.correctLabel})`, 'error');
+        updateStats('slope', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+// Section 4.10: Point-Slope Form Drills
+let currentPointSlopeData = null;
+
+function handlePointSlopeBuildCalculate() {
+    try {
+        const mInput = document.getElementById('pointSlopeMInput');
+        const pointInput = document.getElementById('pointSlopePointInput');
+        
+        if (!mInput || !pointInput) {
+            showResult('Error: Input fields not found.', 'error');
+            return;
+        }
+        
+        const mStr = mInput.value.trim();
+        const pointStr = pointInput.value.trim();
+        
+        if (!mStr || !pointStr) {
+            showResult('Please enter both slope (m) and a point (x,y).', 'error');
+            return;
+        }
+        
+        let m = parseFraction(mStr);
+        const point = parsePoint(pointStr);
+        
+        if (isNaN(m)) {
+            showResult('Invalid slope. Please enter a number or fraction.', 'error');
+            return;
+        }
+        
+        // Build point-slope form
+        const correctEq = buildPointSlopeForm(m, point);
+        
+        // Generate distractors
+        const distractors = generatePointSlopeDistractors(correctEq, m, point);
+        
+        // Create options
+        const options = [
+            { label: 'A', value: correctEq, correct: true },
+            { label: 'B', value: distractors[0] || 'y - 1 = 2(x - 1)', correct: false },
+            { label: 'C', value: distractors[1] || 'y + 1 = 2(x + 1)', correct: false },
+            { label: 'D', value: distractors[2] || 'y - 2 = 2(x - 2)', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        const correctLabel = options[correctIndex].label;
+        
+        currentPointSlopeData = { m, point, correctEq, correctLabel, options };
+        
+        // Display question
+        PracticeMode.showContainer('pointSlopeQuestionContainer', 'pointSlopeSubmit');
+        const questionText = document.querySelector('#pointSlopeQuestionContainer .question-text');
+        if (questionText) {
+            questionText.textContent = `What is the point-slope form of the line with slope ${formatSlopeValue(m)} that passes through point (${point.x}, ${point.y})?`;
+        }
+        PracticeMode.displayMultipleChoice('pointSlopeOptions', options, 'pointSlope', questionText.textContent);
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handlePointSlopeBuildSubmit() {
+    if (gameState.questionAnswered || !currentPointSlopeData) return;
+    
+    const selected = document.querySelector('input[name="pointSlope"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { pointSlope: selected.value };
+    const correctAnswers = { pointSlope: currentPointSlopeData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('pointSlope', selectedAnswers, correctAnswers, ['pointSlopeOptions']);
+    
+    if (answerResult.isCorrect) {
+        const slopeInterceptEq = buildSlopeInterceptFromMPoint(currentPointSlopeData.m, currentPointSlopeData.point);
+        showResult(`Correct! The equation is ${currentPointSlopeData.correctEq} (${currentPointSlopeData.correctLabel}). In slope-intercept form: ${slopeInterceptEq}`, 'success');
+        updateStats('slope', true);
+    } else {
+        showResult(`Incorrect. Correct answer: ${currentPointSlopeData.correctEq} (${currentPointSlopeData.correctLabel})`, 'error');
+        updateStats('slope', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
+// Section 4.13: Absolute Value Graphs
+let currentAbsoluteValueData = null;
+
+function handleAbsoluteValueCalculate() {
+    try {
+        const eqInput = document.getElementById('absoluteValueInput');
+        
+        if (!eqInput) {
+            showResult('Error: Input field not found.', 'error');
+            return;
+        }
+        
+        const eqStr = eqInput.value.trim();
+        if (!eqStr) {
+            showResult('Please enter an absolute value equation in the format: y = a|bx + c| + d', 'error');
+            return;
+        }
+        
+        // Parse equation
+        const { a, b, c, d } = parseAbsoluteValueEquation(eqStr);
+        
+        // Calculate vertex
+        const vertex = calculateAbsoluteValueVertex(a, b, c, d);
+        const direction = a > 0 ? 'up' : 'down';
+        
+        // Determine question type randomly
+        let questionType = randomInt(2, 3); // Skip type 1 (graph matching) for now
+        
+        if (questionType === 2) {
+            // What is the vertex
+            const distractors = generateAbsoluteValueDistractors(vertex, direction);
+            const options = [
+                { label: 'A', value: `(${vertex.x}, ${vertex.y})`, correct: true },
+                { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
+                { label: 'C', value: distractors[1] || '(1, 1)', correct: false },
+                { label: 'D', value: distractors[2] || '(-1, -1)', correct: false }
+            ].sort(() => Math.random() - 0.5);
+            
+            const correctIndex = options.findIndex(opt => opt.correct);
+            const correctLabel = options[correctIndex].label;
+            
+            currentAbsoluteValueData = { a, b, c, d, vertex, direction, questionType: 2, correctLabel, options };
+            
+            // Draw graph
+            const canvas = document.getElementById('absoluteValueGraph');
+            if (canvas) {
+                drawAbsoluteValueGraph('absoluteValueGraph', a, b, c, d);
+            }
+            
+            // Display question
+            PracticeMode.showContainer('absoluteValueQuestionContainer', 'absoluteValueSubmit');
+            const questionText = document.querySelector('#absoluteValueQuestionContainer .question-text');
+            if (questionText) {
+                questionText.textContent = `What is the vertex of the graph of ${eqStr}?`;
+            }
+            PracticeMode.displayMultipleChoice('absoluteValueOptions', options, 'absoluteValue', questionText.textContent);
+        } else if (questionType === 3) {
+            // Is graph opening up or down
+            const distractors = generateAbsoluteValueDirectionDistractors(direction);
+            const options = [
+                { label: 'A', value: direction, correct: true },
+                { label: 'B', value: distractors[0] || 'up', correct: false },
+                { label: 'C', value: distractors[1] || 'down', correct: false },
+                { label: 'D', value: distractors[2] || 'neither', correct: false }
+            ].sort(() => Math.random() - 0.5);
+            
+            const correctIndex = options.findIndex(opt => opt.correct);
+            const correctLabel = options[correctIndex].label;
+            
+            currentAbsoluteValueData = { a, b, c, d, vertex, direction, questionType: 3, correctLabel, options };
+            
+            // Draw graph
+            const canvas = document.getElementById('absoluteValueGraph');
+            if (canvas) {
+                drawAbsoluteValueGraph('absoluteValueGraph', a, b, c, d);
+            }
+            
+            // Display question
+            PracticeMode.showContainer('absoluteValueQuestionContainer', 'absoluteValueSubmit');
+            const questionText = document.querySelector('#absoluteValueQuestionContainer .question-text');
+            if (questionText) {
+                questionText.textContent = `Is the graph of ${eqStr} opening up or down?`;
+            }
+            PracticeMode.displayMultipleChoice('absoluteValueOptions', options, 'absoluteValue', questionText.textContent);
+        }
+        
+        gameState.questionAnswered = false;
+    } catch (error) {
+        showResult('Error: ' + error.message, 'error');
+    }
+}
+
+function handleAbsoluteValueSubmit() {
+    if (gameState.questionAnswered || !currentAbsoluteValueData) return;
+    
+    const selected = document.querySelector('input[name="absoluteValue"]:checked');
+    if (!selected) {
+        showResult('Please select an answer.', 'error');
+        return;
+    }
+    
+    const selectedAnswers = { absoluteValue: selected.value };
+    const correctAnswers = { absoluteValue: currentAbsoluteValueData.correctLabel };
+    const answerResult = PracticeMode.processAnswer('absoluteValue', selectedAnswers, correctAnswers, ['absoluteValueOptions']);
+    
+    if (answerResult.isCorrect) {
+        if (currentAbsoluteValueData.questionType === 2) {
+            showResult(`Correct! The vertex is (${currentAbsoluteValueData.vertex.x}, ${currentAbsoluteValueData.vertex.y}) (${currentAbsoluteValueData.correctLabel})`, 'success');
+        } else {
+            showResult(`Correct! The graph opens ${currentAbsoluteValueData.direction} (${currentAbsoluteValueData.correctLabel})`, 'success');
+        }
+        updateStats('slope', true);
+    } else {
+        if (currentAbsoluteValueData.questionType === 2) {
+            showResult(`Incorrect. Correct answer: (${currentAbsoluteValueData.vertex.x}, ${currentAbsoluteValueData.vertex.y}) (${currentAbsoluteValueData.correctLabel})`, 'error');
+        } else {
+            showResult(`Incorrect. Correct answer: ${currentAbsoluteValueData.direction} (${currentAbsoluteValueData.correctLabel})`, 'error');
+        }
+        updateStats('slope', false);
+    }
+    
+    gameState.questionAnswered = true;
+}
+
 function handleStandardFormCalculate() {
     try {
         const eqInput = document.getElementById('standardFormInput');
@@ -3651,6 +4669,292 @@ function displayTable(containerId, table) {
     }
     html += '</tbody></table>';
     container.innerHTML = html;
+}
+
+// ============================================================================
+// MILESTONE 16: Math Utility Functions for New Features
+// ============================================================================
+
+// Build slope-intercept form from m and b
+function buildSlopeInterceptFromMB(m, b) {
+    const mFormatted = formatSlopeValue(m);
+    const bFormatted = formatSlopeValue(b);
+    
+    if (m === 0) {
+        return `y = ${bFormatted}`;
+    } else if (m === 1) {
+        return b === 0 ? 'y = x' : `y = x + ${bFormatted}`;
+    } else if (m === -1) {
+        return b === 0 ? 'y = -x' : `y = -x + ${bFormatted}`;
+    } else {
+        const slopePart = mFormatted.includes('/') ? `(${mFormatted})x` : `${mFormatted}x`;
+        return b === 0 ? `y = ${slopePart}` : (b > 0 ? `y = ${slopePart} + ${bFormatted}` : `y = ${slopePart} ${bFormatted}`);
+    }
+}
+
+// Build slope-intercept form from slope and point
+function buildSlopeInterceptFromMPoint(m, point) {
+    // Use point-slope: y - y1 = m(x - x1)
+    // Convert to slope-intercept: y = mx + b
+    // b = y1 - m*x1
+    const b = point.y - m * point.x;
+    return buildSlopeInterceptFromMB(m, b);
+}
+
+// Build point-slope form from slope and point
+function buildPointSlopeForm(m, point) {
+    const mFormatted = formatSlopeValue(m);
+    const x1 = formatSlopeValue(point.x);
+    const y1 = formatSlopeValue(point.y);
+    
+    // Handle signs correctly
+    const xPart = point.x === 0 ? 'x' : (point.x > 0 ? `x - ${x1}` : `x + ${Math.abs(point.x)}`);
+    const yPart = point.y === 0 ? 'y' : (point.y > 0 ? `y - ${y1}` : `y + ${Math.abs(point.y)}`);
+    
+    if (m === 1) {
+        return `${yPart} = ${xPart}`;
+    } else if (m === -1) {
+        return `${yPart} = -${xPart}`;
+    } else {
+        const slopePart = mFormatted.includes('/') ? `(${mFormatted})` : mFormatted;
+        return `${yPart} = ${slopePart}(${xPart})`;
+    }
+}
+
+// Convert two points to slope-intercept form
+function twoPointToSlopeIntercept(p1, p2) {
+    if (p1.x === p2.x && p1.y === p2.y) {
+        throw new Error('Points cannot be identical');
+    }
+    
+    if (p1.x === p2.x) {
+        // Vertical line
+        return { kind: 'vertical', x0: p1.x };
+    }
+    
+    const m = (p2.y - p1.y) / (p2.x - p1.x);
+    const b = p1.y - m * p1.x;
+    
+    return { kind: 'slope', m: roundToDecimal(m), b: roundToDecimal(b) };
+}
+
+// Parse point-slope equation
+function parsePointSlopeEquation(eqStr) {
+    const eq = eqStr.trim().replace(/\s+/g, '');
+    
+    // Pattern: y - y1 = m(x - x1) or y + y1 = m(x + x1)
+    const match = eq.match(/y\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\/\d+)?(?:\.\d+)?)\s*\(\s*x\s*([+-])\s*(\d+(?:\.\d+)?)\s*\)/);
+    if (!match) {
+        // Try simpler pattern
+        const simpleMatch = eq.match(/y\s*([+-])\s*(\d+(?:\.\d+)?)\s*=\s*([+-]?\d+(?:\/\d+)?(?:\.\d+)?)\s*\(\s*x\s*([+-])\s*(\d+(?:\.\d+)?)\s*\)/);
+        if (simpleMatch) {
+            const ySign = simpleMatch[1] === '+' ? -1 : 1;
+            const y1 = parseFloat(simpleMatch[2]) * ySign;
+            let m = parseFloat(simpleMatch[3]);
+            if (simpleMatch[3].includes('/')) {
+                const parts = simpleMatch[3].split('/');
+                m = parseFloat(parts[0]) / parseFloat(parts[1]);
+            }
+            const xSign = simpleMatch[4] === '+' ? -1 : 1;
+            const x1 = parseFloat(simpleMatch[5]) * xSign;
+            
+            return { m, point: { x: x1, y: y1 } };
+        }
+        throw new Error('Invalid point-slope format. Use: y - y1 = m(x - x1)');
+    }
+    
+    const ySign = match[1] === '+' ? -1 : 1;
+    const y1 = parseFloat(match[2]) * ySign;
+    let m = parseFloat(match[3]);
+    if (match[3].includes('/')) {
+        const parts = match[3].split('/');
+        m = parseFloat(parts[0]) / parseFloat(parts[1]);
+    }
+    const xSign = match[4] === '+' ? -1 : 1;
+    const x1 = parseFloat(match[5]) * xSign;
+    
+    return { m, point: { x: x1, y: y1 } };
+}
+
+// Convert point-slope to slope-intercept (advanced, handles extra constants)
+function convertPointSlopeToSlopeInterceptAdvanced(pointSlopeEq) {
+    // Parse the equation
+    const parsed = parsePointSlopeEquation(pointSlopeEq);
+    const { m, point } = parsed;
+    
+    // Convert: y - y1 = m(x - x1) → y = mx + b
+    // b = y1 - m*x1
+    const b = point.y - m * point.x;
+    
+    return { kind: 'slope', m: roundToDecimal(m), b: roundToDecimal(b) };
+}
+
+// Parse absolute value equation: y = a|bx + c| + d
+function parseAbsoluteValueEquation(eqStr) {
+    const eq = eqStr.trim().replace(/\s+/g, '');
+    
+    // Pattern: y = a|bx + c| + d or y = a|bx + c| - d
+    const match = eq.match(/y\s*=\s*([+-]?\d+(?:\/\d+)?(?:\.\d+)?)\s*\|\s*([+-]?\d+(?:\/\d+)?(?:\.\d+)?)\s*x\s*([+-])\s*(\d+(?:\.\d+)?)\s*\|\s*([+-])\s*(\d+(?:\.\d+)?)/);
+    
+    if (!match) {
+        throw new Error('Invalid absolute value format. Use: y = a|bx + c| + d');
+    }
+    
+    let a = parseFloat(match[1]);
+    if (match[1].includes('/')) {
+        const parts = match[1].split('/');
+        a = parseFloat(parts[0]) / parseFloat(parts[1]);
+    }
+    
+    let b = parseFloat(match[2]);
+    if (match[2].includes('/')) {
+        const parts = match[2].split('/');
+        b = parseFloat(parts[0]) / parseFloat(parts[1]);
+    }
+    
+    const cSign = match[3] === '+' ? 1 : -1;
+    const c = parseFloat(match[4]) * cSign;
+    
+    const dSign = match[5] === '+' ? 1 : -1;
+    const d = parseFloat(match[6]) * dSign;
+    
+    return { a, b, c, d };
+}
+
+// Calculate absolute value vertex
+function calculateAbsoluteValueVertex(a, b, c, d) {
+    // Vertex occurs when bx + c = 0
+    const vertexX = -c / b;
+    const vertexY = a * Math.abs(b * vertexX + c) + d;
+    return { x: roundToDecimal(vertexX, 2), y: roundToDecimal(vertexY, 2) };
+}
+
+// Generate signed-number expression for micro-practice
+function generateSignedNumberExpression(type = 'random') {
+    const types = ['distributive', 'constant-combination', 'subtraction', 'addition'];
+    const selectedType = type === 'random' ? types[randomInt(0, types.length - 1)] : type;
+    
+    switch (selectedType) {
+        case 'distributive':
+            // m(x - x1) or m(x + c)
+            const m = randomInt(-5, 5) || randomInt(-5, -1) || randomInt(1, 5);
+            const x1 = randomInt(-5, 5);
+            return {
+                expression: `${m}(${x1 > 0 ? `x - ${x1}` : `x + ${Math.abs(x1)}`})`,
+                answer: m * (x1 > 0 ? -x1 : Math.abs(x1)),
+                explanation: `${m} times ${x1 > 0 ? `-${x1}` : Math.abs(x1)} = ${m * (x1 > 0 ? -x1 : Math.abs(x1))}`
+            };
+        case 'constant-combination':
+            const b1 = randomInt(-10, 10);
+            const b2 = randomInt(-10, 10);
+            return {
+                expression: `${b1} + ${b2}`,
+                answer: b1 + b2,
+                explanation: `${b1} + ${b2} = ${b1 + b2}`
+            };
+        case 'subtraction':
+            const s1 = randomInt(-10, 10);
+            const s2 = randomInt(-10, 10);
+            return {
+                expression: `${s1} - ${s2}`,
+                answer: s1 - s2,
+                explanation: `${s1} - ${s2} = ${s1 - s2}`
+            };
+        case 'addition':
+            const a1 = randomInt(-10, 10);
+            const a2 = randomInt(-10, 10);
+            return {
+                expression: `${a1} + ${a2}`,
+                answer: a1 + a2,
+                explanation: `${a1} + ${a2} = ${a1 + a2}`
+            };
+        default:
+            return generateSignedNumberExpression('distributive');
+    }
+}
+
+// ============================================================================
+// MILESTONE 16: Challenge Mode Question Generators
+// ============================================================================
+
+function generatePointSlopeQuestion() {
+    const m = randomInt(-5, 5) || randomInt(-5, -1) || randomInt(1, 5);
+    const point = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
+    
+    const correctEq = buildPointSlopeForm(m, point);
+    const distractors = generatePointSlopeDistractors(correctEq, m, point);
+    
+    const options = [
+        { label: 'A', value: correctEq, correct: true },
+        { label: 'B', value: distractors[0] || 'y - 1 = 2(x - 1)', correct: false },
+        { label: 'C', value: distractors[1] || 'y + 1 = 2(x + 1)', correct: false },
+        { label: 'D', value: distractors[2] || 'y - 2 = 2(x - 2)', correct: false }
+    ].sort(() => Math.random() - 0.5);
+    
+    const correctIndex = options.findIndex(opt => opt.correct);
+    const correctLabel = options[correctIndex].label;
+    
+    return {
+        type: 'pointSlope',
+        question: `What is the point-slope form of the line with slope ${formatSlopeValue(m)} that passes through point (${point.x}, ${point.y})?`,
+        options: options,
+        correctAnswerLabel: correctLabel,
+        correctAnswer: correctEq
+    };
+}
+
+function generateAbsoluteValueQuestion() {
+    const a = randomInt(-3, 3) || randomInt(-3, -1) || randomInt(1, 3);
+    const b = randomInt(-3, 3) || randomInt(-3, -1) || randomInt(1, 3);
+    const c = randomInt(-5, 5);
+    const d = randomInt(-5, 5);
+    
+    const eqStr = `y = ${a}|${b}x ${c >= 0 ? '+' : ''}${c}| ${d >= 0 ? '+' : ''}${d}`;
+    const vertex = calculateAbsoluteValueVertex(a, b, c, d);
+    const direction = a > 0 ? 'up' : 'down';
+    
+    // Randomly choose question type
+    const questionType = randomInt(2, 3);
+    
+    if (questionType === 2) {
+        const distractors = generateAbsoluteValueDistractors(vertex, direction);
+        const options = [
+            { label: 'A', value: `(${vertex.x}, ${vertex.y})`, correct: true },
+            { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
+            { label: 'C', value: distractors[1] || '(1, 1)', correct: false },
+            { label: 'D', value: distractors[2] || '(-1, -1)', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        const correctLabel = options[correctIndex].label;
+        
+        return {
+            type: 'absoluteValue',
+            question: `What is the vertex of the graph of ${eqStr}?`,
+            options: options,
+            correctAnswerLabel: correctLabel,
+            correctAnswer: `(${vertex.x}, ${vertex.y})`
+        };
+    } else {
+        const distractors = generateAbsoluteValueDirectionDistractors(direction);
+        const options = [
+            { label: 'A', value: direction, correct: true },
+            { label: 'B', value: distractors[0] || 'up', correct: false },
+            { label: 'C', value: distractors[1] || 'down', correct: false },
+            { label: 'D', value: distractors[2] || 'neither', correct: false }
+        ].sort(() => Math.random() - 0.5);
+        
+        const correctIndex = options.findIndex(opt => opt.correct);
+        const correctLabel = options[correctIndex].label;
+        
+        return {
+            type: 'absoluteValue',
+            question: `Is the graph of ${eqStr} opening up or down?`,
+            options: options,
+            correctAnswerLabel: correctLabel,
+            correctAnswer: direction
+        };
+    }
 }
 
 // Question Generators for Challenge Mode
@@ -4160,6 +5464,68 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('standardFormSubmit')?.addEventListener('click', () => {
         handleStandardFormSubmit();
+    });
+    
+    // Milestone 16: New feature event listeners
+    // Slope mode selector
+    document.getElementById('slopeModeSelector')?.addEventListener('change', (e) => {
+        const mode = e.target.value;
+        // Hide all modes
+        document.querySelectorAll('.slope-mode').forEach(m => m.style.display = 'none');
+        // Show selected mode
+        if (mode === 'twoPoints') {
+            document.getElementById('slopeTwoPointsMode').style.display = 'block';
+        } else if (mode === 'mAndB') {
+            document.getElementById('slopeMAndBMode').style.display = 'block';
+        } else if (mode === 'mAndPoint') {
+            document.getElementById('slopeMAndPointMode').style.display = 'block';
+        }
+        resetQuestionState();
+    });
+    
+    // Section 4.9.1: From m and b
+    document.getElementById('slopeInterceptMBCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleSlopeInterceptMBCalculate();
+    });
+    document.getElementById('slopeInterceptMBSubmit')?.addEventListener('click', () => {
+        handleSlopeInterceptMBSubmit();
+    });
+    
+    // Section 4.9.2: From m and point
+    document.getElementById('slopeInterceptMPointCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleSlopeInterceptMPointCalculate();
+    });
+    document.getElementById('slopeInterceptMPointSubmit')?.addEventListener('click', () => {
+        handleSlopeInterceptMPointSubmit();
+    });
+    
+    // Section 4.11: Two-point form
+    document.getElementById('twoPointCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleTwoPointCalculate();
+    });
+    document.getElementById('twoPointSubmit')?.addEventListener('click', () => {
+        handleTwoPointSubmit();
+    });
+    
+    // Section 4.10: Point-slope form
+    document.getElementById('pointSlopeCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handlePointSlopeBuildCalculate();
+    });
+    document.getElementById('pointSlopeSubmit')?.addEventListener('click', () => {
+        handlePointSlopeBuildSubmit();
+    });
+    
+    // Section 4.13: Absolute value graphs
+    document.getElementById('absoluteValueCalculateBtn')?.addEventListener('click', () => {
+        startQuestionTimer();
+        handleAbsoluteValueCalculate();
+    });
+    document.getElementById('absoluteValueSubmit')?.addEventListener('click', () => {
+        handleAbsoluteValueSubmit();
     });
     
     // Start timer on input and reset question answered flag when input changes
