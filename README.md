@@ -79,6 +79,11 @@ The app features gamification with timers, streaks, achievements, and local prog
   - Traditional achievements (correct answers, streaks, etc.)
   - Speed-based achievements (Lightning Fast, Speed Demon, Marathon Master, Efficiency Expert)
 - **Hint System**: Helpful hints with step-by-step guidance, formulas, and concepts
+- **Enhanced Feedback Effects (Milestone 18)**: Progressive celebration system
+  - 50% progress: Mild effects (floating points, success badge, progress pulse, subtle particles)
+  - 85% progress: Medium effects (emoji rain, streak fire, confetti trails, screen bounce)
+  - 100% complete: High intensity (celebration modal, particle explosion, confetti, fireworks)
+  - Random selection keeps gameplay fresh and exciting
 - **Local Storage**: All progress saved in your browser
   - Game state (score, streak, achievements, stats)
   - Personal bests (fastest times, best averages)
