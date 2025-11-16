@@ -1035,7 +1035,11 @@ function initializeChallenge(problemType, setSize) {
         hintsUsedPerQuestion: {},
         hintLimit: 5,
         startTime: Date.now(),
-        endTime: null
+        endTime: null,
+        // Issue #016 FIX: Milestone 17 dual timer fields were missing!
+        challengeStartTime: null, // Will be set by startChallengeTimer()
+        questionTimes: [], // Array of {questionIndex, startTime, endTime, duration}
+        totalChallengeTime: 0 // Calculated at completion
     };
     
     // Initialize all question states
