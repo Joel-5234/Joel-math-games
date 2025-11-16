@@ -1008,7 +1008,13 @@ let challengeState = {
     // Milestone 17: Dual timer system
     challengeStartTime: null, // Timestamp when challenge started (for total time)
     questionTimes: [], // Array of {questionIndex, startTime, endTime, duration} for each question
-    totalChallengeTime: 0 // Total time in seconds (calculated at completion)
+    totalChallengeTime: 0, // Total time in seconds (calculated at completion)
+    // Milestone 18: Progress milestone tracking
+    progressMilestones: {
+        fifty: false, // Triggered at 50% progress
+        eightyFive: false, // Triggered at 85% progress
+        hundred: false // Triggered at 100% completion
+    }
 };
 
 function generateChallengeQuestions(problemType, count) {
@@ -1054,7 +1060,13 @@ function initializeChallenge(problemType, setSize) {
         // Issue #016 FIX: Milestone 17 dual timer fields were missing!
         challengeStartTime: null, // Will be set by startChallengeTimer()
         questionTimes: [], // Array of {questionIndex, startTime, endTime, duration}
-        totalChallengeTime: 0 // Calculated at completion
+        totalChallengeTime: 0, // Calculated at completion
+        // Milestone 18: Progress milestone tracking
+        progressMilestones: {
+            fifty: false,
+            eightyFive: false,
+            hundred: false
+        }
     };
     
     // Initialize all question states
@@ -1919,6 +1931,9 @@ function submitChallengeAnswer() {
     // Update navigation
     updateChallengeNavigation();
     
+    // Milestone 18: Check progress milestones and trigger effects
+    checkProgressMilestones();
+    
     // Issue #016: Add logging to debug auto-advance
     console.log('[Submit] Setting up auto-advance timeout (2000ms)');
     
@@ -2178,6 +2193,472 @@ function triggerFireworks() {
         }, 3000);
     } else {
         console.error('fireworksContainer not found');
+    }
+}
+
+// ============================================================================
+// MILESTONE 18: Enhanced Feedback Effects System
+// ============================================================================
+// 10 new visual effects triggered at progress milestones (50%, 85%, 100%)
+// Effects are categorized by intensity: mild, medium, high
+
+// ----------------------------------------------------------------------------
+// MILD EFFECTS (50% Progress)
+// ----------------------------------------------------------------------------
+
+/**
+ * Effect 1: Floating Score Points
+ * Display "+10", "+5", etc. floating upward from answer area
+ * Duration: 2 seconds, green color, fades out
+ */
+function showFloatingPoints(value = 10, x = null, y = null) {
+    const floatingText = document.createElement('div');
+    floatingText.className = 'floating-points';
+    floatingText.textContent = `+${value}`;
+    
+    // Position at center of screen if no coordinates provided
+    if (x === null || y === null) {
+        const rect = document.querySelector('.question-area')?.getBoundingClientRect();
+        x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+        y = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+    }
+    
+    floatingText.style.left = `${x}px`;
+    floatingText.style.top = `${y}px`;
+    floatingText.style.position = 'fixed';
+    
+    document.body.appendChild(floatingText);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        floatingText.remove();
+    }, 2000);
+}
+
+/**
+ * Effect 2: Success Badge Pop-up
+ * Temporary badge in top-right corner with message
+ * Duration: 3 seconds with scale animation
+ */
+function showSuccessBadge(message = 'Halfway There! 🏅') {
+    const badge = document.createElement('div');
+    badge.className = 'success-badge';
+    badge.innerHTML = `<div class="badge-content">${message}</div>`;
+    
+    document.body.appendChild(badge);
+    
+    // Trigger animation
+    setTimeout(() => badge.classList.add('show'), 10);
+    
+    // Remove after display duration
+    setTimeout(() => {
+        badge.classList.remove('show');
+        setTimeout(() => badge.remove(), 500);
+    }, 3000);
+}
+
+/**
+ * Effect 3: Progress Bar Pulse
+ * Make progress bar glow with green box-shadow animation
+ * Duration: 1 second pulse
+ */
+function pulseProgressBar() {
+    const progressBar = document.querySelector('.progress-fill') || 
+                       document.querySelector('.progress-bar');
+    
+    if (progressBar) {
+        progressBar.classList.add('pulse-glow');
+        
+        setTimeout(() => {
+            progressBar.classList.remove('pulse-glow');
+        }, 1000);
+    }
+}
+
+/**
+ * Effect 4: Subtle Particle Burst
+ * Small burst of 5-10 pastel particles from center
+ * Duration: 1.5 seconds
+ */
+function showSubtleParticleBurst() {
+    const container = document.createElement('div');
+    container.className = 'particle-container';
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '9999';
+    
+    document.body.appendChild(container);
+    
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const colors = ['#B3E5FC', '#F8BBD0', '#FFF9C4', '#C8E6C9']; // Pastel colors
+    const particleCount = 5 + Math.floor(Math.random() * 6); // 5-10 particles
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'subtle-particle';
+        
+        const size = 5 + Math.random() * 5; // 5-10px
+        const angle = (Math.random() * 360) * (Math.PI / 180);
+        const distance = 50 + Math.random() * 50; // 50-100px
+        const duration = 1 + Math.random() * 0.5; // 1-1.5s
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.borderRadius = '50%';
+        particle.style.position = 'absolute';
+        particle.style.left = `${centerX}px`;
+        particle.style.top = `${centerY}px`;
+        particle.style.setProperty('--angle-x', `${Math.cos(angle) * distance}px`);
+        particle.style.setProperty('--angle-y', `${Math.sin(angle) * distance}px`);
+        particle.style.animation = `subtleParticleBurst ${duration}s ease-out forwards`;
+        
+        container.appendChild(particle);
+    }
+    
+    // Remove container after animation
+    setTimeout(() => {
+        container.remove();
+    }, 1500);
+}
+
+// ----------------------------------------------------------------------------
+// MEDIUM EFFECTS (85% Progress)
+// ----------------------------------------------------------------------------
+
+/**
+ * Effect 5: Emoji Rain
+ * Drop 10-15 emojis from top of screen with rotation
+ * Duration: 3 seconds
+ */
+function showEmojiRain() {
+    const emojis = ['🎉', '🎊', '⭐', '🌟', '🎈', '✨', '💫'];
+    const count = 10 + Math.floor(Math.random() * 6); // 10-15 emojis
+    
+    for (let i = 0; i < count; i++) {
+        const emoji = document.createElement('div');
+        emoji.className = 'emoji-rain';
+        emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        emoji.style.left = `${Math.random() * 100}%`;
+        emoji.style.animationDelay = `${Math.random() * 0.5}s`;
+        emoji.style.animationDuration = `${2 + Math.random()}s`;
+        
+        document.body.appendChild(emoji);
+        
+        // Remove after animation
+        setTimeout(() => {
+            emoji.remove();
+        }, 3500);
+    }
+}
+
+/**
+ * Effect 6: Streak Meter Fire
+ * Add flickering flame effect to streak display
+ * Duration: 4 seconds
+ */
+function showStreakFire() {
+    const streakDisplay = document.getElementById('streakDisplay') || 
+                         document.querySelector('.streak-display') ||
+                         document.querySelector('[class*="streak"]');
+    
+    if (streakDisplay) {
+        streakDisplay.classList.add('fire-effect');
+        
+        setTimeout(() => {
+            streakDisplay.classList.remove('fire-effect');
+        }, 4000);
+    }
+}
+
+/**
+ * Effect 7: Confetti Trails
+ * Colored dots follow cursor for 5 seconds
+ * Duration: 5 seconds active
+ */
+let confettiTrailActive = false;
+let confettiTrailTimeout = null;
+
+function showConfettiTrails() {
+    if (confettiTrailActive) return; // Already active
+    
+    confettiTrailActive = true;
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'];
+    let colorIndex = 0;
+    
+    const mouseMoveHandler = (e) => {
+        if (!confettiTrailActive) return;
+        
+        const trail = document.createElement('div');
+        trail.className = 'confetti-trail-dot';
+        trail.style.left = `${e.clientX}px`;
+        trail.style.top = `${e.clientY}px`;
+        trail.style.background = colors[colorIndex % colors.length];
+        colorIndex++;
+        
+        document.body.appendChild(trail);
+        
+        setTimeout(() => trail.remove(), 1000);
+    };
+    
+    document.addEventListener('mousemove', mouseMoveHandler);
+    
+    // Stop after 5 seconds
+    confettiTrailTimeout = setTimeout(() => {
+        confettiTrailActive = false;
+        document.removeEventListener('mousemove', mouseMoveHandler);
+    }, 5000);
+}
+
+/**
+ * Effect 8: Screen Bounce
+ * Quick upward bounce of main container (positive, not jarring)
+ * Duration: 500ms
+ */
+function showScreenBounce() {
+    const container = document.querySelector('.container') || 
+                     document.querySelector('main') ||
+                     document.body;
+    
+    container.classList.add('screen-bounce');
+    
+    setTimeout(() => {
+        container.classList.remove('screen-bounce');
+    }, 500);
+}
+
+// ----------------------------------------------------------------------------
+// HIGH INTENSITY EFFECTS (100% Completion)
+// ----------------------------------------------------------------------------
+
+/**
+ * Effect 9: Celebration Modal
+ * Full-screen overlay with stars, checkmark, and message
+ * Duration: 5 seconds or until dismissed
+ */
+function showCelebrationModal(message = 'Challenge Complete!', callback = null) {
+    const modal = document.createElement('div');
+    modal.className = 'celebration-modal';
+    modal.innerHTML = `
+        <div class="celebration-overlay"></div>
+        <div class="celebration-content">
+            <div class="celebration-stars">
+                ${Array(15).fill('<div class="star">⭐</div>').join('')}
+            </div>
+            <div class="celebration-checkmark">✓</div>
+            <div class="celebration-message">${message}</div>
+            <button class="celebration-continue">Continue</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Trigger animation
+    setTimeout(() => modal.classList.add('show'), 10);
+    
+    // Continue button handler
+    const continueBtn = modal.querySelector('.celebration-continue');
+    const dismiss = () => {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+            if (callback) callback();
+        }, 300);
+    };
+    
+    continueBtn.addEventListener('click', dismiss);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(dismiss, 5000);
+}
+
+/**
+ * Effect 10: Particle Explosion
+ * Burst of 50-80 bright particles with gravity effect
+ * Duration: 4 seconds
+ */
+function showParticleExplosion() {
+    const container = document.createElement('div');
+    container.className = 'explosion-container';
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.pointerEvents = 'none';
+    container.style.zIndex = '9999';
+    
+    document.body.appendChild(container);
+    
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const colors = ['#FF3E3E', '#FF8C42', '#FFD93D', '#6BCF7F', '#4D96FF', '#A855F7'];
+    const particleCount = 50 + Math.floor(Math.random() * 31); // 50-80 particles
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'explosion-particle';
+        
+        const size = 3 + Math.random() * 12; // 3-15px
+        const angle = (Math.random() * 360) * (Math.PI / 180);
+        const velocity = 150 + Math.random() * 200; // Initial velocity
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity - 100; // Bias upward
+        const shape = Math.random() > 0.5 ? '50%' : '0'; // Circle or square
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.borderRadius = shape;
+        particle.style.position = 'absolute';
+        particle.style.left = `${centerX}px`;
+        particle.style.top = `${centerY}px`;
+        particle.style.setProperty('--vx', `${vx}px`);
+        particle.style.setProperty('--vy', `${vy}px`);
+        particle.style.animation = `explosionParticle 4s ease-out forwards`;
+        
+        container.appendChild(particle);
+    }
+    
+    // Remove container after animation
+    setTimeout(() => {
+        container.remove();
+    }, 4000);
+}
+
+// ----------------------------------------------------------------------------
+// RANDOM SELECTION LOGIC & EFFECT POOLS
+// ----------------------------------------------------------------------------
+
+/**
+ * Effect pools organized by intensity level
+ * Each milestone triggers a random effect from the appropriate pool
+ */
+const effectPools = {
+    mild: [
+        { name: 'floatingPoints', fn: showFloatingPoints, args: [10] },
+        { name: 'successBadge', fn: showSuccessBadge, args: ['Halfway There! 🏅'] },
+        { name: 'progressPulse', fn: pulseProgressBar, args: [] },
+        { name: 'subtleParticles', fn: showSubtleParticleBurst, args: [] }
+    ],
+    medium: [
+        { name: 'emojiRain', fn: showEmojiRain, args: [] },
+        { name: 'streakFire', fn: showStreakFire, args: [] },
+        { name: 'confettiTrails', fn: showConfettiTrails, args: [] },
+        { name: 'screenBounce', fn: showScreenBounce, args: [] }
+    ],
+    high: [
+        { name: 'celebrationModal', fn: showCelebrationModal, args: ['Challenge Complete! 🎉'] },
+        { name: 'particleExplosion', fn: showParticleExplosion, args: [] },
+        { name: 'confetti', fn: triggerConfetti, args: [] },
+        { name: 'fireworks', fn: triggerFireworks, args: [] }
+    ]
+};
+
+/**
+ * Get a random effect from the specified intensity pool
+ * @param {string} intensityLevel - 'mild', 'medium', or 'high'
+ * @returns {Object|null} - Effect object with name, fn, and args, or null if invalid
+ */
+function getRandomEffect(intensityLevel) {
+    const pool = effectPools[intensityLevel];
+    
+    if (!pool || pool.length === 0) {
+        console.error(`[Milestone 18] Invalid intensity level: ${intensityLevel}`);
+        return null;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * pool.length);
+    return pool[randomIndex];
+}
+
+/**
+ * Trigger a random effect at the specified intensity level
+ * @param {string} intensityLevel - 'mild', 'medium', or 'high'
+ */
+function triggerRandomEffect(intensityLevel) {
+    const effect = getRandomEffect(intensityLevel);
+    
+    if (effect) {
+        console.log(`[Milestone 18] Triggering ${intensityLevel} effect: ${effect.name}`);
+        effect.fn(...effect.args);
+    }
+}
+
+/**
+ * Show visual effects warning modal on first load
+ * Uses localStorage to remember if user has dismissed it
+ */
+function showVisualEffectsWarning() {
+    const hasSeenWarning = localStorage.getItem('visualEffectsWarningSeen');
+    
+    if (!hasSeenWarning) {
+        const modal = document.getElementById('visualEffectsWarningModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            
+            // OK button handler
+            const okBtn = document.getElementById('visualEffectsOkBtn');
+            if (okBtn) {
+                okBtn.addEventListener('click', () => {
+                    const dontShowAgain = document.getElementById('dontShowAgainCheckbox')?.checked;
+                    
+                    if (dontShowAgain) {
+                        localStorage.setItem('visualEffectsWarningSeen', 'true');
+                    }
+                    
+                    modal.style.display = 'none';
+                });
+            }
+        }
+    }
+}
+
+/**
+ * Check progress milestones and trigger appropriate effects
+ * Called after each answer in Challenge mode
+ * Triggers effects at 50%, 85%, and 100% progress
+ */
+function checkProgressMilestones() {
+    if (!challengeState.active) return;
+    
+    const totalQuestions = challengeState.questions.length;
+    const answeredCount = Object.keys(challengeState.questionStates).filter(
+        key => challengeState.questionStates[key] === 'answered' || 
+               challengeState.questionStates[key] === 'gave-up'
+    ).length;
+    
+    const progress = (answeredCount / totalQuestions) * 100;
+    
+    console.log(`[Milestone 18] Progress check: ${answeredCount}/${totalQuestions} = ${progress.toFixed(1)}%`);
+    
+    // Check 50% milestone
+    if (progress >= 50 && !challengeState.progressMilestones.fifty) {
+        console.log('[Milestone 18] 50% milestone reached! Triggering mild effect.');
+        challengeState.progressMilestones.fifty = true;
+        triggerRandomEffect('mild');
+    }
+    
+    // Check 85% milestone
+    if (progress >= 85 && !challengeState.progressMilestones.eightyFive) {
+        console.log('[Milestone 18] 85% milestone reached! Triggering medium effect.');
+        challengeState.progressMilestones.eightyFive = true;
+        triggerRandomEffect('medium');
+    }
+    
+    // Check 100% milestone (all questions answered or gave up)
+    if (progress >= 100 && !challengeState.progressMilestones.hundred) {
+        console.log('[Milestone 18] 100% milestone reached! Triggering high intensity effect.');
+        challengeState.progressMilestones.hundred = true;
+        // Delay slightly so it triggers after completion screen is shown
+        setTimeout(() => {
+            triggerRandomEffect('high');
+        }, 500);
     }
 }
 
@@ -5533,6 +6014,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGameState();
     updateUI();
     
+    // Milestone 18: Show visual effects warning on first load
+    showVisualEffectsWarning();
+    
     // Mobile Menu Toggle
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
     const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
@@ -5975,6 +6459,90 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } else {
         console.error('testFireworksBtn not found');
+    }
+    
+    // Milestone 18: Test buttons for new feedback effects
+    // Mild effects
+    const testFloatingPointsBtn = document.getElementById('testFloatingPointsBtn');
+    if (testFloatingPointsBtn) {
+        testFloatingPointsBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Floating Points button clicked');
+            showFloatingPoints(10);
+        });
+    }
+    
+    const testSuccessBadgeBtn = document.getElementById('testSuccessBadgeBtn');
+    if (testSuccessBadgeBtn) {
+        testSuccessBadgeBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Success Badge button clicked');
+            showSuccessBadge('Test Badge! 🏅');
+        });
+    }
+    
+    const testProgressPulseBtn = document.getElementById('testProgressPulseBtn');
+    if (testProgressPulseBtn) {
+        testProgressPulseBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Progress Pulse button clicked');
+            pulseProgressBar();
+        });
+    }
+    
+    const testSubtleParticlesBtn = document.getElementById('testSubtleParticlesBtn');
+    if (testSubtleParticlesBtn) {
+        testSubtleParticlesBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Subtle Particles button clicked');
+            showSubtleParticleBurst();
+        });
+    }
+    
+    // Medium effects
+    const testEmojiRainBtn = document.getElementById('testEmojiRainBtn');
+    if (testEmojiRainBtn) {
+        testEmojiRainBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Emoji Rain button clicked');
+            showEmojiRain();
+        });
+    }
+    
+    const testStreakFireBtn = document.getElementById('testStreakFireBtn');
+    if (testStreakFireBtn) {
+        testStreakFireBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Streak Fire button clicked');
+            showStreakFire();
+        });
+    }
+    
+    const testConfettiTrailsBtn = document.getElementById('testConfettiTrailsBtn');
+    if (testConfettiTrailsBtn) {
+        testConfettiTrailsBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Confetti Trails button clicked');
+            showConfettiTrails();
+        });
+    }
+    
+    const testScreenBounceBtn = document.getElementById('testScreenBounceBtn');
+    if (testScreenBounceBtn) {
+        testScreenBounceBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Screen Bounce button clicked');
+            showScreenBounce();
+        });
+    }
+    
+    // High effects
+    const testCelebrationModalBtn = document.getElementById('testCelebrationModalBtn');
+    if (testCelebrationModalBtn) {
+        testCelebrationModalBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Celebration Modal button clicked');
+            showCelebrationModal('Test Celebration! 🎉');
+        });
+    }
+    
+    const testParticleExplosionBtn = document.getElementById('testParticleExplosionBtn');
+    if (testParticleExplosionBtn) {
+        testParticleExplosionBtn.addEventListener('click', () => {
+            console.log('[Milestone 18] Test Particle Explosion button clicked');
+            showParticleExplosion();
+        });
     }
     
     // Close hint tooltip (legacy - kept for backward compatibility)

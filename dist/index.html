@@ -600,6 +600,49 @@
                         🎆 Test Fireworks
                     </button>
                 </div>
+                
+                <!-- Milestone 18: Enhanced Feedback Effects Test Buttons -->
+                <h4 style="margin-top: 20px; font-size: 0.9rem; color: #999;">Mild Effects (50%)</h4>
+                <div class="test-buttons">
+                    <button id="testFloatingPointsBtn" class="test-button" title="Test floating score points">
+                        🎯 Floating Points
+                    </button>
+                    <button id="testSuccessBadgeBtn" class="test-button" title="Test success badge pop-up">
+                        🏅 Success Badge
+                    </button>
+                    <button id="testProgressPulseBtn" class="test-button" title="Test progress bar pulse">
+                        ✨ Progress Pulse
+                    </button>
+                    <button id="testSubtleParticlesBtn" class="test-button" title="Test subtle particle burst">
+                        💫 Subtle Particles
+                    </button>
+                </div>
+                
+                <h4 style="margin-top: 15px; font-size: 0.9rem; color: #999;">Medium Effects (85%)</h4>
+                <div class="test-buttons">
+                    <button id="testEmojiRainBtn" class="test-button" title="Test emoji rain">
+                        🎊 Emoji Rain
+                    </button>
+                    <button id="testStreakFireBtn" class="test-button" title="Test streak meter fire">
+                        🔥 Streak Fire
+                    </button>
+                    <button id="testConfettiTrailsBtn" class="test-button" title="Test confetti trails">
+                        🌈 Confetti Trails
+                    </button>
+                    <button id="testScreenBounceBtn" class="test-button" title="Test screen bounce">
+                        📳 Screen Bounce
+                    </button>
+                </div>
+                
+                <h4 style="margin-top: 15px; font-size: 0.9rem; color: #999;">High Effects (100%)</h4>
+                <div class="test-buttons">
+                    <button id="testCelebrationModalBtn" class="test-button" title="Test celebration modal">
+                        🎉 Celebration Modal
+                    </button>
+                    <button id="testParticleExplosionBtn" class="test-button" title="Test particle explosion">
+                        💥 Particle Explosion
+                    </button>
+                </div>
             </div>
         </aside>
     </div>
@@ -659,6 +702,34 @@
                 <button id="restartChallenge" class="action-button">Start New Challenge</button>
                 <button id="returnToPractice" class="action-button">Return to Practice</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Milestone 18: Visual Effects Warning Modal -->
+    <div id="visualEffectsWarningModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <h2 style="color: #ff9800; margin-bottom: 15px;">⚠️ Visual Effects Notice</h2>
+            <p style="margin-bottom: 15px; line-height: 1.6;">
+                This app uses animated visual effects including:
+            </p>
+            <ul style="text-align: left; margin: 15px 0; padding-left: 30px;">
+                <li>Flashing particles and colors</li>
+                <li>Moving elements and screen motion</li>
+                <li>Rapid animations</li>
+            </ul>
+            <p style="margin-bottom: 20px; line-height: 1.6;">
+                If you have sensitivity to visual motion or flashing lights,
+                please be aware these effects may occur during gameplay.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="dontShowAgainCheckbox">
+                    <span>Don't show this again</span>
+                </label>
+            </div>
+            <button id="visualEffectsOkBtn" style="margin-top: 20px; padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; font-weight: bold;">
+                OK, I Understand
+            </button>
         </div>
     </div>
 

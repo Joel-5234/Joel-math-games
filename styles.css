@@ -1469,3 +1469,396 @@ body {
     height: auto;
 }
 
+/* ============================================================================
+   MILESTONE 18: Enhanced Feedback Effects System
+   CSS Animations and Styling for 10 new visual effects
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   MILD EFFECTS (50% Progress)
+   --------------------------------------------------------------------------- */
+
+/* Effect 1: Floating Score Points */
+.floating-points {
+    position: fixed;
+    font-size: 24px;
+    font-weight: bold;
+    color: #4caf50;
+    pointer-events: none;
+    z-index: 10000;
+    animation: floatUp 2s ease-out forwards;
+}
+
+@keyframes floatUp {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+}
+
+/* Effect 2: Success Badge Pop-up */
+.success-badge {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s ease;
+}
+
+.success-badge.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.badge-content {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    animation: badgePulse 0.5s ease infinite alternate;
+}
+
+@keyframes badgePulse {
+    from {
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    }
+    to {
+        box-shadow: 0 4px 25px rgba(255, 215, 0, 0.6);
+    }
+}
+
+/* Effect 3: Progress Bar Pulse */
+.pulse-glow {
+    animation: pulseGlow 1s ease;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 rgba(76, 175, 80, 0);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+    }
+}
+
+/* Effect 4: Subtle Particle Burst */
+.subtle-particle {
+    position: absolute;
+    pointer-events: none;
+    opacity: 1;
+}
+
+@keyframes subtleParticleBurst {
+    from {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    to {
+        transform: translate(var(--angle-x), var(--angle-y));
+        opacity: 0;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   MEDIUM EFFECTS (85% Progress)
+   --------------------------------------------------------------------------- */
+
+/* Effect 5: Emoji Rain */
+.emoji-rain {
+    position: fixed;
+    top: -50px;
+    font-size: 2rem;
+    pointer-events: none;
+    z-index: 9999;
+    animation: emojiRainFall 3s linear forwards;
+}
+
+@keyframes emojiRainFall {
+    from {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Effect 6: Streak Meter Fire */
+.fire-effect {
+    position: relative;
+    animation: fireFlicker 0.5s ease-in-out infinite;
+}
+
+.fire-effect::before {
+    content: '🔥';
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    animation: flameMove 0.8s ease-in-out infinite;
+}
+
+@keyframes fireFlicker {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(255, 140, 0, 0.8);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(255, 69, 0, 1);
+    }
+}
+
+@keyframes flameMove {
+    0%, 100% {
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        transform: translateY(-55%) scale(1.1);
+    }
+}
+
+/* Effect 7: Confetti Trails */
+.confetti-trail-dot {
+    position: fixed;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: trailFade 1s ease-out forwards;
+}
+
+@keyframes trailFade {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+/* Effect 8: Screen Bounce */
+.screen-bounce {
+    animation: screenBounce 0.5s ease-out;
+}
+
+@keyframes screenBounce {
+    0% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-10px);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+    70% {
+        transform: translateY(-7px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   HIGH INTENSITY EFFECTS (100% Completion)
+   --------------------------------------------------------------------------- */
+
+/* Effect 9: Celebration Modal */
+.celebration-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.celebration-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.celebration-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.celebration-content {
+    position: relative;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    animation: celebrationScale 0.5s ease-out;
+}
+
+@keyframes celebrationScale {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.celebration-stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.celebration-stars .star {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: starSpin 2s linear infinite;
+}
+
+.celebration-stars .star:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+.celebration-stars .star:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.2s; }
+.celebration-stars .star:nth-child(3) { top: 40%; left: 5%; animation-delay: 0.4s; }
+.celebration-stars .star:nth-child(4) { top: 60%; right: 10%; animation-delay: 0.6s; }
+.celebration-stars .star:nth-child(5) { top: 80%; left: 20%; animation-delay: 0.8s; }
+.celebration-stars .star:nth-child(6) { bottom: 10%; right: 20%; animation-delay: 1s; }
+
+@keyframes starSpin {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2);
+    }
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+.celebration-checkmark {
+    font-size: 80px;
+    color: #4caf50;
+    font-weight: bold;
+    margin: 20px 0;
+    animation: checkmarkScale 0.6s ease-out;
+}
+
+@keyframes checkmarkScale {
+    from {
+        transform: scale(0);
+    }
+    60% {
+        transform: scale(1.2);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+.celebration-message {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin: 20px 0;
+}
+
+.celebration-continue {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.celebration-continue:hover {
+    transform: scale(1.05);
+}
+
+/* Effect 10: Particle Explosion */
+.explosion-particle {
+    position: absolute;
+    pointer-events: none;
+    opacity: 1;
+}
+
+@keyframes explosionParticle {
+    from {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    to {
+        transform: translate(var(--vx), calc(var(--vy) + 300px));
+        opacity: 0;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE ADJUSTMENTS FOR EFFECTS
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .floating-points {
+        font-size: 20px;
+    }
+    
+    .success-badge {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .badge-content {
+        padding: 10px 15px;
+        font-size: 0.95rem;
+    }
+    
+    .emoji-rain {
+        font-size: 1.5rem;
+    }
+    
+    .celebration-content {
+        padding: 30px 20px;
+        max-width: 90%;
+    }
+    
+    .celebration-checkmark {
+        font-size: 60px;
+    }
+    
+    .celebration-message {
+        font-size: 1.2rem;
+    }
+}
+
