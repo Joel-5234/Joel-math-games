@@ -545,6 +545,40 @@ function randomFloat(min, max, decimals = 1) {
 }
 
 // Distractor Generation Functions for Multiple Choice
+// Issue #017: Helper function to deduplicate options and ensure exactly 4 unique values
+function deduplicateOptions(correctValue, distractors, fallbackValues) {
+    // Start with correct answer and distractors
+    let options = [
+        { value: correctValue, correct: true },
+        ...distractors.map(d => ({ value: d, correct: false }))
+    ];
+    
+    // Deduplicate by value
+    const seen = new Set();
+    options = options.filter(opt => {
+        if (seen.has(opt.value)) {
+            console.warn(`[Issue #017] Duplicate option detected and removed: ${opt.value}`);
+            return false;
+        }
+        seen.add(opt.value);
+        return true;
+    });
+    
+    // Backfill if we have less than 4 options due to duplicates
+    for (const val of fallbackValues) {
+        if (options.length >= 4) break;
+        if (!seen.has(val)) {
+            options.push({ value: val, correct: false });
+            seen.add(val);
+        }
+    }
+    
+    // Shuffle
+    options.sort(() => Math.random() - 0.5);
+    
+    return options;
+}
+
 function generateSlopeDistractors(correctSlope) {
     const distractors = new Set();
     const correct = correctSlope === Infinity ? 'undefined' : formatSlopeValue(correctSlope);
@@ -750,25 +784,17 @@ function generateSlopeQuestion() {
     const result = calculateSlope(p1, p2);
     
     // Generate two separate questions: slope value and classification
-        const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
+    const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
     const slopeDistractors = generateSlopeDistractors(result.slope);
     const classificationDistractors = generateClassificationDistractors(result.classification);
     
-        // Create options for slope question (no labels yet, will be assigned in renderRadioOptions)
-    const slopeOptions = [
-            { value: slopeValue, correct: true },
-            { value: slopeDistractors[0], correct: false },
-            { value: slopeDistractors[1], correct: false },
-            { value: slopeDistractors[2], correct: false }
-    ].sort(() => Math.random() - 0.5); // Shuffle options
+    // Issue #017: Create slope options with deduplication using helper function
+    const fallbackSlopes = ['0', '1', '-1', '2', '-2', '3', '-3', '1/2', '-1/2', '1/3', '-1/3', '2/3', '-2/3', '3/2', '-3/2'];
+    const slopeOptions = deduplicateOptions(slopeValue, slopeDistractors, fallbackSlopes);
     
-    // Create options for classification question (no labels yet, will be assigned in renderRadioOptions)
-    const classificationOptions = [
-        { value: result.classification, correct: true },
-        { value: classificationDistractors[0], correct: false },
-        { value: classificationDistractors[1], correct: false },
-        { value: classificationDistractors[2], correct: false }
-    ].sort(() => Math.random() - 0.5); // Shuffle options
+    // Issue #017: Create classification options with deduplication using helper function
+    const fallbackClassifications = ['rising', 'falling', 'horizontal', 'vertical'];
+    const classificationOptions = deduplicateOptions(result.classification, classificationDistractors, fallbackClassifications);
     
     return {
         type: 'slope',
@@ -854,13 +880,9 @@ function generateRelationshipQuestion() {
     const relationship = determineRelationship(line1, line2);
     const relationshipDistractors = generateRelationshipDistractors(relationship);
     
-    // Create options for relationship question (no labels yet, will be assigned in renderRadioOptions)
-    const options = [
-        { value: relationship, correct: true },
-        { value: relationshipDistractors[0], correct: false },
-        { value: relationshipDistractors[1], correct: false },
-        { value: relationshipDistractors[2], correct: false }
-    ].sort(() => Math.random() - 0.5); // Shuffle options
+    // Issue #017: Create options with deduplication using helper function
+    const fallbackRelationships = ['parallel', 'perpendicular', 'neither', 'same'];
+    const options = deduplicateOptions(relationship, relationshipDistractors, fallbackRelationships);
     
     const correctAnswer = `Equation 1: ${formatEquation(line1)}\nEquation 2: ${formatEquation(line2)}\nRelationship: ${relationship.charAt(0).toUpperCase() + relationship.slice(1)}`;
     
@@ -904,13 +926,10 @@ function generateParallelQuestion() {
     const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, true);
     const correctEq = formatEquation(resultLine);
     
-    // Create options for parallel question (no labels yet, will be assigned in renderRadioOptions)
-    const options = [
-        { value: correctEq, correct: true },
-        { value: equationDistractors[0], correct: false },
-        { value: equationDistractors[1], correct: false },
-        { value: equationDistractors[2], correct: false }
-    ].sort(() => Math.random() - 0.5); // Shuffle options
+    // Issue #017: Create options with deduplication using helper function
+    // For equation-based questions, use simple slope-intercept forms as fallbacks
+    const fallbackEquations = ['y = x', 'y = -x', 'y = 2x', 'y = -2x', 'y = x + 1', 'y = x - 1', 'y = 0', 'x = 0'];
+    const options = deduplicateOptions(correctEq, equationDistractors, fallbackEquations);
     
     const correctAnswer = `Parallel line: ${correctEq}`;
     
@@ -954,13 +973,9 @@ function generatePerpendicularQuestion() {
     const equationDistractors = generateEquationDistractors(resultLine, baseLine, point, false);
     const correctEq = formatEquation(resultLine);
     
-    // Create options for perpendicular question (no labels yet, will be assigned in renderRadioOptions)
-    const options = [
-        { value: correctEq, correct: true },
-        { value: equationDistractors[0], correct: false },
-        { value: equationDistractors[1], correct: false },
-        { value: equationDistractors[2], correct: false }
-    ].sort(() => Math.random() - 0.5); // Shuffle options
+    // Issue #017: Create options with deduplication using helper function
+    const fallbackEquations = ['y = x', 'y = -x', 'y = 2x', 'y = -2x', 'y = x + 1', 'y = x - 1', 'y = 0', 'x = 0'];
+    const options = deduplicateOptions(correctEq, equationDistractors, fallbackEquations);
     
     const correctAnswer = `Perpendicular line: ${correctEq}`;
     
