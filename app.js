@@ -5349,6 +5349,61 @@ function saveGameState() {
     localStorage.setItem('lineTrainerGameState', JSON.stringify(stateToSave));
 }
 
+// Milestone 17: Personal Bests Management
+function updatePersonalBests() {
+    const personalBests = loadPersonalBests();
+    let updated = false;
+    
+    // Update fastest challenge time by set size
+    const setSize = challengeState.setSize;
+    const totalTime = challengeState.totalChallengeTime;
+    
+    if (!personalBests.fastestChallenge[setSize] || totalTime < personalBests.fastestChallenge[setSize]) {
+        personalBests.fastestChallenge[setSize] = totalTime;
+        updated = true;
+    }
+    
+    // Update fastest single question time
+    const fastestTime = challengeState.questionTimes.length > 0
+        ? Math.min(...challengeState.questionTimes.map(qt => qt.duration))
+        : Infinity;
+    
+    if (fastestTime < Infinity && (!personalBests.fastestQuestion || fastestTime < personalBests.fastestQuestion)) {
+        personalBests.fastestQuestion = fastestTime;
+        updated = true;
+    }
+    
+    // Update best average time per question
+    const avgTime = challengeState.questionTimes.length > 0
+        ? challengeState.questionTimes.reduce((sum, qt) => sum + qt.duration, 0) / challengeState.questionTimes.length
+        : Infinity;
+    
+    if (avgTime < Infinity && (!personalBests.bestAverageTime || avgTime < personalBests.bestAverageTime)) {
+        personalBests.bestAverageTime = avgTime;
+        updated = true;
+    }
+    
+    if (updated) {
+        savePersonalBests(personalBests);
+    }
+}
+
+function loadPersonalBests() {
+    const stored = localStorage.getItem('personalBests');
+    if (stored) {
+        return JSON.parse(stored);
+    }
+    return {
+        fastestChallenge: {}, // { setSize: time }
+        fastestQuestion: null,
+        bestAverageTime: null
+    };
+}
+
+function savePersonalBests(personalBests) {
+    localStorage.setItem('personalBests', JSON.stringify(personalBests));
+}
+
 function loadGameState() {
     const saved = localStorage.getItem('lineTrainerGameState');
     if (saved) {
