@@ -29,6 +29,7 @@ let gameState = {
     mode: 'practice',
     questionStartTime: null,
     questionTimer: null,
+    challengeTimer: null, // Milestone 17: Separate challenge timer
     sessionStartTime: null,
     sessionTimer: null,
     challengeCountdown: null,
@@ -910,7 +911,11 @@ let challengeState = {
     hintsUsedPerQuestion: {}, // Map of question index to boolean (used hint)
     hintLimit: 5, // Maximum hints allowed per challenge
     startTime: null,
-    endTime: null
+    endTime: null,
+    // Milestone 17: Dual timer system
+    challengeStartTime: null, // Timestamp when challenge started (for total time)
+    questionTimes: [], // Array of {questionIndex, startTime, endTime, duration} for each question
+    totalChallengeTime: 0 // Total time in seconds (calculated at completion)
 };
 
 function generateChallengeQuestions(problemType, count) {
@@ -962,9 +967,12 @@ function initializeChallenge(problemType, setSize) {
 }
 
 function resetChallenge() {
-    // Stop timer when resetting challenge
+    // Stop timers when resetting challenge
     stopQuestionTimer();
     gameState.questionStartTime = null;
+    
+    // Milestone 17: Stop challenge timer
+    stopChallengeTimer();
     
     challengeState = {
         active: false,
@@ -979,7 +987,11 @@ function resetChallenge() {
         hintsUsedPerQuestion: {},
         hintLimit: 5,
         startTime: null,
-        endTime: null
+        endTime: null,
+        // Milestone 17: Reset dual timer fields
+        challengeStartTime: null,
+        questionTimes: [],
+        totalChallengeTime: 0
     };
 }
 
@@ -1020,11 +1032,15 @@ function startChallenge(setSize) {
     const tabName = activeTab ? activeTab.dataset.tab : 'slope';
     const problemType = mapTabToProblemType(tabName);
     
-    // Stop any existing timer and reset for challenge mode
+    // Stop any existing timers and reset for challenge mode
     stopQuestionTimer();
     gameState.questionStartTime = null;
     
     initializeChallenge(problemType, setSize);
+    
+    // Milestone 17: Start challenge timer
+    startChallengeTimer();
+    
     hideChallengeSetupModal();
     displayChallengeQuestion();
     showChallengeInterface();
@@ -1476,11 +1492,25 @@ function skipChallengeQuestion() {
 }
 
 function giveUpChallengeQuestion() {
+    // Milestone 17: Record question end time before stopping timer
+    const questionEndTime = Date.now();
+    
     // Stop timer when giving up
     stopQuestionTimer();
     const question = challengeState.questions[challengeState.currentQuestionIndex];
     challengeState.questionStates[challengeState.currentQuestionIndex] = 'gave-up';
     challengeState.correctAnswers[challengeState.currentQuestionIndex] = false;
+    
+    // Milestone 17: Track question time
+    if (gameState.questionStartTime) {
+        const duration = Math.floor((questionEndTime - gameState.questionStartTime) / 1000);
+        challengeState.questionTimes.push({
+            questionIndex: challengeState.currentQuestionIndex,
+            startTime: gameState.questionStartTime,
+            endTime: questionEndTime,
+            duration: duration
+        });
+    }
     
     // Show answer
     const resultArea = document.getElementById('challengeResult');
@@ -1512,6 +1542,9 @@ function submitChallengeAnswer() {
     if (questionState === 'answered' || questionState === 'gave-up') {
         return; // Already answered
     }
+    
+    // Milestone 17: Record question end time before stopping timer
+    const questionEndTime = Date.now();
     
     // Stop timer when answer is submitted
     stopQuestionTimer();
@@ -1744,6 +1777,17 @@ function submitChallengeAnswer() {
     challengeState.questionStates[challengeState.currentQuestionIndex] = 'answered';
     challengeState.correctAnswers[challengeState.currentQuestionIndex] = isCorrect;
     
+    // Milestone 17: Track question time
+    if (gameState.questionStartTime) {
+        const duration = Math.floor((questionEndTime - gameState.questionStartTime) / 1000);
+        challengeState.questionTimes.push({
+            questionIndex: challengeState.currentQuestionIndex,
+            startTime: gameState.questionStartTime,
+            endTime: questionEndTime,
+            duration: duration
+        });
+    }
+    
     // Show result
     const resultArea = document.getElementById('challengeResult');
     if (resultArea) {
@@ -1807,6 +1851,15 @@ function checkChallengeCompletion() {
     
     if (allAnswered || challengeState.currentQuestionIndex >= challengeState.questions.length - 1) {
         challengeState.endTime = Date.now();
+        
+        // Milestone 17: Calculate total challenge time
+        if (challengeState.challengeStartTime) {
+            challengeState.totalChallengeTime = Math.floor((challengeState.endTime - challengeState.challengeStartTime) / 1000);
+        }
+        
+        // Stop challenge timer
+        stopChallengeTimer();
+        
         showChallengeCompletion();
     }
 }
@@ -1858,6 +1911,35 @@ function calculateChallengeGrade() {
 function showChallengeCompletion() {
     const grade = calculateChallengeGrade();
     
+    // Milestone 17: Format total challenge time
+    const formatTime = (seconds) => {
+        if (seconds >= 60) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}m ${secs}s`;
+        }
+        return `${seconds}s`;
+    };
+    
+    // Milestone 17: Calculate question time statistics
+    const questionTimesDisplay = challengeState.questionTimes.length > 0 
+        ? challengeState.questionTimes
+            .map(qt => `Q${qt.questionIndex + 1}: ${formatTime(qt.duration)}`)
+            .join(', ')
+        : 'No time data available';
+    
+    const avgTime = challengeState.questionTimes.length > 0
+        ? Math.round(challengeState.questionTimes.reduce((sum, qt) => sum + qt.duration, 0) / challengeState.questionTimes.length)
+        : 0;
+    
+    const fastestTime = challengeState.questionTimes.length > 0
+        ? Math.min(...challengeState.questionTimes.map(qt => qt.duration))
+        : 0;
+    
+    const slowestTime = challengeState.questionTimes.length > 0
+        ? Math.max(...challengeState.questionTimes.map(qt => qt.duration))
+        : 0;
+    
     // Show completion modal
     const completionModal = document.getElementById('challengeCompletionModal');
     if (completionModal) {
@@ -1891,6 +1973,29 @@ function showChallengeCompletion() {
                 <div class="stat-row grade-row">
                     <span>Final Grade:</span>
                     <span class="grade-value grade-${grade.letterGrade.toLowerCase()}">${grade.percentage}% (${grade.letterGrade})</span>
+                </div>
+                <div class="stat-section time-stats">
+                    <h4>Time Statistics</h4>
+                    <div class="stat-row">
+                        <span>Total Time:</span>
+                        <span>${formatTime(challengeState.totalChallengeTime)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Average per Question:</span>
+                        <span>${formatTime(avgTime)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Fastest Question:</span>
+                        <span>${formatTime(fastestTime)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Slowest Question:</span>
+                        <span>${formatTime(slowestTime)}</span>
+                    </div>
+                    <div class="stat-row time-breakdown">
+                        <span>Time per Question:</span>
+                        <span class="time-list">${questionTimesDisplay}</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -2003,6 +2108,36 @@ function stopQuestionTimer() {
     if (gameState.questionTimer) {
         clearInterval(gameState.questionTimer);
         gameState.questionTimer = null;
+    }
+}
+
+// Milestone 17: Challenge Timer Functions
+function startChallengeTimer() {
+    // Stop any existing challenge timer
+    stopChallengeTimer();
+    
+    // Start new challenge timer
+    challengeState.challengeStartTime = Date.now();
+    gameState.challengeTimer = setInterval(updateChallengeTimer, 100);
+}
+
+function stopChallengeTimer() {
+    if (gameState.challengeTimer) {
+        clearInterval(gameState.challengeTimer);
+        gameState.challengeTimer = null;
+    }
+}
+
+function updateChallengeTimer() {
+    if (!challengeState.challengeStartTime) return;
+    
+    const elapsed = Math.floor((Date.now() - challengeState.challengeStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    
+    const challengeTimerDisplay = document.getElementById('challengeTimerDisplay');
+    if (challengeTimerDisplay) {
+        challengeTimerDisplay.textContent = `Total: ${minutes}m ${seconds}s`;
     }
 }
 
