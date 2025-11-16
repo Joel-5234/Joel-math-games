@@ -162,6 +162,13 @@
       "status": "resolved_not_a_bug",
       "filename": "issue-024-20251116-185000.md",
       "date": "2025-11-16T18:50:00"
+    },
+    {
+      "id": "025",
+      "description": "Challenge Mode Not Auto-Advancing After Answer Submission - Browser Caching Suspected",
+      "status": "investigating",
+      "filename": "issue-025-20251116-193000.md",
+      "date": "2025-11-16T19:30:00"
     }
   ]
 }
