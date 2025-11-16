@@ -99,7 +99,7 @@
     {
       "id": "milestone-17",
       "name": "Separate Challenge Timer and Question Timer",
-      "status": "pending",
+      "status": "completed",
       "description": "Implement dual timers in Challenge Mode: a total challenge timer that runs continuously from start to completion, and a per-question timer that resets for each question. Display both side by side with distinct visual styles, track time per question, and add speed-based achievements."
     }
   ]

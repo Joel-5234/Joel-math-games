@@ -69,11 +69,19 @@ The app features gamification with timers, streaks, achievements, and local prog
   - Point-slope form drills
   - Absolute value line graphs
 - **Practice Mode**: Timed practice with scoring
-- **Challenge Mode**: Countdown timer with time bonuses
+- **Challenge Mode**: Set-length challenges with dual timer system
+  - **Total Timer**: Tracks overall challenge duration
+  - **Question Timer**: Tracks time per individual question
+  - **Time Statistics**: View detailed time breakdown on completion
+  - **Speed Achievements**: Earn achievements for fast performance
 - **Session Mode**: Extended practice sessions
 - **Achievements**: Unlock achievements as you progress
+  - Traditional achievements (correct answers, streaks, etc.)
+  - Speed-based achievements (Lightning Fast, Speed Demon, Marathon Master, Efficiency Expert)
 - **Hint System**: Helpful hints with step-by-step guidance, formulas, and concepts
 - **Local Storage**: All progress saved in your browser
+  - Game state (score, streak, achievements, stats)
+  - Personal bests (fastest times, best averages)
 
 ## 📚 Documentation
 
