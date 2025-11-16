@@ -34,6 +34,8 @@ let gameState = {
     sessionTimer: null,
     challengeCountdown: null,
     questionAnswered: false, // Track if current question has been answered
+    quickAnswersCount: 0, // Issue #020: Track answers under 10 seconds for Speed Runner
+    challengesCompleted: 0, // Issue #020: Track total challenges completed
     stats: {
         slope: { correct: 0, total: 0, times: [] },
         relationship: { correct: 0, total: 0, times: [] },
@@ -220,19 +222,49 @@ const hints = {
 
 // Achievement Definitions
 const achievements = [
-    { id: 'firstSteps', name: 'First Steps', description: 'Get your first correct answer', condition: (state) => state.correctQuestions >= 1 },
-    { id: 'slopeStarter', name: 'Slope Starter', description: 'Answer 5 slope questions correctly', condition: (state) => state.stats.slope.correct >= 5 },
-    { id: 'slopeMaster', name: 'Slope Master', description: 'Answer 20 slope questions correctly with no mistakes', condition: (state) => state.stats.slope.correct >= 20 && state.stats.slope.total === state.stats.slope.correct },
-    { id: 'parallelPro', name: 'Parallel Pro', description: 'Answer 10 relationship questions correctly', condition: (state) => state.stats.relationship.correct >= 10 },
-    { id: 'perpendicularPro', name: 'Perpendicular Pro', description: 'Answer 10 perpendicular questions correctly', condition: (state) => state.stats.perpendicular.correct >= 10 },
-    { id: 'speedRunner', name: 'Speed Runner', description: 'Answer any question correctly in under 10 seconds', condition: () => false }, // Checked per question
-    { id: 'focus10', name: 'Focus 10', description: 'Answer 10 questions correctly in a row in one session', condition: (state) => state.streakCurrent >= 10 },
-    { id: 'homeworkHero', name: 'Homework Hero', description: 'Score 100 points in one session', condition: (state) => state.score >= 100 },
-    // Milestone 17: Speed-based achievements
+    // === GETTING STARTED ===
+    { id: 'firstSteps', name: '👣 First Steps', description: 'Get your first correct answer', condition: (state) => state.correctQuestions >= 1 },
+    { id: 'earlyBird', name: '🌅 Early Bird', description: 'Complete your first practice session', condition: (state) => state.correctQuestions >= 3 },
+    
+    // === PROBLEM TYPE MASTERY ===
+    { id: 'slopeStarter', name: '📐 Slope Starter', description: 'Answer 5 slope questions correctly', condition: (state) => state.stats.slope.correct >= 5 },
+    { id: 'slopeMaster', name: '🎯 Slope Master', description: 'Answer 20 slope questions correctly with no mistakes', condition: (state) => state.stats.slope.correct >= 20 && state.stats.slope.total === state.stats.slope.correct },
+    { id: 'parallelPro', name: '⚖️ Parallel Pro', description: 'Answer 10 relationship questions correctly', condition: (state) => state.stats.relationship.correct >= 10 },
+    { id: 'perpendicularPro', name: '⊥ Perpendicular Pro', description: 'Answer 10 perpendicular questions correctly', condition: (state) => state.stats.perpendicular.correct >= 10 },
+    { id: 'interceptExplorer', name: '🎯 Intercept Explorer', description: 'Answer 10 intercept questions correctly', condition: (state) => state.stats.intercepts && state.stats.intercepts.correct >= 10 },
+    { id: 'linearGenius', name: '📊 Linear Genius', description: 'Answer 10 linear function questions correctly', condition: (state) => state.stats.linearFunctions && state.stats.linearFunctions.correct >= 10 },
+    { id: 'standardFormStar', name: '⭐ Standard Form Star', description: 'Answer 10 standard form questions correctly', condition: (state) => state.stats.standardForm && state.stats.standardForm.correct >= 10 },
+    
+    // === SPEED & TIMING ===
     { id: 'lightningFast', name: '⚡ Lightning Fast', description: 'Answer a question correctly in under 10 seconds', condition: () => false }, // Checked per question
+    { id: 'speedRunner', name: '🏃 Speed Runner', description: 'Answer 5 questions correctly under 10 seconds each', condition: () => false }, // Issue #020 FIX: Changed from single to 5 quick answers
     { id: 'speedDemon', name: '🔥 Speed Demon', description: 'Complete a 10-question challenge in under 5 minutes', condition: () => false }, // Checked at challenge completion
+    { id: 'sprintMaster', name: '💨 Sprint Master', description: 'Complete a challenge with average under 15 seconds per question', condition: () => false }, // Checked at challenge completion
     { id: 'marathonMaster', name: '🏃 Marathon Master', description: 'Complete a 50-question challenge', condition: () => false }, // Checked at challenge completion
-    { id: 'efficiencyExpert', name: '💎 Efficiency Expert', description: 'Average under 20 seconds per question in a challenge', condition: () => false } // Checked at challenge completion
+    { id: 'efficiencyExpert', name: '💎 Efficiency Expert', description: 'Average under 20 seconds per question in a challenge', condition: () => false }, // Checked at challenge completion
+    
+    // === ACCURACY & STREAKS ===
+    { id: 'focus10', name: '🎯 Focus 10', description: 'Answer 10 questions correctly in a row in one session', condition: (state) => state.streakCurrent >= 10 },
+    { id: 'hotStreak', name: '🔥 Hot Streak', description: 'Answer 5 questions correctly in a row', condition: (state) => state.streakCurrent >= 5 },
+    { id: 'unstoppable', name: '💪 Unstoppable', description: 'Answer 20 questions correctly in a row', condition: (state) => state.streakCurrent >= 20 },
+    { id: 'perfect10', name: '✨ Perfect 10', description: 'Get 10 correct answers with 100% accuracy in a session', condition: (state) => state.correctQuestions >= 10 && state.correctQuestions === state.totalQuestions && state.totalQuestions >= 10 },
+    { id: 'flawless', name: '💯 Flawless', description: 'Complete a challenge with no mistakes', condition: () => false }, // Checked at challenge completion
+    
+    // === POINTS & SCORING ===
+    { id: 'homeworkHero', name: '📚 Homework Hero', description: 'Score 100 points in one session', condition: (state) => state.score >= 100 },
+    { id: 'centurion', name: '💯 Centurion', description: 'Score 200 points in one session', condition: (state) => state.score >= 200 },
+    { id: 'pointCollector', name: '💰 Point Collector', description: 'Score 500 points in one session', condition: (state) => state.score >= 500 },
+    
+    // === CHALLENGE MODE ===
+    { id: 'challengeSeeker', name: '🎮 Challenge Seeker', description: 'Complete your first challenge', condition: () => false }, // Checked at challenge completion
+    { id: 'challengeChampion', name: '🏆 Challenge Champion', description: 'Complete 5 challenges', condition: () => false }, // Tracked separately
+    { id: 'challengeLegend', name: '👑 Challenge Legend', description: 'Complete 10 challenges', condition: () => false }, // Tracked separately
+    
+    // === DEDICATION & PRACTICE ===
+    { id: 'dedicated', name: '📖 Dedicated Student', description: 'Answer 50 questions correctly (all time)', condition: (state) => state.correctQuestions >= 50 },
+    { id: 'mathematician', name: '🧮 Mathematician', description: 'Answer 100 questions correctly (all time)', condition: (state) => state.correctQuestions >= 100 },
+    { id: 'mathWizard', name: '🧙 Math Wizard', description: 'Answer 250 questions correctly (all time)', condition: (state) => state.correctQuestions >= 250 },
+    { id: 'mathLegend', name: '🌟 Math Legend', description: 'Answer 500 questions correctly (all time)', condition: (state) => state.correctQuestions >= 500 }
 ];
 
 // Utility Functions
@@ -1935,9 +1967,16 @@ function submitChallengeAnswer() {
             duration: duration
         });
         
-        // Milestone 17: Check for Lightning Fast achievement (correct answer in under 10 seconds)
+        // Milestone 17 & Issue #020: Check for speed achievements
         if (isCorrect && duration < 10) {
+            // Lightning Fast: Single quick answer
             unlockAchievement('lightningFast');
+            
+            // Issue #020: Speed Runner - Track quick answers
+            gameState.quickAnswersCount++;
+            if (gameState.quickAnswersCount >= 5) {
+                unlockAchievement('speedRunner');
+            }
         }
     }
     
@@ -2847,13 +2886,42 @@ function checkAchievements() {
     });
 }
 
-// Milestone 17: Check speed-based achievements at challenge completion
+// Milestone 17 & Issue #020: Check speed-based and challenge achievements at completion
 function checkSpeedAchievements(grade) {
     if (!challengeState.active) return;
+    
+    // Issue #020: Increment challenges completed
+    gameState.challengesCompleted++;
+    
+    // Challenge Seeker: First challenge
+    if (gameState.challengesCompleted >= 1) {
+        unlockAchievement('challengeSeeker');
+    }
+    
+    // Challenge Champion: 5 challenges
+    if (gameState.challengesCompleted >= 5) {
+        unlockAchievement('challengeChampion');
+    }
+    
+    // Challenge Legend: 10 challenges
+    if (gameState.challengesCompleted >= 10) {
+        unlockAchievement('challengeLegend');
+    }
+    
+    // Flawless: No mistakes in challenge
+    if (grade === 'A' && challengeState.totalCorrect === challengeState.setSize) {
+        unlockAchievement('flawless');
+    }
     
     // Speed Demon: Complete a 10-question challenge in under 5 minutes
     if (challengeState.setSize >= 10 && challengeState.totalChallengeTime < 300) {
         unlockAchievement('speedDemon');
+    }
+    
+    // Sprint Master: Average under 15 seconds per question
+    const avgTime = challengeState.totalChallengeTime / challengeState.setSize;
+    if (avgTime < 15) {
+        unlockAchievement('sprintMaster');
     }
     
     // Marathon Master: Complete a 50-question challenge
