@@ -207,10 +207,27 @@ a) Per question timer
 • Start when the user clicks "Start" or when they first type
 • Stop on answer submission
 • Show elapsed time in seconds
-b) Set Challenge mode timer
-• Tracks time per question (stopwatch style)
-• Shows total elapsed time for the challenge
-• No countdown - user works at their own pace
+• Display format: "Question: Xs" (lighter visual weight)
+b) Set Challenge mode timers (DUAL TIMER SYSTEM - Milestone 17)
+• **Challenge Timer** (Total Time):
+  - Starts when challenge begins
+  - Runs continuously throughout the challenge
+  - Stops when challenge is completed
+  - Display format: "Total: Xm Ys" (darker visual weight)
+  - Shown on completion screen with summary
+• **Question Timer** (Per Question):
+  - Resets for each new question
+  - Stops when answer submitted, skipped, or given up
+  - Tracks and stores time spent per question
+  - Display format: "Question: Xs"
+• **Display Layout**: Side by side in header
+  - Example: `Total: 2m 34s | Question: 11s`
+  - Challenge timer darker than question timer for visual hierarchy
+• **Historical Tracking**:
+  - Record time per question in questionTimes array
+  - Show individual question times on completion screen
+  - Track personal bests (fastest challenge, fastest question)
+  - Calculate statistics (average time per question)
 c) Session timer
 • Track total active time in the current session
 • Reset when the user clicks "New session"
@@ -240,7 +257,7 @@ e) Set Challenge completion
 5.4 Achievements
 All achievements stored in browser localStorage.
 
-Examples
+Examples (Milestone 17 adds speed-based achievements)
 a) "First Steps"
 • Condition: first correct answer
 b) "Slope Starter"
