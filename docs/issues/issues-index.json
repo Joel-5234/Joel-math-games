@@ -85,6 +85,13 @@
       "status": "fixed",
       "filename": "issue-013-20251115-112500.md",
       "date": "2025-11-15T11:25:00"
+    },
+    {
+      "id": "014",
+      "description": "No Correct Answer in Options (Incomplete label removal from Issue #012)",
+      "status": "fixed",
+      "filename": "issue-014-20251115-113000.md",
+      "date": "2025-11-15T11:30:00"
     }
   ]
 }

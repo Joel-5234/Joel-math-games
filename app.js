@@ -549,13 +549,13 @@ function generateSlopeDistractors(correctSlope) {
     // Generate wrong answers: focus on common student mistakes
     const possibleDistractors = [];
     
-    if (correctSlope === Infinity) {
+        if (correctSlope === Infinity) {
         // For vertical lines (undefined), use simple numeric slopes
         possibleDistractors.push('0', '1', '-1', '2');
-    } else if (correctSlope === 0) {
+        } else if (correctSlope === 0) {
         // For horizontal lines (0), use simple non-zero slopes
         possibleDistractors.push('1', '-1', '2', '-2', 'undefined');
-    } else {
+        } else {
         // Common student mistakes for regular slopes:
         
         // 1. Wrong sign (most common mistake)
@@ -671,11 +671,11 @@ function generateSlopeQuestion() {
     
     // Generate two separate questions: slope value and classification
         const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
-        const slopeDistractors = generateSlopeDistractors(result.slope);
-        const classificationDistractors = generateClassificationDistractors(result.classification);
-        
+    const slopeDistractors = generateSlopeDistractors(result.slope);
+    const classificationDistractors = generateClassificationDistractors(result.classification);
+    
         // Create options for slope question (no labels yet, will be assigned in renderRadioOptions)
-        const slopeOptions = [
+    const slopeOptions = [
             { value: slopeValue, correct: true },
             { value: slopeDistractors[0], correct: false },
             { value: slopeDistractors[1], correct: false },
@@ -1132,34 +1132,35 @@ function displayChallengeQuestion() {
             if (!question.slopeQuestion || !question.classificationQuestion) {
                 // Regenerate question with multiple choice structure if missing
                 const result = question.data.result;
-                const slopeValue = result.slope === Infinity ? 'undefined' : roundToDecimal(result.slope, 1).toString();
+                const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
                 const slopeDistractors = generateSlopeDistractors(result.slope);
                 const classificationDistractors = generateClassificationDistractors(result.classification);
                 
+                // Create options WITHOUT labels (will be assigned in renderRadioOptions)
                 const slopeOptions = [
-                    { label: 'A', value: slopeValue, correct: true },
-                    { label: 'B', value: slopeDistractors[0], correct: false },
-                    { label: 'C', value: slopeDistractors[1], correct: false },
-                    { label: 'D', value: slopeDistractors[2], correct: false }
+                    { value: slopeValue, correct: true },
+                    { value: slopeDistractors[0], correct: false },
+                    { value: slopeDistractors[1], correct: false },
+                    { value: slopeDistractors[2], correct: false }
                 ].sort(() => Math.random() - 0.5);
                 
                 const classificationOptions = [
-                    { label: 'A', value: result.classification, correct: true },
-                    { label: 'B', value: classificationDistractors[0], correct: false },
-                    { label: 'C', value: classificationDistractors[1], correct: false },
-                    { label: 'D', value: classificationDistractors[2], correct: false }
+                    { value: result.classification, correct: true },
+                    { value: classificationDistractors[0], correct: false },
+                    { value: classificationDistractors[1], correct: false },
+                    { value: classificationDistractors[2], correct: false }
                 ].sort(() => Math.random() - 0.5);
                 
                 question.slopeQuestion = {
                     question: 'What is the slope?',
                     options: slopeOptions,
-                    correctAnswer: slopeOptions.find(opt => opt.correct).label
+                    correctAnswer: slopeValue
                 };
                 
                 question.classificationQuestion = {
                     question: 'What is the classification?',
                     options: classificationOptions,
-                    correctAnswer: classificationOptions.find(opt => opt.correct).label
+                    correctAnswer: result.classification
                 };
             }
             
@@ -2624,23 +2625,23 @@ function handleSlopeCalculate() {
         // Calculate slope
         const result = calculateSlope(p1, p2);
         
-        // Generate multiple choice options
+        // Generate multiple choice options WITHOUT labels (will be assigned in renderRadioOptions)
         const slopeValue = result.slope === Infinity ? 'undefined' : formatSlopeValue(result.slope);
         const slopeDistractors = generateSlopeDistractors(result.slope);
         const classificationDistractors = generateClassificationDistractors(result.classification);
         
         const slopeOptions = [
-            { label: 'A', value: slopeValue, correct: true },
-            { label: 'B', value: slopeDistractors[0], correct: false },
-            { label: 'C', value: slopeDistractors[1], correct: false },
-            { label: 'D', value: slopeDistractors[2], correct: false }
+            { value: slopeValue, correct: true },
+            { value: slopeDistractors[0], correct: false },
+            { value: slopeDistractors[1], correct: false },
+            { value: slopeDistractors[2], correct: false }
         ].sort(() => Math.random() - 0.5);
         
         const classificationOptions = [
-            { label: 'A', value: result.classification, correct: true },
-            { label: 'B', value: classificationDistractors[0], correct: false },
-            { label: 'C', value: classificationDistractors[1], correct: false },
-            { label: 'D', value: classificationDistractors[2], correct: false }
+            { value: result.classification, correct: true },
+            { value: classificationDistractors[0], correct: false },
+            { value: classificationDistractors[1], correct: false },
+            { value: classificationDistractors[2], correct: false }
         ].sort(() => Math.random() - 0.5);
         
         // Store question data
@@ -2648,8 +2649,8 @@ function handleSlopeCalculate() {
             type: 'slope',
             slopeOptions: slopeOptions,
             classificationOptions: classificationOptions,
-            correctSlopeLabel: slopeOptions.find(opt => opt.correct).label,
-            correctClassificationLabel: classificationOptions.find(opt => opt.correct).label
+            correctSlopeValue: slopeValue,
+            correctClassificationValue: result.classification
         };
         
         // Validate required elements exist
