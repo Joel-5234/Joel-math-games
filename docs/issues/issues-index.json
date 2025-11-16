@@ -148,6 +148,13 @@
       "status": "fixed",
       "filename": "issue-022-20251116-180000.md",
       "date": "2025-11-16T18:00:00"
+    },
+    {
+      "id": "023",
+      "description": "Linear Functions & Standard Form Using Old Label Pattern in Challenge Mode",
+      "status": "fixed",
+      "filename": "issue-023-20251116-183000.md",
+      "date": "2025-11-16T18:30:00"
     }
   ]
 }

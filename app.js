@@ -5981,24 +5981,22 @@ function generateLinearFunctionQuestion() {
     const distractors = generateLinearFunctionDistractors(result.isLinear);
     const correctAnswer = result.isLinear ? `Yes - ${result.explanation}` : `No - ${result.explanation}`;
     
+    // Issue #023: Fix linear function to use value-based pattern (no hardcoded labels)
     const options = [
-        { label: 'A', value: correctAnswer, correct: true },
-        { label: 'B', value: distractors[0] || 'No', correct: false },
-        { label: 'C', value: distractors[1] || 'Yes', correct: false },
-        { label: 'D', value: distractors[2] || 'Maybe', correct: false }
+        { value: correctAnswer, correct: true },
+        { value: distractors[0] || 'No', correct: false },
+        { value: distractors[1] || 'Yes', correct: false },
+        { value: distractors[2] || 'Maybe', correct: false }
     ].sort(() => Math.random() - 0.5);
-    
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
     
     return {
         type: 'linearFunction',
         question: 'Does the table represent a linear function? EXPLAIN.',
         display: table,
-        correctAnswer: `${correctAnswer} (${correctLabel})`,
+        correctAnswer: correctAnswer,
+        correctAnswerValue: correctAnswer,
         data: { table, result },
-        options: options,
-        correctAnswerLabel: correctLabel
+        options: options
     };
 }
 
@@ -6017,24 +6015,22 @@ function generateStandardFormQuestion() {
     const result = convertToStandardForm(eqStr);
     const distractors = generateStandardFormDistractors(result.equation, result.A, result.B, result.C);
     
+    // Issue #023: Fix standard form to use value-based pattern (no hardcoded labels)
     const options = [
-        { label: 'A', value: result.equation, correct: true },
-        { label: 'B', value: distractors[0] || 'x + y = 0', correct: false },
-        { label: 'C', value: distractors[1] || 'x - y = 0', correct: false },
-        { label: 'D', value: distractors[2] || 'y = x', correct: false }
+        { value: result.equation, correct: true },
+        { value: distractors[0] || 'x + y = 0', correct: false },
+        { value: distractors[1] || 'x - y = 0', correct: false },
+        { value: distractors[2] || 'y = x', correct: false }
     ].sort(() => Math.random() - 0.5);
-    
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
     
     return {
         type: 'standardForm',
         question: `Convert ${eqStr} to standard form (Ax + By = C):`,
         display: eqStr,
-        correctAnswer: `${result.equation} (${correctLabel})`,
+        correctAnswer: result.equation,
+        correctAnswerValue: result.equation,
         data: { originalEq: eqStr, result },
-        options: options,
-        correctAnswerLabel: correctLabel
+        options: options
     };
 }
 
