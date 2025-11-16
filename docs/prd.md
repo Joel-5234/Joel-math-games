@@ -451,12 +451,16 @@ f) Hint tracking: Track hints used per question and total
 g) Completion summary: Display hint usage statistics
 h) Hint button disabled when limit reached
 
-10.7 Test Celebration Buttons
-a) Developer/test buttons available in sidebar
+10.7 Test Celebration Buttons & Developer Tools
+a) Developer/test buttons available in sidebar under "Developer Tools" section
 b) "Test Confetti" button triggers confetti animation
 c) "Test Fireworks" button triggers fireworks animation
-d) Buttons clearly labeled as test buttons
-e) Available in all modes for testing and demonstration
+d) 10 additional test buttons for new feedback effects (Milestone 18):
+   - Mild: Floating Points, Success Badge, Progress Pulse, Subtle Particles
+   - Medium: Emoji Rain, Streak Fire, Confetti Trails, Screen Bounce
+   - High: Celebration Modal, Particle Explosion
+e) Buttons clearly labeled as test buttons
+f) Available in all modes for testing and demonstration
 
 10.8 Multiple Choice Answer Format
 a) All problem types use multiple choice format (4 options: A, B, C, D)
