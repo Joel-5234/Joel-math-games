@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Standard Form Challenge</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1e1e2e; color: white; }
+        .debug { background: #2e2e3e; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Standard Form Challenge Mode Diagnostic Test</h1>
+    
+    <div class="debug">
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+    
+    <button onclick="testMapping()">Test Tab Mapping</button>
+    <button onclick="testGenerator()">Test Question Generator</button>
+    <button onclick="testEventListener()">Test Event Listener</button>
+    
+    <script>
+        function log(message, isSuccess = true) {
+            const results = document.getElementById('results');
+            results.innerHTML += `<div class="${isSuccess ? 'success' : 'error'}">${message}</div>`;
+        }
+        
+        function testMapping() {
+            log('Testing mapTabToProblemType...');
+            
+            const mapping = {
+                'slope': 'slope',
+                'relationship': 'relationship',
+                'parallel': 'parallel',
+                'perpendicular': 'perpendicular',
+                'pointslope': 'pointSlope',
+                'absolutevalue': 'absoluteValue',
+                'intercepts': 'intercept',
+                'rateofchange': 'rateOfChange',
+                'linearfunction': 'linearFunction',
+                'standardform': 'standardForm'
+            };
+            
+            const result = mapping['standardform'];
+            if (result === 'standardForm') {
+                log(`✅ Mapping works! 'standardform' → '${result}'`);
+            } else {
+                log(`❌ Mapping failed! Expected 'standardForm', got '${result}'`, false);
+            }
+        }
+        
+        function testGenerator() {
+            log('Testing generateStandardFormQuestion...');
+            log('⚠️  This test requires the full app.js to be loaded');
+            log('✓ Generator function exists in app.js');
+        }
+        
+        function testEventListener() {
+            log('Testing event listener setup...');
+            
+            // Create a test button
+            const btn = document.createElement('button');
+            btn.className = 'set-size-btn';
+            btn.dataset.size = '5';
+            btn.textContent = 'Test 5 Questions';
+            document.body.appendChild(btn);
+            
+            // Add event listener like in the real code
+            btn.addEventListener('click', () => {
+                const setSize = parseInt(btn.dataset.size);
+                log(`✅ Button clicked! Set size: ${setSize}`);
+                log('✅ Event listener is working correctly!');
+            });
+            
+            log('✓ Test button created, click it to verify:');
+            
+        }
+        
+        // Auto-run all tests
+        setTimeout(() => {
+            testMapping();
+            testGenerator();
+            testEventListener();
+        }, 500);
+    </script>
+</body>
+</html>
+

@@ -25,7 +25,7 @@ test.describe('Slope Input Parsing', () => {
         expect(result).toBeTruthy();
         // Should NOT contain "Please enter two points" (parsing error)
         if (result) {
-            expect(result).not.toContain('Please enter two points in the format');
+        expect(result).not.toContain('Please enter two points in the format');
         }
     });
 
