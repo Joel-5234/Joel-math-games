@@ -2988,10 +2988,18 @@ function updateAchievementsDisplay() {
 }
 
 function showAllAchievements() {
+    console.log('[Issue #021] showAllAchievements called, achievements count:', achievements.length);
+    
     const container = document.getElementById('allAchievements');
+    if (!container) {
+        console.error('[Issue #021] allAchievements container not found!');
+        return;
+    }
+    
     container.innerHTML = '';
     
-    achievements.forEach(achievement => {
+    // Issue #020: Now showing all 33 achievements
+    achievements.forEach((achievement, index) => {
         const isUnlocked = gameState.achievementsUnlocked.includes(achievement.id);
         const item = document.createElement('div');
         item.className = `achievement-item ${isUnlocked ? '' : 'locked'}`;
@@ -3003,7 +3011,15 @@ function showAllAchievements() {
         container.appendChild(item);
     });
     
-    document.getElementById('achievementModal').classList.add('active');
+    console.log('[Issue #021] Added', achievements.length, 'achievements to modal');
+    
+    const modal = document.getElementById('achievementModal');
+    if (modal) {
+        modal.classList.add('active');
+        console.log('[Issue #021] Achievement modal opened successfully');
+    } else {
+        console.error('[Issue #021] achievementModal element not found!');
+    }
 }
 
 // Hint Functions
@@ -6484,17 +6500,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // Achievement modal
-    document.getElementById('viewAchievements').addEventListener('click', showAllAchievements);
-    document.querySelector('.close-modal').addEventListener('click', () => {
-        document.getElementById('achievementModal').classList.remove('active');
-    });
+    // Issue #021: Achievement modal with defensive checks
+    const viewAchievementsBtn = document.getElementById('viewAchievements');
+    if (viewAchievementsBtn) {
+        viewAchievementsBtn.addEventListener('click', () => {
+            console.log('[Issue #021] View Achievements button clicked');
+            showAllAchievements();
+        });
+    } else {
+        console.error('[Issue #021] viewAchievements button not found!');
+    }
     
-    document.getElementById('achievementModal').addEventListener('click', (e) => {
-        if (e.target.id === 'achievementModal') {
-            document.getElementById('achievementModal').classList.remove('active');
+    const achievementModal = document.getElementById('achievementModal');
+    if (achievementModal) {
+        // Close button (the × in the modal)
+        const achievementCloseBtn = achievementModal.querySelector('.close-modal');
+        if (achievementCloseBtn) {
+            achievementCloseBtn.addEventListener('click', () => {
+                console.log('[Issue #021] Achievement modal close button clicked');
+                achievementModal.classList.remove('active');
+            });
         }
-    });
+        
+        // Click outside modal to close
+        achievementModal.addEventListener('click', (e) => {
+            if (e.target.id === 'achievementModal') {
+                console.log('[Issue #021] Clicked outside achievement modal, closing');
+                achievementModal.classList.remove('active');
+            }
+        });
+    } else {
+        console.error('[Issue #021] achievementModal not found!');
+    }
     
     // Hint buttons
     document.querySelectorAll('.hint-button').forEach(button => {

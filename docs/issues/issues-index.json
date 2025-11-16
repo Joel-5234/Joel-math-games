@@ -134,6 +134,13 @@
       "status": "fixed",
       "filename": "issue-020-20251116-170000.md",
       "date": "2025-11-16T17:00:00"
+    },
+    {
+      "id": "021",
+      "description": "Achievement 'View All' Button Not Working - Added Defensive Checks",
+      "status": "fixed",
+      "filename": "issue-021-20251116-173000.md",
+      "date": "2025-11-16T17:30:00"
     }
   ]
 }
