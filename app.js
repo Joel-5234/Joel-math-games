@@ -610,17 +610,18 @@ function generateSlopeDistractors(correctSlope) {
     const distractors = new Set();
     const correct = correctSlope === Infinity ? 'undefined' : formatSlopeValue(correctSlope);
     
+    // Issue #019 FIX: ALL values must be STRINGS to match formatSlopeValue() output!
     // Common simple values for 8th grade level - ONLY use these!
-    const simpleValues = [0, 1, -1, 2, -2, 3, -3, '1/2', '-1/2', '1/3', '-1/3', '2/3', '-2/3', '3/2', '-3/2', 'undefined'];
+    const simpleValues = ['0', '1', '-1', '2', '-2', '3', '-3', '1/2', '-1/2', '1/3', '-1/3', '2/3', '-2/3', '3/2', '-3/2', 'undefined'];
     
     // Generate wrong answers: focus on common student mistakes
     const possibleDistractors = [];
     
         if (correctSlope === Infinity) {
-        // For vertical lines (undefined), use simple numeric slopes
+        // For vertical lines (undefined), use simple numeric slopes (already strings)
         possibleDistractors.push('0', '1', '-1', '2');
         } else if (correctSlope === 0) {
-        // For horizontal lines (0), use simple non-zero slopes
+        // For horizontal lines (0), use simple non-zero slopes (already strings)
         possibleDistractors.push('1', '-1', '2', '-2', 'undefined');
         } else {
         // For regular slopes, ONLY use simple wrong answers
