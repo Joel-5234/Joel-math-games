@@ -227,7 +227,12 @@ const achievements = [
     { id: 'perpendicularPro', name: 'Perpendicular Pro', description: 'Answer 10 perpendicular questions correctly', condition: (state) => state.stats.perpendicular.correct >= 10 },
     { id: 'speedRunner', name: 'Speed Runner', description: 'Answer any question correctly in under 10 seconds', condition: () => false }, // Checked per question
     { id: 'focus10', name: 'Focus 10', description: 'Answer 10 questions correctly in a row in one session', condition: (state) => state.streakCurrent >= 10 },
-    { id: 'homeworkHero', name: 'Homework Hero', description: 'Score 100 points in one session', condition: (state) => state.score >= 100 }
+    { id: 'homeworkHero', name: 'Homework Hero', description: 'Score 100 points in one session', condition: (state) => state.score >= 100 },
+    // Milestone 17: Speed-based achievements
+    { id: 'lightningFast', name: '⚡ Lightning Fast', description: 'Answer a question correctly in under 10 seconds', condition: () => false }, // Checked per question
+    { id: 'speedDemon', name: '🔥 Speed Demon', description: 'Complete a 10-question challenge in under 5 minutes', condition: () => false }, // Checked at challenge completion
+    { id: 'marathonMaster', name: '🏃 Marathon Master', description: 'Complete a 50-question challenge', condition: () => false }, // Checked at challenge completion
+    { id: 'efficiencyExpert', name: '💎 Efficiency Expert', description: 'Average under 20 seconds per question in a challenge', condition: () => false } // Checked at challenge completion
 ];
 
 // Utility Functions
@@ -1786,6 +1791,11 @@ function submitChallengeAnswer() {
             endTime: questionEndTime,
             duration: duration
         });
+        
+        // Milestone 17: Check for Lightning Fast achievement (correct answer in under 10 seconds)
+        if (isCorrect && duration < 10) {
+            unlockAchievement('lightningFast');
+        }
     }
     
     // Show result
@@ -1939,6 +1949,9 @@ function showChallengeCompletion() {
     const slowestTime = challengeState.questionTimes.length > 0
         ? Math.max(...challengeState.questionTimes.map(qt => qt.duration))
         : 0;
+    
+    // Milestone 17: Check for speed-based achievements
+    checkSpeedAchievements(grade);
     
     // Show completion modal
     const completionModal = document.getElementById('challengeCompletionModal');
@@ -2216,6 +2229,33 @@ function checkAchievements() {
             }
         }
     });
+}
+
+// Milestone 17: Check speed-based achievements at challenge completion
+function checkSpeedAchievements(grade) {
+    if (!challengeState.active) return;
+    
+    // Speed Demon: Complete a 10-question challenge in under 5 minutes
+    if (challengeState.setSize >= 10 && challengeState.totalChallengeTime < 300) {
+        unlockAchievement('speedDemon');
+    }
+    
+    // Marathon Master: Complete a 50-question challenge
+    if (challengeState.setSize >= 50) {
+        unlockAchievement('marathonMaster');
+    }
+    
+    // Efficiency Expert: Average under 20 seconds per question
+    const avgTime = challengeState.questionTimes.length > 0
+        ? challengeState.questionTimes.reduce((sum, qt) => sum + qt.duration, 0) / challengeState.questionTimes.length
+        : 0;
+    
+    if (avgTime > 0 && avgTime < 20) {
+        unlockAchievement('efficiencyExpert');
+    }
+    
+    // Update personal bests
+    updatePersonalBests();
 }
 
 function unlockAchievement(achievementId) {
