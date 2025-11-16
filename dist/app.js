@@ -664,15 +664,88 @@ function generateEquationDistractors(correctLine, baseLine, point, isParallel) {
 
 // Question Generation Functions for Set Challenge Mode
 function generateSlopeQuestion() {
-    let p1, p2;
-    let attempts = 0;
+    // Issue #015: Only generate slopes from simple whitelist to avoid complex fractions
+    const simpleSlopes = [
+        { m: 0, name: 'horizontal' },
+        { m: 1, name: 'rising' },
+        { m: -1, name: 'falling' },
+        { m: 2, name: 'rising' },
+        { m: -2, name: 'falling' },
+        { m: 3, name: 'rising' },
+        { m: -3, name: 'falling' },
+        { m: 0.5, name: 'rising' },      // 1/2
+        { m: -0.5, name: 'falling' },    // -1/2
+        { m: 1/3, name: 'rising' },
+        { m: -1/3, name: 'falling' },
+        { m: 2/3, name: 'rising' },
+        { m: -2/3, name: 'falling' },
+        { m: 1.5, name: 'rising' },      // 3/2
+        { m: -1.5, name: 'falling' },    // -3/2
+        { m: Infinity, name: 'vertical' }
+    ];
     
-    // Ensure points are not identical
-    do {
+    // Pick a random simple slope
+    const targetSlope = simpleSlopes[randomInt(0, simpleSlopes.length - 1)];
+    
+    // Generate two points that produce this exact slope
+    let p1, p2;
+    
+    if (targetSlope.m === Infinity) {
+        // Vertical line: same x, different y
+        const x = randomInt(-10, 10);
+        p1 = { x: x, y: randomInt(-10, 10) };
+        p2 = { x: x, y: randomInt(-10, 10) };
+        // Ensure different y values
+        while (p1.y === p2.y) {
+            p2.y = randomInt(-10, 10);
+        }
+    } else {
+        // Non-vertical line: y = mx + b
+        // Start with p1
         p1 = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
-        p2 = { x: randomInt(-10, 10), y: randomInt(-10, 10) };
-        attempts++;
-    } while (p1.x === p2.x && p1.y === p2.y && attempts < 100);
+        
+        // Calculate p2 such that slope = (p2.y - p1.y) / (p2.x - p1.x) = targetSlope.m
+        // Choose a random dx (change in x)
+        let dx;
+        if (targetSlope.m === 0) {
+            // Horizontal line: any dx works, dy = 0
+            dx = randomInt(1, 5) * (Math.random() < 0.5 ? 1 : -1);
+            p2 = { x: p1.x + dx, y: p1.y };
+        } else {
+            // For fractional slopes, choose dx that gives integer dy
+            // If m = a/b, then dy = m * dx = (a/b) * dx
+            // Choose dx as a multiple of denominator to ensure integer dy
+            const fractionMap = {
+                0.5: 2,      // 1/2: dx multiple of 2
+                '-0.5': 2,   // -1/2: dx multiple of 2
+                [1/3]: 3,    // 1/3: dx multiple of 3
+                [-1/3]: 3,   // -1/3: dx multiple of 3
+                [2/3]: 3,    // 2/3: dx multiple of 3
+                [-2/3]: 3,   // -2/3: dx multiple of 3
+                1.5: 2,      // 3/2: dx multiple of 2
+                '-1.5': 2    // -3/2: dx multiple of 2
+            };
+            
+            const multiplier = fractionMap[targetSlope.m] || 1;
+            dx = randomInt(1, 3) * multiplier * (Math.random() < 0.5 ? 1 : -1);
+            const dy = Math.round(targetSlope.m * dx);
+            
+            p2 = { x: p1.x + dx, y: p1.y + dy };
+            
+            // Ensure p2 is within bounds
+            if (Math.abs(p2.x) > 10) {
+                p2.x = p1.x - dx; // Try opposite direction
+            }
+            if (Math.abs(p2.y) > 10) {
+                // Adjust p1 instead
+                p1.y = p2.y - dy;
+                if (Math.abs(p1.y) > 10) {
+                    p1.y = randomInt(-5, 5);
+                    p2.y = p1.y + dy;
+                }
+            }
+        }
+    }
     
     const result = calculateSlope(p1, p2);
     
