@@ -543,37 +543,67 @@ function generateSlopeDistractors(correctSlope) {
     const distractors = new Set();
     const correct = correctSlope === Infinity ? 'undefined' : formatSlopeValue(correctSlope);
     
-    // Generate wrong answers: wrong sign, calculation errors, common mistakes
-    while (distractors.size < 3) {
-        let distractor;
-        if (correctSlope === Infinity) {
-            // For vertical lines, wrong answers are numeric slopes
-            distractor = formatSlopeValue(randomFloat(-5, 5));
-        } else if (correctSlope === 0) {
-            // For horizontal lines, wrong answers are non-zero slopes
-            const val = randomInt(-5, 5) || 1;
-            distractor = formatSlopeValue(val);
-        } else {
-            // Common mistakes: wrong sign, off by small amount, reciprocal
-            const mistakeType = randomInt(0, 2);
-            if (mistakeType === 0) {
-                // Wrong sign
-                distractor = formatSlopeValue(-correctSlope);
-            } else if (mistakeType === 1) {
-                // Off by small amount
-                distractor = formatSlopeValue(correctSlope + randomFloat(-1, 1));
-            } else {
-                // Reciprocal or other calculation error
-                distractor = correctSlope !== 0 ? formatSlopeValue(1 / correctSlope) : '1';
+    // Common simple values for 8th grade level
+    const simpleValues = [0, 1, -1, 2, -2, 3, -3, '1/2', '-1/2', '1/3', '-1/3', '2/3', '-2/3', '3/2', '-3/2'];
+    
+    // Generate wrong answers: focus on common student mistakes
+    const possibleDistractors = [];
+    
+    if (correctSlope === Infinity) {
+        // For vertical lines (undefined), use simple numeric slopes
+        possibleDistractors.push('0', '1', '-1', '2');
+    } else if (correctSlope === 0) {
+        // For horizontal lines (0), use simple non-zero slopes
+        possibleDistractors.push('1', '-1', '2', '-2', 'undefined');
+    } else {
+        // Common student mistakes for regular slopes:
+        
+        // 1. Wrong sign (most common mistake)
+        possibleDistractors.push(formatSlopeValue(-correctSlope));
+        
+        // 2. Off by 1 (simple calculation error)
+        possibleDistractors.push(formatSlopeValue(correctSlope + 1));
+        possibleDistractors.push(formatSlopeValue(correctSlope - 1));
+        
+        // 3. Flipped fraction (rise/run confusion) - only if it results in a simple value
+        if (Math.abs(correctSlope) > 0.01 && Math.abs(correctSlope) < 10) {
+            const reciprocal = 1 / correctSlope;
+            // Only use reciprocal if it's simple (denominator <= 5)
+            const fraction = decimalToFraction(Math.abs(reciprocal), 0.001, 5);
+            if (fraction && fraction.denominator <= 5) {
+                possibleDistractors.push(formatSlopeValue(reciprocal));
             }
         }
         
-        if (distractor !== correct && !distractors.has(distractor)) {
+        // 4. Add some simple common values as alternatives
+        for (const val of simpleValues) {
+            if (val !== correct) {
+                possibleDistractors.push(val);
+            }
+        }
+    }
+    
+    // Shuffle and pick 3 different distractors that are not the correct answer
+    const shuffled = possibleDistractors.filter(d => d !== correct && d !== undefined);
+    while (distractors.size < 3 && shuffled.length > 0) {
+        const randomIndex = randomInt(0, shuffled.length - 1);
+        const distractor = shuffled[randomIndex];
+        shuffled.splice(randomIndex, 1);
+        
+        if (!distractors.has(distractor)) {
             distractors.add(distractor);
         }
     }
     
-    return Array.from(distractors);
+    // If we still don't have 3, fill with simple values
+    for (const val of simpleValues) {
+        if (distractors.size >= 3) break;
+        if (val !== correct && !distractors.has(val)) {
+            distractors.add(val);
+        }
+    }
+    
+    return Array.from(distractors).slice(0, 3);
 }
 
 function generateClassificationDistractors(correctClassification) {
@@ -598,19 +628,21 @@ function generateEquationDistractors(correctLine, baseLine, point, isParallel) {
         let wrongLine;
         
         if (correctLine.kind === 'vertical') {
-            // Wrong vertical line (different x)
-            wrongLine = { kind: 'vertical', x0: correctLine.x0 + randomInt(-3, 3) || 1 };
+            // Wrong vertical line (different x by simple amounts)
+            const offset = [1, -1, 2, -2, 3][distractors.length];
+            wrongLine = { kind: 'vertical', x0: correctLine.x0 + offset };
         } else if (correctLine.kind === 'slope') {
-            const mistakeType = randomInt(0, 2);
+            const mistakeType = distractors.length; // Use different mistake for each distractor
             if (mistakeType === 0 && !isParallel) {
                 // Wrong slope (use parallel slope instead of perpendicular)
                 wrongLine = { kind: 'slope', m: baseLine.m, b: point.y - baseLine.m * point.x };
             } else if (mistakeType === 1) {
-                // Wrong intercept
-                wrongLine = { kind: 'slope', m: correctLine.m, b: correctLine.b + randomInt(-3, 3) || 1 };
+                // Wrong intercept (simple integer offset)
+                const offset = correctLine.b > 0 ? -2 : 2;
+                wrongLine = { kind: 'slope', m: correctLine.m, b: correctLine.b + offset };
             } else {
-                // Wrong slope (close but incorrect)
-                wrongLine = { kind: 'slope', m: correctLine.m + randomFloat(-0.5, 0.5), b: point.y - (correctLine.m + randomFloat(-0.5, 0.5)) * point.x };
+                // Wrong sign on slope
+                wrongLine = { kind: 'slope', m: -correctLine.m, b: point.y - (-correctLine.m) * point.x };
             }
         }
         

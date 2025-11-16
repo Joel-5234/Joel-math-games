@@ -78,6 +78,13 @@
       "date": "2025-11-15T10:58:47",
       "revised": "2025-11-15T11:11:00",
       "final_fix": "2025-11-15T11:20:00"
+    },
+    {
+      "id": "013",
+      "description": "Distractors Too Complex for 8th Grade (e.g., -27/10)",
+      "status": "fixed",
+      "filename": "issue-013-20251115-112500.md",
+      "date": "2025-11-15T11:25:00"
     }
   ]
 }
