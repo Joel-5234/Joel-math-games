@@ -1542,23 +1542,34 @@ function updateChallengeNavigation() {
 }
 
 function navigateChallengeQuestion(direction) {
+    // Issue #016: Add defensive console logging to debug navigation issues
+    console.log(`[Navigation] Direction: ${direction}, Current Index: ${challengeState.currentQuestionIndex}, Total Questions: ${challengeState.questions.length}`);
+    
     // Hide hints when navigating
-    hideHints();
+    try {
+        hideHints();
+    } catch (error) {
+        console.error('[Navigation] Error hiding hints:', error);
+    }
     
     if (direction === 'next') {
         if (challengeState.currentQuestionIndex < challengeState.questions.length - 1) {
             challengeState.currentQuestionIndex++;
+            console.log(`[Navigation] Moved to next question: ${challengeState.currentQuestionIndex}`);
         } else {
             // Check if all questions answered
+            console.log('[Navigation] Last question reached, checking completion');
             checkChallengeCompletion();
             return;
         }
     } else if (direction === 'prev') {
         if (challengeState.currentQuestionIndex > 0) {
             challengeState.currentQuestionIndex--;
+            console.log(`[Navigation] Moved to previous question: ${challengeState.currentQuestionIndex}`);
         }
     }
     
+    console.log('[Navigation] Calling displayChallengeQuestion()');
     displayChallengeQuestion();
 }
 
@@ -1889,8 +1900,12 @@ function submitChallengeAnswer() {
     // Update navigation
     updateChallengeNavigation();
     
+    // Issue #016: Add logging to debug auto-advance
+    console.log('[Submit] Setting up auto-advance timeout (2000ms)');
+    
     // Auto-advance after a delay
     setTimeout(() => {
+        console.log('[Submit] Auto-advance timeout fired, navigating to next question');
         navigateChallengeQuestion('next');
     }, 2000);
 }
