@@ -2919,8 +2919,8 @@ function checkSpeedAchievements(grade) {
     }
     
     // Sprint Master: Average under 15 seconds per question
-    const avgTime = challengeState.totalChallengeTime / challengeState.setSize;
-    if (avgTime < 15) {
+    const avgTimeTotal = challengeState.totalChallengeTime / challengeState.setSize;
+    if (avgTimeTotal < 15) {
         unlockAchievement('sprintMaster');
     }
     
@@ -2930,11 +2930,11 @@ function checkSpeedAchievements(grade) {
     }
     
     // Efficiency Expert: Average under 20 seconds per question
-    const avgTime = challengeState.questionTimes.length > 0
+    const avgTimePerQ = challengeState.questionTimes.length > 0
         ? challengeState.questionTimes.reduce((sum, qt) => sum + qt.duration, 0) / challengeState.questionTimes.length
         : 0;
     
-    if (avgTime > 0 && avgTime < 20) {
+    if (avgTimePerQ > 0 && avgTimePerQ < 20) {
         unlockAchievement('efficiencyExpert');
     }
     

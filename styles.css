@@ -936,7 +936,7 @@ body {
     .main-content {
         grid-column: 1 / -1;
     }
-    
+
     .sidebar {
         grid-row: 3;
     }
@@ -1378,11 +1378,11 @@ body {
         width: 100%;
         justify-content: space-between;
     }
-    
+
     .nav-sidebar {
         width: 260px;
     }
-    
+
     .sidebar {
         display: none;
     }
