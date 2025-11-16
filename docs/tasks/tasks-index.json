@@ -101,6 +101,12 @@
       "name": "Separate Challenge Timer and Question Timer",
       "status": "completed",
       "description": "Implement dual timers in Challenge Mode: a total challenge timer that runs continuously from start to completion, and a per-question timer that resets for each question. Display both side by side with distinct visual styles, track time per question, and add speed-based achievements."
+    },
+    {
+      "id": "milestone-18",
+      "name": "Enhanced Feedback Effects System",
+      "status": "pending",
+      "description": "Add 10 new visual feedback effects that trigger at progress milestones (50%, 85%, 100%) during Challenge mode. Effects are randomly selected based on intensity level (mild, medium, high). Includes Developer Tools test buttons for all effects and accessibility warning."
     }
   ]
 }
