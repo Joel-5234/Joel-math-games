@@ -543,41 +543,40 @@ function generateSlopeDistractors(correctSlope) {
     const distractors = new Set();
     const correct = correctSlope === Infinity ? 'undefined' : formatSlopeValue(correctSlope);
     
-    // Common simple values for 8th grade level
-    const simpleValues = [0, 1, -1, 2, -2, 3, -3, '1/2', '-1/2', '1/3', '-1/3', '2/3', '-2/3', '3/2', '-3/2'];
+    // Common simple values for 8th grade level - ONLY use these!
+    const simpleValues = [0, 1, -1, 2, -2, 3, -3, '1/2', '-1/2', '1/3', '-1/3', '2/3', '-2/3', '3/2', '-3/2', 'undefined'];
     
     // Generate wrong answers: focus on common student mistakes
     const possibleDistractors = [];
     
-        if (correctSlope === Infinity) {
+    if (correctSlope === Infinity) {
         // For vertical lines (undefined), use simple numeric slopes
         possibleDistractors.push('0', '1', '-1', '2');
-        } else if (correctSlope === 0) {
+    } else if (correctSlope === 0) {
         // For horizontal lines (0), use simple non-zero slopes
         possibleDistractors.push('1', '-1', '2', '-2', 'undefined');
-        } else {
-        // Common student mistakes for regular slopes:
+    } else {
+        // For regular slopes, ONLY use simple wrong answers
+        // Don't do arithmetic on correctSlope as it can create complex fractions!
         
-        // 1. Wrong sign (most common mistake)
-        possibleDistractors.push(formatSlopeValue(-correctSlope));
+        // 1. Wrong sign - but only if the result is simple
+        const negativeSlope = formatSlopeValue(-correctSlope);
+        if (simpleValues.includes(negativeSlope)) {
+            possibleDistractors.push(negativeSlope);
+        }
         
-        // 2. Off by 1 (simple calculation error)
-        possibleDistractors.push(formatSlopeValue(correctSlope + 1));
-        possibleDistractors.push(formatSlopeValue(correctSlope - 1));
-        
-        // 3. Flipped fraction (rise/run confusion) - only if it results in a simple value
+        // 2. Flipped fraction - but only if both original and reciprocal are simple
         if (Math.abs(correctSlope) > 0.01 && Math.abs(correctSlope) < 10) {
             const reciprocal = 1 / correctSlope;
-            // Only use reciprocal if it's simple (denominator <= 5)
-            const fraction = decimalToFraction(Math.abs(reciprocal), 0.001, 5);
-            if (fraction && fraction.denominator <= 5) {
-                possibleDistractors.push(formatSlopeValue(reciprocal));
+            const reciprocalStr = formatSlopeValue(reciprocal);
+            if (simpleValues.includes(reciprocalStr)) {
+                possibleDistractors.push(reciprocalStr);
             }
         }
         
-        // 4. Add some simple common values as alternatives
+        // 3. Add ALL other simple values that aren't the correct answer
         for (const val of simpleValues) {
-            if (val !== correct) {
+            if (val !== correct && val !== 'undefined') {
                 possibleDistractors.push(val);
             }
         }
@@ -585,20 +584,22 @@ function generateSlopeDistractors(correctSlope) {
     
     // Shuffle and pick 3 different distractors that are not the correct answer
     const shuffled = possibleDistractors.filter(d => d !== correct && d !== undefined);
-    while (distractors.size < 3 && shuffled.length > 0) {
-        const randomIndex = randomInt(0, shuffled.length - 1);
-        const distractor = shuffled[randomIndex];
-        shuffled.splice(randomIndex, 1);
-        
-        if (!distractors.has(distractor)) {
-            distractors.add(distractor);
-        }
+    
+    // Use a more thorough shuffle and deduplication
+    const uniqueDistractors = [...new Set(shuffled)];
+    
+    // Randomly select 3 distractors
+    while (distractors.size < 3 && uniqueDistractors.length > 0) {
+        const randomIndex = randomInt(0, uniqueDistractors.length - 1);
+        const distractor = uniqueDistractors[randomIndex];
+        uniqueDistractors.splice(randomIndex, 1);
+        distractors.add(distractor);
     }
     
-    // If we still don't have 3, fill with simple values
+    // If we still don't have 3, fill with simple values (fallback)
     for (const val of simpleValues) {
         if (distractors.size >= 3) break;
-        if (val !== correct && !distractors.has(val)) {
+        if (val !== correct && val !== 'undefined' && !distractors.has(val)) {
             distractors.add(val);
         }
     }
