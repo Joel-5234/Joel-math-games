@@ -92,6 +92,13 @@
       "status": "fixed",
       "filename": "issue-014-20251115-113000.md",
       "date": "2025-11-15T11:30:00"
+    },
+    {
+      "id": "015",
+      "description": "Complex Fractions Still Appearing as Correct Answers (e.g., 22/31, 5/7)",
+      "status": "fixed",
+      "filename": "issue-015-20251116-120000.md",
+      "date": "2025-11-16T12:00:00"
     }
   ]
 }
