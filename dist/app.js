@@ -396,6 +396,7 @@ function decimalToFraction(decimal, tolerance = 0.0001, maxDenominator = 100) {
 }
 
 function formatSlopeValue(slope) {
+    // Issue #018: ONLY return simple fractions for 8th grade
     // Format slope as fraction only (no decimal)
     if (slope === Infinity || slope === -Infinity) {
         return 'undefined';
@@ -410,18 +411,44 @@ function formatSlopeValue(slope) {
         return Math.round(slope).toString();
     }
     
-    // Try to convert to fraction
-    const fraction = decimalToFraction(slope, 0.001, 100);
-    if (fraction) {
-        const simplified = simplifyFraction(fraction.numerator, fraction.denominator);
-        if (simplified.denominator === 1) {
-            return simplified.numerator.toString();
+    // Issue #018 FIX: STRICT whitelist matching - find closest simple fraction
+    // Define ONLY acceptable 8th grade fractions
+    const simpleFractions = [
+        { value: 1/2, display: '1/2' },
+        { value: -1/2, display: '-1/2' },
+        { value: 1/3, display: '1/3' },
+        { value: -1/3, display: '-1/3' },
+        { value: 2/3, display: '2/3' },
+        { value: -2/3, display: '-2/3' },
+        { value: 3/2, display: '3/2' },
+        { value: -3/2, display: '-3/2' },
+        { value: 1, display: '1' },
+        { value: -1, display: '-1' },
+        { value: 2, display: '2' },
+        { value: -2, display: '-2' },
+        { value: 3, display: '3' },
+        { value: -3, display: '-3' }
+    ];
+    
+    // Find the CLOSEST simple fraction
+    let closest = simpleFractions[0];
+    let minDiff = Math.abs(slope - closest.value);
+    
+    for (const frac of simpleFractions) {
+        const diff = Math.abs(slope - frac.value);
+        if (diff < minDiff) {
+            minDiff = diff;
+            closest = frac;
         }
-        return `${simplified.numerator}/${simplified.denominator}`;
     }
     
-    // Fallback to decimal if fraction conversion fails
-    return roundToDecimal(slope, 2).toString();
+    // If very close to a simple fraction (within 0.01), use it
+    if (minDiff < 0.01) {
+        return closest.display;
+    }
+    
+    // Otherwise, fallback to rounded integer
+    return Math.round(slope).toString();
 }
 
 // Math Logic Functions
@@ -589,13 +616,13 @@ function generateSlopeDistractors(correctSlope) {
     // Generate wrong answers: focus on common student mistakes
     const possibleDistractors = [];
     
-    if (correctSlope === Infinity) {
+        if (correctSlope === Infinity) {
         // For vertical lines (undefined), use simple numeric slopes
         possibleDistractors.push('0', '1', '-1', '2');
-    } else if (correctSlope === 0) {
+        } else if (correctSlope === 0) {
         // For horizontal lines (0), use simple non-zero slopes
         possibleDistractors.push('1', '-1', '2', '-2', 'undefined');
-    } else {
+        } else {
         // For regular slopes, ONLY use simple wrong answers
         // Don't do arithmetic on correctSlope as it can create complex fractions!
         
@@ -633,7 +660,7 @@ function generateSlopeDistractors(correctSlope) {
         const randomIndex = randomInt(0, uniqueDistractors.length - 1);
         const distractor = uniqueDistractors[randomIndex];
         uniqueDistractors.splice(randomIndex, 1);
-        distractors.add(distractor);
+            distractors.add(distractor);
     }
     
     // If we still don't have 3, fill with simple values (fallback)
@@ -1578,7 +1605,7 @@ function navigateChallengeQuestion(direction) {
     
     // Hide hints when navigating
     try {
-        hideHints();
+    hideHints();
     } catch (error) {
         console.error('[Navigation] Error hiding hints:', error);
     }

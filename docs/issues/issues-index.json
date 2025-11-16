@@ -113,6 +113,13 @@
       "status": "fixed",
       "filename": "issue-017-20251116-130000.md",
       "date": "2025-11-16T13:00:00"
+    },
+    {
+      "id": "018",
+      "description": "Complex Fractions Still Appearing (e.g., -33/100) - formatSlopeValue() maxDenom issue",
+      "status": "fixed",
+      "filename": "issue-018-20251116-160000.md",
+      "date": "2025-11-16T16:00:00"
     }
   ]
 }
