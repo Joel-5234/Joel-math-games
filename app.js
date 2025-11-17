@@ -225,6 +225,85 @@ const hints = {
             "The sign of 'a' determines if the V opens up (positive) or down (negative).",
             "The graph is symmetric about a vertical line through the vertex."
         ]
+    },
+    // MILESTONE 19: Interactive Graphing Hints
+    'graph-slopeintercept': {
+        steps: [
+            "1. Find the y-intercept: Where does the line cross the y-axis? (x = 0)",
+            "2. Use the slope to find another point: Rise over run from the y-intercept",
+            "3. If slope is 2, go up 2 and right 1 from y-intercept",
+            "4. If slope is -1/2, go down 1 and right 2 from y-intercept",
+            "5. Select 2 points that you've calculated"
+        ],
+        formula: "Slope-Intercept Form: y = mx + b\n\nWhere:\n• m = slope\n• b = y-intercept\n\nTo graph:\n1. Plot (0, b) on y-axis\n2. Use slope m to find another point\n3. Connect the points",
+        concepts: [
+            "The y-intercept (b) is where the line crosses the y-axis at x = 0.",
+            "The slope (m) tells you how to move from one point to another: rise/run.",
+            "Positive slope: line goes up from left to right.",
+            "Negative slope: line goes down from left to right."
+        ]
+    },
+    'graph-pointslope': {
+        steps: [
+            "1. Identify the given point (x₁, y₁) from the equation",
+            "2. This point MUST be one of your selected points",
+            "3. Use the slope to find a second point from the given point",
+            "4. Apply rise/run from the given point",
+            "5. Select both the given point and the calculated point"
+        ],
+        formula: "Point-Slope Form: y - y₁ = m(x - x₁)\n\nWhere:\n• m = slope\n• (x₁, y₁) = given point\n\nTo graph:\n1. Plot the given point (x₁, y₁)\n2. Use slope m to find another point\n3. Connect the points",
+        concepts: [
+            "The given point (x₁, y₁) from the equation must be on your line.",
+            "Use the slope to move from the given point: rise over run.",
+            "Watch the signs: y - y₁ means the point is (x₁, y₁), not (x₁, -y₁)."
+        ]
+    },
+    'graph-parallel': {
+        steps: [
+            "1. STEP 1: Graph the base line using its equation",
+            "2. STEP 2: Graph a parallel line through the given point",
+            "3. Parallel lines have the SAME slope",
+            "4. Use the same slope from the base line",
+            "5. Apply that slope starting from the given point"
+        ],
+        formula: "Parallel Lines:\n• Same slope: m₁ = m₂\n• Different y-intercepts: b₁ ≠ b₂\n\nBase line: y = mx + b₁\nParallel line through (x₀, y₀):\ny = mx + b₂ where b₂ = y₀ - mx₀",
+        concepts: [
+            "Parallel lines never intersect and have the same slope.",
+            "To draw a parallel line, use the same slope as the base line.",
+            "The new line must pass through the given point."
+        ]
+    },
+    'graph-perpendicular': {
+        steps: [
+            "1. STEP 1: Graph the base line using its equation",
+            "2. STEP 2: Graph a perpendicular line through the given point",
+            "3. Perpendicular lines have NEGATIVE RECIPROCAL slopes",
+            "4. If base slope is 2, perpendicular slope is -1/2",
+            "5. If base slope is -3/4, perpendicular slope is 4/3"
+        ],
+        formula: "Perpendicular Lines:\n• Negative reciprocal slopes: m₁ × m₂ = -1\n• m₂ = -1/m₁\n\nBase line: y = m₁x + b₁\nPerpendicular line through (x₀, y₀):\ny = m₂x + b₂ where:\n• m₂ = -1/m₁\n• b₂ = y₀ - m₂x₀",
+        concepts: [
+            "Perpendicular lines intersect at 90° and have negative reciprocal slopes.",
+            "To find the perpendicular slope: flip and negate the original slope.",
+            "Example: slope 3/4 → perpendicular slope -4/3.",
+            "The new line must pass through the given point."
+        ]
+    },
+    'graph-absolutevalue': {
+        steps: [
+            "1. Find the vertex: Where the expression inside |...| equals zero",
+            "2. The vertex is the tip of the V shape",
+            "3. Select the vertex as one of your 3 points",
+            "4. Choose one point on the LEFT side of the V",
+            "5. Choose one point on the RIGHT side of the V"
+        ],
+        formula: "Absolute Value Graph: y = a|bx + c| + d\n\nVertex: (-c/b, d)\n\nTo graph:\n1. Plot the vertex\n2. If a > 0, V opens UP\n3. If a < 0, V opens DOWN\n4. Use slope |a| for both sides",
+        concepts: [
+            "Absolute value graphs are V-shaped with a vertex at the turning point.",
+            "You need 3 points: vertex + one on each side of the V.",
+            "The graph is symmetric about a vertical line through the vertex.",
+            "If 'a' is negative, the V is upside down."
+        ]
     }
 };
 
