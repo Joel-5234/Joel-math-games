@@ -1097,7 +1097,13 @@ function generateChallengeQuestions(problemType, count) {
         intercept: generateInterceptQuestion,
         rateOfChange: generateRateOfChangeQuestion,
         linearFunction: generateLinearFunctionQuestion,
-        standardForm: generateStandardFormQuestion
+        standardForm: generateStandardFormQuestion,
+        // MILESTONE 19: Interactive Graphing Challenge Types
+        'graph-slopeintercept': generateGraphSlopeInterceptQuestion,
+        'graph-pointslope': generateGraphPointSlopeQuestion,
+        'graph-parallel': generateGraphParallelQuestion,
+        'graph-perpendicular': generateGraphPerpendicularQuestion,
+        'graph-absolutevalue': generateGraphAbsoluteValueQuestion
     };
     
     const generator = generators[problemType];
@@ -1570,6 +1576,64 @@ function displayChallengeQuestion() {
                 const radio = document.querySelector(`input[name="challengeAbsoluteValue"][value="${userAnswer}"]`);
                 if (radio) radio.checked = true;
                 document.querySelectorAll('#challengeAbsoluteValueOptions input').forEach(r => r.disabled = true);
+            }
+        } else if (question.type === 'graphSlopeIntercept' || question.type === 'graphPointSlope' || 
+                   question.type === 'graphParallel' || question.type === 'graphPerpendicular' || 
+                   question.type === 'graphAbsoluteValue') {
+            // MILESTONE 19: Interactive Graphing in Challenge Mode
+            questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>`;
+            
+            // Create canvas for interactive graphing
+            inputContainer.innerHTML = `
+                <div class="challenge-graph-container">
+                    <canvas id="challengeGraphCanvas" width="500" height="500"></canvas>
+                    <button id="challengeGraphSubmit" class="primary-button" style="margin-top: 10px;">Submit Answer</button>
+                </div>
+            `;
+            
+            // Initialize interactive graph
+            const graph = initializeInteractiveGraph('challengeGraphCanvas', question);
+            if (question.requirePoints === 3) {
+                graph.maxPoints = 3;
+            }
+            
+            // Wire up submit button
+            document.getElementById('challengeGraphSubmit')?.addEventListener('click', () => {
+                const isCorrect = graph.validateSelection();
+                graph.showFeedback(isCorrect);
+                
+                // Update challenge state
+                challengeState.questionStates[challengeState.currentQuestionIndex] = 'answered';
+                challengeState.answers[challengeState.currentQuestionIndex] = isCorrect ? 'correct' : 'incorrect';
+                
+                // Update stats
+                updateStats(question.type, isCorrect);
+                
+                // Show result
+                const resultArea = document.getElementById('challengeResult');
+                if (resultArea) {
+                    if (isCorrect) {
+                        resultArea.textContent = '✓ Correct!';
+                        resultArea.className = 'result-area success';
+                    } else {
+                        resultArea.textContent = '✗ Incorrect. Correct points shown in green.';
+                        resultArea.className = 'result-area error';
+                    }
+                }
+                
+                // Disable submit button
+                document.getElementById('challengeGraphSubmit').disabled = true;
+                
+                // Auto-advance after 1 second
+                setTimeout(() => {
+                    nextChallengeQuestion();
+                }, 1000);
+            });
+            
+            // If already answered, show feedback
+            if (questionState === 'answered') {
+                graph.showFeedback(userAnswer === 'correct');
+                document.getElementById('challengeGraphSubmit').disabled = true;
             }
         }
         
