@@ -1711,7 +1711,7 @@ function displayChallengeQuestion() {
                 
                 // Auto-advance after 1 second
                 setTimeout(() => {
-                    nextChallengeQuestion();
+                    navigateChallenge('next');
                 }, 1000);
             });
             
