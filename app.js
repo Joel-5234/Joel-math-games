@@ -4894,7 +4894,7 @@ function generateGraphSlopeInterceptQuestion() {
     const allPoints = [...correctPoints, ...distractors].sort(() => Math.random() - 0.5);
     
     return {
-        type: 'graphSlopeIntercept',
+        type: 'graph-slopeintercept',
         direction: 'equationToGraph',
         question: `Graph the line: ${equation}`,
         equation: equation,
@@ -4985,7 +4985,7 @@ function generateGraphPointSlopeQuestion() {
     const allPoints = [...correctPoints, ...distractors].sort(() => Math.random() - 0.5);
     
     return {
-        type: 'graphPointSlope',
+        type: 'graph-pointslope',
         direction: 'equationToGraph',
         question: `Graph the line: ${equation}`,
         equation: equation,
@@ -5075,7 +5075,7 @@ function generateGraphParallelQuestion() {
     const parallelDistractors = generateDistractorPoints(parallelPoints, parallelLineEq, 3);
     
     return {
-        type: 'graphParallel',
+        type: 'graph-parallel',
         direction: 'equationToGraph',
         question: `Graph the line ${baseEq}, then graph a line parallel to it through point (${pointX}, ${pointY})`,
         baseEquation: baseEq,
@@ -5146,7 +5146,7 @@ function generateGraphPerpendicularQuestion() {
     const perpDistractors = generateDistractorPoints(perpPoints, perpLineEq, 3);
     
     return {
-        type: 'graphPerpendicular',
+        type: 'graph-perpendicular',
         direction: 'equationToGraph',
         question: `Graph the line ${baseEq}, then graph a line perpendicular to it through point (${pointX}, ${pointY})`,
         baseEquation: baseEq,
@@ -5229,7 +5229,7 @@ function generateGraphAbsoluteValueQuestion() {
     const allPoints = [...correctPoints, ...distractors].sort(() => Math.random() - 0.5);
     
     return {
-        type: 'graphAbsoluteValue',
+        type: 'graph-absolutevalue',
         direction: 'equationToGraph',
         question: `Graph the absolute value function: ${equation}`,
         equation: equation,
