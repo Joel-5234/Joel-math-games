@@ -576,82 +576,113 @@
         <!-- MILESTONE 19: Interactive Graphing Practice - New Tab Containers -->
         
         <!-- Graph: Slope-Intercept -->
-        <section id="graph-slopeintercept-panel" class="problem-panel" style="display: none;">
-            <h2>Interactive Graphing: Slope-Intercept Form</h2>
-            
-            <div class="mode-selector">
-                <button class="mode-button active" data-mode="practice" data-problem-type="graph-slopeintercept">Practice Mode</button>
-                <button class="mode-button" data-mode="challenge" data-problem-type="graph-slopeintercept">Challenge Mode</button>
-                <button class="mode-button" data-mode="session" data-problem-type="graph-slopeintercept">Session Mode</button>
+        <div id="graph-slopeintercept-panel" class="problem-panel">
+            <div class="problem-layout">
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <h2>Interactive Graphing: Slope-Intercept Form</h2>
+                        <button class="hint-button" data-hint="graph-slopeintercept" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p><strong>Instructions:</strong></p>
+                        <ul>
+                            <li>Click 2 points that lie on the given line</li>
+                            <li>Double-click a point to deselect it</li>
+                            <li>A line will automatically draw when 2 points are selected</li>
+                            <li>Click Submit when you're confident in your answer</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="question-area">
+                        <p id="graphSlopeInterceptQuestion" class="question-text"></p>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <canvas id="graphSlopeInterceptCanvas" width="500" height="500"></canvas>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="graphSlopeInterceptSubmit" class="primary-button">Submit Answer</button>
+                        <button id="graphSlopeInterceptNext" class="secondary-button" style="display: none;">Next Question</button>
+                    </div>
+                    
+                    <div id="graphSlopeInterceptResult" class="result-area"></div>
+                </div>
+                <div id="graph-slopeintercept-hint-panel" class="hint-panel">
+                    <div class="hint-header">
+                        <h3>💡 Hints</h3>
+                        <button class="close-hint" data-hint-panel="graph-slopeintercept-hint-panel">&times;</button>
+                    </div>
+                    <div id="graph-slopeintercept-hint-content" class="hint-content"></div>
+                </div>
             </div>
-            
-            <div class="instructions">
-                <p><strong>Instructions:</strong></p>
-                <ul>
-                    <li>Click 2 points that lie on the given line</li>
-                    <li>Double-click a point to deselect it</li>
-                    <li>A line will automatically draw when 2 points are selected</li>
-                    <li>Click Submit when you're confident in your answer</li>
-                </ul>
-            </div>
-            
-            <div class="question-area">
-                <p id="graphSlopeInterceptQuestion" class="question-text"></p>
-            </div>
-            
-            <div class="graph-container">
-                <canvas id="graphSlopeInterceptCanvas" width="500" height="500"></canvas>
-            </div>
-            
-            <div class="button-group">
-                <button id="graphSlopeInterceptSubmit" class="primary-button">Submit Answer</button>
-                <button id="graphSlopeInterceptHint" class="secondary-button">💡 Hint</button>
-                <button id="graphSlopeInterceptNext" class="secondary-button" style="display: none;">Next Question</button>
-            </div>
-            
-            <div id="graphSlopeInterceptResult" class="result-area"></div>
-        </section>
+        </div>
         
         <!-- Graph: Point-Slope -->
-        <section id="graph-pointslope-panel" class="problem-panel" style="display: none;">
-            <h2>Interactive Graphing: Point-Slope Form</h2>
+        <div id="graph-pointslope-panel" class="problem-panel">
+            <div class="problem-layout">
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <h2>Interactive Graphing: Point-Slope Form</h2>
+                        <button class="hint-button" data-hint="graph-pointslope" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
             
             <div class="mode-selector">
                 <button class="mode-button active" data-mode="practice" data-problem-type="graph-pointslope">Practice Mode</button>
                 <button class="mode-button" data-mode="challenge" data-problem-type="graph-pointslope">Challenge Mode</button>
                 <button class="mode-button" data-mode="session" data-problem-type="graph-pointslope">Session Mode</button>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p><strong>Instructions:</strong></p>
+                        <ul>
+                            <li>Click 2 points that lie on the given line</li>
+                            <li>Double-click a point to deselect it</li>
+                            <li>A line will automatically draw when 2 points are selected</li>
+                            <li>Click Submit when you're confident in your answer</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="question-area">
+                        <p id="graphPointSlopeQuestion" class="question-text"></p>
+                    </div>
+                    
+                    <div class="graph-container">
+                        <canvas id="graphPointSlopeCanvas" width="500" height="500"></canvas>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="graphPointSlopeSubmit" class="primary-button">Submit Answer</button>
+                        <button id="graphPointSlopeNext" class="secondary-button" style="display: none;">Next Question</button>
+                    </div>
+                    
+                    <div id="graphPointSlopeResult" class="result-area"></div>
+                </div>
+                <div id="graph-pointslope-hint-panel" class="hint-panel">
+                    <div class="hint-header">
+                        <h3>💡 Hints</h3>
+                        <button class="close-hint" data-hint-panel="graph-pointslope-hint-panel">&times;</button>
+                    </div>
+                    <div id="graph-pointslope-hint-content" class="hint-content"></div>
+                </div>
             </div>
-            
-            <div class="instructions">
-                <p><strong>Instructions:</strong></p>
-                <ul>
-                    <li>Click 2 points that lie on the given line</li>
-                    <li>Double-click a point to deselect it</li>
-                    <li>A line will automatically draw when 2 points are selected</li>
-                    <li>Click Submit when you're confident in your answer</li>
-                </ul>
-            </div>
-            
-            <div class="question-area">
-                <p id="graphPointSlopeQuestion" class="question-text"></p>
-            </div>
-            
-            <div class="graph-container">
-                <canvas id="graphPointSlopeCanvas" width="500" height="500"></canvas>
-            </div>
-            
-            <div class="button-group">
-                <button id="graphPointSlopeSubmit" class="primary-button">Submit Answer</button>
-                <button id="graphPointSlopeHint" class="secondary-button">💡 Hint</button>
-                <button id="graphPointSlopeNext" class="secondary-button" style="display: none;">Next Question</button>
-            </div>
-            
-            <div id="graphPointSlopeResult" class="result-area"></div>
-        </section>
+        </div>
         
         <!-- Graph: Parallel Lines -->
-        <section id="graph-parallel-panel" class="problem-panel" style="display: none;">
-            <h2>Interactive Graphing: Parallel Lines</h2>
+        <div id="graph-parallel-panel" class="problem-panel">
+            <div class="problem-layout">
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <h2>Interactive Graphing: Parallel Lines</h2>
+                        <button class="hint-button" data-hint="graph-parallel" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
             
             <div class="mode-selector">
                 <button class="mode-button active" data-mode="practice" data-problem-type="graph-parallel">Practice Mode</button>
@@ -679,17 +710,32 @@
             </div>
             
             <div class="button-group">
-                <button id="graphParallelSubmit" class="primary-button">Submit Answer</button>
-                <button id="graphParallelHint" class="secondary-button">💡 Hint</button>
-                <button id="graphParallelNext" class="secondary-button" style="display: none;">Next Question</button>
+                        <button id="graphParallelSubmit" class="primary-button">Submit Answer</button>
+                        <button id="graphParallelNext" class="secondary-button" style="display: none;">Next Question</button>
+                    </div>
+                    
+                    <div id="graphParallelResult" class="result-area"></div>
+                </div>
+                <div id="graph-parallel-hint-panel" class="hint-panel">
+                    <div class="hint-header">
+                        <h3>💡 Hints</h3>
+                        <button class="close-hint" data-hint-panel="graph-parallel-hint-panel">&times;</button>
+                    </div>
+                    <div id="graph-parallel-hint-content" class="hint-content"></div>
+                </div>
             </div>
-            
-            <div id="graphParallelResult" class="result-area"></div>
-        </section>
+        </div>
         
         <!-- Graph: Perpendicular Lines -->
-        <section id="graph-perpendicular-panel" class="problem-panel" style="display: none;">
-            <h2>Interactive Graphing: Perpendicular Lines</h2>
+        <div id="graph-perpendicular-panel" class="problem-panel">
+            <div class="problem-layout">
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <h2>Interactive Graphing: Perpendicular Lines</h2>
+                        <button class="hint-button" data-hint="graph-perpendicular" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
             
             <div class="mode-selector">
                 <button class="mode-button active" data-mode="practice" data-problem-type="graph-perpendicular">Practice Mode</button>
@@ -717,17 +763,32 @@
             </div>
             
             <div class="button-group">
-                <button id="graphPerpendicularSubmit" class="primary-button">Submit Answer</button>
-                <button id="graphPerpendicularHint" class="secondary-button">💡 Hint</button>
-                <button id="graphPerpendicularNext" class="secondary-button" style="display: none;">Next Question</button>
+                        <button id="graphPerpendicularSubmit" class="primary-button">Submit Answer</button>
+                        <button id="graphPerpendicularNext" class="secondary-button" style="display: none;">Next Question</button>
+                    </div>
+                    
+                    <div id="graphPerpendicularResult" class="result-area"></div>
+                </div>
+                <div id="graph-perpendicular-hint-panel" class="hint-panel">
+                    <div class="hint-header">
+                        <h3>💡 Hints</h3>
+                        <button class="close-hint" data-hint-panel="graph-perpendicular-hint-panel">&times;</button>
+                    </div>
+                    <div id="graph-perpendicular-hint-content" class="hint-content"></div>
+                </div>
             </div>
-            
-            <div id="graphPerpendicularResult" class="result-area"></div>
-        </section>
+        </div>
         
         <!-- Graph: Absolute Value -->
-        <section id="graph-absolutevalue-panel" class="problem-panel" style="display: none;">
-            <h2>Interactive Graphing: Absolute Value Functions</h2>
+        <div id="graph-absolutevalue-panel" class="problem-panel">
+            <div class="problem-layout">
+                <div class="problem-card">
+                    <div class="problem-header">
+                        <h2>Interactive Graphing: Absolute Value Functions</h2>
+                        <button class="hint-button" data-hint="graph-absolutevalue" title="Get hints">
+                            💡 Get Hint
+                        </button>
+                    </div>
             
             <div class="mode-selector">
                 <button class="mode-button active" data-mode="practice" data-problem-type="graph-absolutevalue">Practice Mode</button>
@@ -754,13 +815,21 @@
             </div>
             
             <div class="button-group">
-                <button id="graphAbsoluteValueSubmit" class="primary-button">Submit Answer</button>
-                <button id="graphAbsoluteValueHint" class="secondary-button">💡 Hint</button>
-                <button id="graphAbsoluteValueNext" class="secondary-button" style="display: none;">Next Question</button>
+                        <button id="graphAbsoluteValueSubmit" class="primary-button">Submit Answer</button>
+                        <button id="graphAbsoluteValueNext" class="secondary-button" style="display: none;">Next Question</button>
+                    </div>
+                    
+                    <div id="graphAbsoluteValueResult" class="result-area"></div>
+                </div>
+                <div id="graph-absolutevalue-hint-panel" class="hint-panel">
+                    <div class="hint-header">
+                        <h3>💡 Hints</h3>
+                        <button class="close-hint" data-hint-panel="graph-absolutevalue-hint-panel">&times;</button>
+                    </div>
+                    <div id="graph-absolutevalue-hint-content" class="hint-content"></div>
+                </div>
             </div>
-            
-            <div id="graphAbsoluteValueResult" class="result-area"></div>
-        </section>
+        </div>
 
         </main>
 
