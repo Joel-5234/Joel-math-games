@@ -107,6 +107,15 @@
       "name": "Enhanced Feedback Effects System",
       "status": "completed",
       "description": "Add 10 new visual feedback effects that trigger at progress milestones (50%, 85%, 100%) during Challenge mode. Effects are randomly selected based on intensity level (mild, medium, high). Includes Developer Tools test buttons for all effects and accessibility warning."
+    },
+    {
+      "id": "milestone-19",
+      "name": "Interactive Graphing Practice",
+      "status": "planned",
+      "priority": "high",
+      "estimatedDays": "7-10",
+      "description": "Add interactive graphing practice where students click 2 points from 8 options to graph lines. Covers Slope-Intercept, Point-Slope, Parallel, Perpendicular, and Absolute Value equations. Includes both equation-to-graph and graph-to-equation directions.",
+      "features": ["Click-to-select points", "Auto-draw line", "Double-click deselect", "8-point validation system", "Graph range -9 to 9", "Challenge mode integration", "Step-by-step hints", "Correct answer overlay"]
     }
   ]
 }

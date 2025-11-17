@@ -583,3 +583,190 @@ i) Hint system enhancements:
    - "Practice this step" overlay for signed-number practice
    - Integration with existing hint penalties and limits
 
+
+## 4.11 Interactive Graphing Practice (Milestone 19 - Planned)
+
+### Overview
+Interactive graphing practice where students click 2 points from 8 options to graph lines and identify equations from graphs. Covers 5 equation types with bidirectional practice.
+
+### Problem Types
+
+#### 4.11.1 Graph from Slope-Intercept Form
+**Mode**: Equation → Graph
+- **Input**: Given equation (e.g., `y = 2x + 3`)
+- **Display**: Graph with 8 selectable points (no line shown initially)
+- **Interaction**: 
+  - User clicks 2 points to select them
+  - Selected points turn blue
+  - Line automatically drawn when 2 points selected
+  - Double-click to deselect a point
+- **Validation**: Check if both selected points lie on the given equation
+- **Feedback**: Highlight correct 2 points in green, show correct line with dashed overlay
+
+#### 4.11.2 Identify Slope-Intercept from Graph  
+**Mode**: Graph → Equation
+- **Input**: Graph showing a line (2 points highlighted)
+- **Display**: Canvas graph with drawn line
+- **Interaction**: Text input field for equation
+- **Validation**: Parse user equation, check if equivalent to correct equation
+- **Feedback**: Show equation in standard format, highlight any errors
+
+#### 4.11.3 Graph from Point-Slope Form
+**Mode**: Equation → Graph
+- **Input**: Given equation (e.g., `y - 1 = -2(x + 3)`)
+- **Display**: Graph with 8 selectable points
+- **Interaction**: Same as 4.11.1 (click 2 points)
+- **Validation**: Check if points satisfy point-slope equation
+- **Feedback**: Show correct points and line
+
+#### 4.11.4 Identify Point-Slope from Graph
+**Mode**: Graph → Equation
+- **Input**: Graph showing a line
+- **Display**: Canvas graph with drawn line
+- **Interaction**: Text input for point-slope form equation
+- **Validation**: Parse and verify equation format and values
+- **Feedback**: Accept multiple correct forms (different points on same line)
+
+#### 4.11.5 Graph Parallel Line
+**Mode**: Given base equation, graph parallel line through point
+- **Input**: 
+  - Base equation (e.g., `y = 3x + 1`)
+  - Target point (e.g., `(2, 5)`)
+- **Display**: Graph with 16 selectable points (8 for each line)
+- **Interaction**: 
+  - Step 1: Select 2 points to graph base line
+  - Step 2: Select 2 points to graph parallel line through target point
+- **Validation**: 
+  - Check base line is correct
+  - Check parallel line has same slope and passes through target point
+- **Feedback**: Show both correct lines, highlight if base or parallel is wrong
+
+#### 4.11.6 Graph Perpendicular Line
+**Mode**: Given base equation, graph perpendicular line through point
+- **Input**:
+  - Base equation (e.g., `y = 2x - 1`)
+  - Target point (e.g., `(1, 3)`)
+- **Display**: Graph with 16 selectable points
+- **Interaction**: Same as parallel (2-step process)
+- **Validation**:
+  - Check base line is correct
+  - Check perpendicular line has negative reciprocal slope and passes through point
+- **Feedback**: Show both lines, indicate which is incorrect if any
+
+#### 4.11.7 Graph from Absolute Value Form
+**Mode**: Equation → Graph
+- **Input**: Given equation (e.g., `y = 2|x - 1| + 3`)
+- **Display**: Graph with 9 selectable points (vertex + 2 on each side)
+- **Interaction**: 
+  - User selects 3 points (vertex + 1 on each side)
+  - OR: Vertex provided, user selects 2 points (1 on each side)
+- **Validation**: Check if points lie on absolute value function
+- **Feedback**: Show correct V-shaped graph
+
+#### 4.11.8 Identify Absolute Value from Graph
+**Mode**: Graph → Equation
+- **Input**: V-shaped graph
+- **Display**: Canvas graph showing absolute value function
+- **Interaction**: Text input for vertex form equation
+- **Validation**: Parse and verify equation
+- **Feedback**: Highlight vertex and slope on each side
+
+### Technical Specifications
+
+#### Graph Component
+- **Canvas-based** interactive graph
+- **Coordinate range**: -9 to 9 on both x and y axes
+- **Grid**: 1-unit squares with axis labels
+- **Point rendering**:
+  - Unselected: Gray circle (8px radius)
+  - Selected: Blue circle (10px radius)
+  - Correct: Green circle (10px radius)
+  - Incorrect: Red circle (10px radius)
+- **Line rendering**: 3px width, colored by state
+
+#### Point Selection System
+- **Click detection**: 15px hit radius around each point
+- **Selection limit**: Maximum 2 points (3 for absolute value)
+- **Deselection**: Double-click on selected point
+- **Auto-draw**: Line drawn automatically when max points selected
+- **Visual feedback**: Point color changes immediately on selection
+
+#### Validation Logic
+- **Point validation**: Check if point coordinates satisfy equation within tolerance (0.01)
+- **Equation parsing**: Support multiple formats, be lenient with spacing
+- **Equivalent equations**: Recognize algebraically equivalent forms
+
+#### Integration
+
+**New Tabs in Sidebar**:
+1. "Graph Slope-Intercept"
+2. "Graph Point-Slope"
+3. "Graph Parallel Lines"
+4. "Graph Perpendicular Lines"
+5. "Graph Absolute Value"
+
+**Game Modes**:
+- Practice Mode: Unlimited time, hints available
+- Challenge Mode: Pre-generated sets, accuracy-based scoring (no time limits)
+- Session Mode: 10-minute practice session
+
+**Hints System**:
+- Step-by-step guidance
+- Visual highlights on graph (e.g., y-intercept, slope)
+- Animation showing correct solution
+
+**Feedback**:
+- Correct answer overlay (dashed line in green)
+- Highlight correct points
+- Show equation of correct line
+- Explain why answer is correct/incorrect
+
+### User Experience Flow
+
+1. **Student selects graphing tab** (e.g., "Graph Slope-Intercept")
+2. **System displays**:
+   - Equation or problem statement
+   - Interactive graph with 8 selectable points
+   - Instructions
+3. **Student clicks points** to select them
+   - Points turn blue when selected
+   - Can double-click to deselect
+4. **After selecting 2 points**:
+   - Line automatically drawn through points
+   - Submit button enabled
+5. **Student clicks Submit**
+6. **System validates**:
+   - If correct: Green checkmark, "Correct!" message, auto-advance in Challenge mode
+   - If incorrect: Red X, show correct answer overlay, explain error
+7. **Repeat** for next question
+
+### Challenge Mode Integration
+- Graphing problems included in mixed challenge sets
+- Scoring based on accuracy only (no time penalties)
+- Stats tracked separately for graphing problem types
+- Achievements for graphing mastery
+
+### Success Criteria
+- Students can select points with 95%+ accuracy (no mis-clicks)
+- Average completion time: 30-45 seconds per graphing problem
+- 70%+ accuracy rate on graphing problems
+- Positive user feedback on interactivity
+- Zero console errors during testing
+- Works on Chrome, Firefox, Safari, Edge
+- Responsive on desktop and tablet
+
+### Future Enhancements (Post-Milestone 19)
+- Touch screen optimization for mobile
+- Undo/Redo functionality
+- Graph zoom/pan controls
+- Export graph as image
+- Systems of equations graphing
+- Inequalities graphing
+- Graphing calculator mode
+
+---
+
+**Version Updated**: 2.1.0  
+**Last Updated**: 2025-11-16  
+**Status**: Milestone 19 planned, ready for implementation
+
