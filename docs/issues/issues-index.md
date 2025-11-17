@@ -8,6 +8,20 @@ None currently.
 
 ## Resolved Issues
 
+### Issue #029: Challenge Mode from Graphing Tabs Shows Wrong Questions
+- **Date**: 2025-11-16 22:00:00
+- **Status**: ✅ RESOLVED
+- **Priority**: CRITICAL
+- **Severity**: High
+- **Reporter**: User
+- **Resolution Time**: 25 minutes
+- **Description**: Starting Challenge mode from any graphing tab (Slope-Intercept, Point-Slope, Parallel, Perpendicular, Absolute Value) would show "Slope & Description" questions instead of the expected graphing questions.
+- **Root Cause**: The `mapTabToProblemType()` function was missing mappings for the 5 new graphing tabs added in Milestone 19, causing it to default to 'slope' problem type.
+- **Fix**: Added 5 new mappings to `mapTabToProblemType()` function: `graph-slopeintercept` → `graphSlopeIntercept`, `graph-pointslope` → `graphPointSlope`, `graph-parallel` → `graphParallel`, `graph-perpendicular` → `graphPerpendicular`, `graph-absolutevalue` → `graphAbsoluteValue`.
+- **Files Modified**: `app.js`
+- **Commits**: 1 commit
+- **Details**: [issue-029-20251116-220000.md](./issue-029-20251116-220000.md)
+
 ### Issue #028: Button Styling Inconsistent in Interactive Graphing Tabs
 - **Date**: 2025-11-16 21:47:00
 - **Status**: ✅ RESOLVED
@@ -176,6 +190,6 @@ None currently.
 
 ---
 
-**Total Issues**: 27 (26 resolved, 1 open)
-**Last Updated**: 2025-11-16 21:45:00
+**Total Issues**: 29 (29 resolved, 0 open)
+**Last Updated**: 2025-11-16 22:05:00
 
