@@ -4629,6 +4629,494 @@ class InteractiveGraph {
 }
 
 // ============================================================================
+// MILESTONE 19: Interactive Graphing - Problem Generators
+// ============================================================================
+
+/**
+ * Helper: Generate distractor points near but not on the line
+ */
+function generateDistractorPoints(correctPoints, lineEquation, count = 6) {
+    const distractors = [];
+    const usedPoints = new Set(correctPoints.map(p => `${p.x},${p.y}`));
+    const attempts = 0;
+    const maxAttempts = 100;
+    
+    while (distractors.length < count && attempts < maxAttempts) {
+        // Pick random grid point in range -9 to 9
+        const x = randomInt(-9, 9);
+        const y = randomInt(-9, 9);
+        const pointKey = `${x},${y}`;
+        
+        // Skip if already used
+        if (usedPoints.has(pointKey)) continue;
+        
+        // Check if point is NOT on the line (with small tolerance)
+        const isOnLine = isPointOnLineEquation({ x, y }, lineEquation, 0.01);
+        
+        if (!isOnLine) {
+            distractors.push({ x, y });
+            usedPoints.add(pointKey);
+        }
+    }
+    
+    // If we don't have enough distractors, fill with random points
+    while (distractors.length < count) {
+        const x = randomInt(-9, 9);
+        const y = randomInt(-9, 9);
+        const pointKey = `${x},${y}`;
+        if (!usedPoints.has(pointKey)) {
+            distractors.push({ x, y });
+            usedPoints.add(pointKey);
+        }
+    }
+    
+    return distractors;
+}
+
+/**
+ * Helper: Check if point is on line equation (with tolerance)
+ */
+function isPointOnLineEquation(point, equation, tolerance = 0.01) {
+    if (equation.kind === 'vertical') {
+        return Math.abs(point.x - equation.x0) < tolerance;
+    }
+    
+    // y = mx + b
+    const expectedY = equation.m * point.x + equation.b;
+    return Math.abs(point.y - expectedY) < tolerance;
+}
+
+/**
+ * 1. Graph from Slope-Intercept Equation
+ * Given: y = mx + b
+ * Task: Select 2 points that lie on this line
+ */
+function generateGraphSlopeInterceptQuestion() {
+    // Use simple slopes from whitelist
+    const simpleSlopes = [-2, -1, -0.5, 0, 0.5, 1, 2];
+    const m = simpleSlopes[randomInt(0, simpleSlopes.length - 1)];
+    const b = randomInt(-5, 5);
+    
+    // Generate equation string
+    const equation = buildSlopeInterceptFromMB(m, b);
+    
+    // Calculate 2 correct points on the line
+    const correctPoints = [];
+    const x1 = randomInt(-5, 0);
+    const y1 = m * x1 + b;
+    if (y1 >= -9 && y1 <= 9 && Number.isInteger(y1)) {
+        correctPoints.push({ x: x1, y: y1 });
+    }
+    
+    const x2 = randomInt(1, 5);
+    const y2 = m * x2 + b;
+    if (y2 >= -9 && y2 <= 9 && Number.isInteger(y2) && correctPoints.length < 2) {
+        correctPoints.push({ x: x2, y: y2 });
+    }
+    
+    // If we don't have 2 valid points, try y-intercept and another
+    if (correctPoints.length < 2) {
+        correctPoints.length = 0;
+        // Y-intercept
+        if (b >= -9 && b <= 9) {
+            correctPoints.push({ x: 0, y: b });
+        }
+        // Find another point
+        for (let x = -9; x <= 9 && correctPoints.length < 2; x++) {
+            if (x === 0) continue;
+            const y = m * x + b;
+            if (y >= -9 && y <= 9 && Number.isInteger(y)) {
+                correctPoints.push({ x, y });
+            }
+        }
+    }
+    
+    // Generate 6 distractor points
+    const lineEquation = { kind: 'slope', m, b };
+    const distractors = generateDistractorPoints(correctPoints, lineEquation, 6);
+    
+    // Combine and shuffle
+    const allPoints = [...correctPoints, ...distractors].sort(() => Math.random() - 0.5);
+    
+    return {
+        type: 'graphSlopeIntercept',
+        direction: 'equationToGraph',
+        question: `Graph the line: ${equation}`,
+        equation: equation,
+        equationData: { m, b },
+        availablePoints: allPoints,
+        correctPoints: correctPoints,
+        mode: 'interactive-graph'
+    };
+}
+
+/**
+ * 2. Identify Slope-Intercept from Graph
+ * Given: Graph showing a line
+ * Task: Write equation in y = mx + b form
+ */
+function generateIdentifySlopeInterceptQuestion() {
+    // Pick 2 random grid points
+    const x1 = randomInt(-6, -1);
+    const y1 = randomInt(-6, 6);
+    const x2 = randomInt(1, 6);
+    
+    // Calculate slope
+    const m = (x2 - x1 !== 0) ? (y1 + randomInt(-3, 3) - y1) / (x2 - x1) : randomInt(-2, 2);
+    const simpleM = Math.round(m * 2) / 2;  // Round to nearest 0.5
+    
+    // Calculate y-intercept
+    const b = y1 - simpleM * x1;
+    
+    // Ensure y2 is valid
+    const y2 = simpleM * x2 + b;
+    
+    // Points for display
+    const point1 = { x: x1, y: y1 };
+    const point2 = { x: x2, y: Math.round(y2) };
+    
+    // Correct equation
+    const correctEq = buildSlopeInterceptFromMB(simpleM, Math.round(b));
+    
+    return {
+        type: 'identifySlopeIntercept',
+        direction: 'graphToEquation',
+        question: 'What is the equation of the line shown?',
+        displayPoints: [point1, point2],
+        lineData: { kind: 'slope', m: simpleM, b: Math.round(b) },
+        correctEquation: correctEq,
+        mode: 'text-input'
+    };
+}
+
+/**
+ * 3. Graph from Point-Slope Equation
+ * Given: y - y1 = m(x - x1)
+ * Task: Select 2 points on this line
+ */
+function generateGraphPointSlopeQuestion() {
+    // Generate slope and point
+    const simpleSlopes = [-2, -1, -0.5, 0, 0.5, 1, 2];
+    const m = simpleSlopes[randomInt(0, simpleSlopes.length - 1)];
+    const x1 = randomInt(-5, 5);
+    const y1 = randomInt(-5, 5);
+    
+    // Build point-slope equation
+    const equation = buildPointSlopeForm(m, { x: x1, y: y1 });
+    
+    // Calculate b for line equation (y = mx + b)
+    const b = y1 - m * x1;
+    
+    // Find 2 correct points on the line
+    const correctPoints = [];
+    // Include the given point
+    correctPoints.push({ x: x1, y: y1 });
+    
+    // Find another point
+    for (let x = -9; x <= 9 && correctPoints.length < 2; x++) {
+        if (x === x1) continue;
+        const y = m * x + b;
+        if (y >= -9 && y <= 9 && Number.isInteger(y)) {
+            correctPoints.push({ x, y });
+            break;
+        }
+    }
+    
+    // Generate distractors
+    const lineEquation = { kind: 'slope', m, b };
+    const distractors = generateDistractorPoints(correctPoints, lineEquation, 6);
+    
+    // Combine and shuffle
+    const allPoints = [...correctPoints, ...distractors].sort(() => Math.random() - 0.5);
+    
+    return {
+        type: 'graphPointSlope',
+        direction: 'equationToGraph',
+        question: `Graph the line: ${equation}`,
+        equation: equation,
+        equationData: { m, x1, y1, b },
+        availablePoints: allPoints,
+        correctPoints: correctPoints,
+        mode: 'interactive-graph'
+    };
+}
+
+/**
+ * 4. Identify Point-Slope from Graph
+ * Given: Graph showing a line
+ * Task: Write equation in point-slope form
+ */
+function generateIdentifyPointSlopeQuestion() {
+    // Pick 2 grid points
+    const x1 = randomInt(-6, 6);
+    const y1 = randomInt(-6, 6);
+    const x2 = randomInt(-6, 6);
+    const y2 = randomInt(-6, 6);
+    
+    if (x1 === x2) return generateIdentifyPointSlopeQuestion();  // Retry if vertical
+    
+    // Calculate slope
+    const m = (y2 - y1) / (x2 - x1);
+    const simpleM = Math.round(m * 2) / 2;  // Round to nearest 0.5
+    
+    // Use first point for equation
+    const correctEq = buildPointSlopeForm(simpleM, { x: x1, y: y1 });
+    
+    return {
+        type: 'identifyPointSlope',
+        direction: 'graphToEquation',
+        question: 'What is the equation of the line shown in point-slope form?',
+        displayPoints: [{ x: x1, y: y1 }, { x: x2, y: y2 }],
+        lineData: { kind: 'slope', m: simpleM, b: y1 - simpleM * x1 },
+        correctEquation: correctEq,
+        mode: 'text-input'
+    };
+}
+
+/**
+ * 5. Graph Parallel Line
+ * Given: Base equation and a point
+ * Task: First graph base line, then graph parallel line through point
+ */
+function generateGraphParallelQuestion() {
+    // Generate base equation
+    const simpleSlopes = [-2, -1, -0.5, 0.5, 1, 2];
+    const m = simpleSlopes[randomInt(0, simpleSlopes.length - 1)];
+    const b = randomInt(-5, 5);
+    const baseEq = buildSlopeInterceptFromMB(m, b);
+    
+    // Generate point for parallel line
+    const pointX = randomInt(-5, 5);
+    const pointY = randomInt(-5, 5);
+    
+    // Calculate parallel line (same slope, through point)
+    const parallelB = pointY - m * pointX;
+    
+    // Find 2 points on base line
+    const basePoints = [];
+    for (let x = -9; x <= 9 && basePoints.length < 2; x++) {
+        const y = m * x + b;
+        if (y >= -9 && y <= 9 && Number.isInteger(y)) {
+            basePoints.push({ x, y });
+        }
+    }
+    
+    // Find 2 points on parallel line
+    const parallelPoints = [];
+    parallelPoints.push({ x: pointX, y: pointY });
+    for (let x = -9; x <= 9 && parallelPoints.length < 2; x++) {
+        if (x === pointX) continue;
+        const y = m * x + parallelB;
+        if (y >= -9 && y <= 9 && Number.isInteger(y)) {
+            parallelPoints.push({ x, y });
+            break;
+        }
+    }
+    
+    // Generate distractors for each line
+    const baseLineEq = { kind: 'slope', m, b };
+    const parallelLineEq = { kind: 'slope', m, b: parallelB };
+    const baseDistractors = generateDistractorPoints(basePoints, baseLineEq, 3);
+    const parallelDistractors = generateDistractorPoints(parallelPoints, parallelLineEq, 3);
+    
+    return {
+        type: 'graphParallel',
+        direction: 'equationToGraph',
+        question: `Graph the line ${baseEq}, then graph a line parallel to it through point (${pointX}, ${pointY})`,
+        baseEquation: baseEq,
+        throughPoint: { x: pointX, y: pointY },
+        steps: [
+            {
+                instruction: `Step 1: Graph the base line ${baseEq}`,
+                availablePoints: [...basePoints, ...baseDistractors].sort(() => Math.random() - 0.5),
+                correctPoints: basePoints
+            },
+            {
+                instruction: `Step 2: Graph a parallel line through (${pointX}, ${pointY})`,
+                availablePoints: [...parallelPoints, ...parallelDistractors].sort(() => Math.random() - 0.5),
+                correctPoints: parallelPoints
+            }
+        ],
+        mode: 'two-step-graph'
+    };
+}
+
+/**
+ * 6. Graph Perpendicular Line
+ * Given: Base equation and a point
+ * Task: First graph base line, then graph perpendicular line through point
+ */
+function generateGraphPerpendicularQuestion() {
+    // Generate base equation (avoid m=0 for perpendicular)
+    const simpleSlopes = [-2, -1, -0.5, 0.5, 1, 2];
+    const m = simpleSlopes[randomInt(0, simpleSlopes.length - 1)];
+    const b = randomInt(-5, 5);
+    const baseEq = buildSlopeInterceptFromMB(m, b);
+    
+    // Calculate perpendicular slope
+    const perpM = -1 / m;
+    
+    // Generate point for perpendicular line
+    const pointX = randomInt(-5, 5);
+    const pointY = randomInt(-5, 5);
+    
+    // Calculate perpendicular line
+    const perpB = pointY - perpM * pointX;
+    
+    // Find 2 points on base line
+    const basePoints = [];
+    for (let x = -9; x <= 9 && basePoints.length < 2; x++) {
+        const y = m * x + b;
+        if (y >= -9 && y <= 9 && Number.isInteger(y)) {
+            basePoints.push({ x, y });
+        }
+    }
+    
+    // Find 2 points on perpendicular line
+    const perpPoints = [];
+    perpPoints.push({ x: pointX, y: pointY });
+    for (let x = -9; x <= 9 && perpPoints.length < 2; x++) {
+        if (x === pointX) continue;
+        const y = perpM * x + perpB;
+        if (y >= -9 && y <= 9 && Number.isInteger(y)) {
+            perpPoints.push({ x, y: Math.round(y) });
+            break;
+        }
+    }
+    
+    // Generate distractors
+    const baseLineEq = { kind: 'slope', m, b };
+    const perpLineEq = { kind: 'slope', m: perpM, b: perpB };
+    const baseDistractors = generateDistractorPoints(basePoints, baseLineEq, 3);
+    const perpDistractors = generateDistractorPoints(perpPoints, perpLineEq, 3);
+    
+    return {
+        type: 'graphPerpendicular',
+        direction: 'equationToGraph',
+        question: `Graph the line ${baseEq}, then graph a line perpendicular to it through point (${pointX}, ${pointY})`,
+        baseEquation: baseEq,
+        throughPoint: { x: pointX, y: pointY },
+        steps: [
+            {
+                instruction: `Step 1: Graph the base line ${baseEq}`,
+                availablePoints: [...basePoints, ...baseDistractors].sort(() => Math.random() - 0.5),
+                correctPoints: basePoints
+            },
+            {
+                instruction: `Step 2: Graph a perpendicular line through (${pointX}, ${pointY})`,
+                availablePoints: [...perpPoints, ...perpDistractors].sort(() => Math.random() - 0.5),
+                correctPoints: perpPoints
+            }
+        ],
+        mode: 'two-step-graph'
+    };
+}
+
+/**
+ * 7. Graph from Absolute Value Equation
+ * Given: y = a|bx + c| + d
+ * Task: Select vertex and 2 side points (3 total)
+ */
+function generateGraphAbsoluteValueQuestion() {
+    // Generate simple absolute value equation
+    const a = randomInt(1, 2) * (Math.random() > 0.5 ? 1 : -1);  // 1 or -1
+    const b = 1;  // Keep simple
+    const c = randomInt(-3, 3);
+    const d = randomInt(-3, 3);
+    
+    // Build equation string
+    const equation = `y = ${a === 1 ? '' : a}|x${c >= 0 ? ' + ' : ' - '}${Math.abs(c)}|${d >= 0 ? ' + ' : ' - '}${Math.abs(d)}`;
+    
+    // Calculate vertex
+    const vertexX = -c / b;
+    const vertexY = d;
+    
+    // Find 2 additional points on the V
+    const correctPoints = [];
+    correctPoints.push({ x: Math.round(vertexX), y: Math.round(vertexY) });
+    
+    // Left side point
+    const x1 = Math.round(vertexX) - 2;
+    const y1 = a * Math.abs(b * x1 + c) + d;
+    if (y1 >= -9 && y1 <= 9) {
+        correctPoints.push({ x: x1, y: Math.round(y1) });
+    }
+    
+    // Right side point
+    const x2 = Math.round(vertexX) + 2;
+    const y2 = a * Math.abs(b * x2 + c) + d;
+    if (y2 >= -9 && y2 <= 9) {
+        correctPoints.push({ x: x2, y: Math.round(y2) });
+    }
+    
+    // Generate distractors (points not on the V)
+    const distractors = [];
+    for (let i = 0; i < 6 && distractors.length < 5; i++) {
+        const x = randomInt(-9, 9);
+        const expectedY = a * Math.abs(b * x + c) + d;
+        const y = randomInt(-9, 9);
+        
+        // Only add if NOT on the curve
+        if (Math.abs(y - expectedY) > 1) {
+            const pointKey = `${x},${y}`;
+            if (!correctPoints.some(p => p.x === x && p.y === y)) {
+                distractors.push({ x, y });
+            }
+        }
+    }
+    
+    // Fill remaining distractors
+    while (distractors.length < 5) {
+        distractors.push({ x: randomInt(-9, 9), y: randomInt(-9, 9) });
+    }
+    
+    // Combine and shuffle
+    const allPoints = [...correctPoints, ...distractors].sort(() => Math.random() - 0.5);
+    
+    return {
+        type: 'graphAbsoluteValue',
+        direction: 'equationToGraph',
+        question: `Graph the absolute value function: ${equation}`,
+        equation: equation,
+        equationData: { a, b, c, d, vertex: { x: Math.round(vertexX), y: Math.round(vertexY) } },
+        availablePoints: allPoints,
+        correctPoints: correctPoints,
+        mode: 'interactive-graph',
+        requirePoints: 3  // Need 3 points instead of 2
+    };
+}
+
+/**
+ * 8. Identify Absolute Value from Graph
+ * Given: V-shaped graph
+ * Task: Write equation in vertex form
+ */
+function generateIdentifyAbsoluteValueQuestion() {
+    // Generate vertex
+    const h = randomInt(-5, 5);
+    const k = randomInt(-5, 5);
+    const a = Math.random() > 0.5 ? 1 : -1;
+    
+    // Build equation
+    const equation = `y = ${a === 1 ? '' : a}|x${h >= 0 ? ' - ' : ' + '}${Math.abs(h)}|${k >= 0 ? ' + ' : ' - '}${Math.abs(k)}`;
+    
+    // Calculate 3 points for display
+    const vertex = { x: h, y: k };
+    const leftPoint = { x: h - 2, y: k + a * 2 };
+    const rightPoint = { x: h + 2, y: k + a * 2 };
+    
+    return {
+        type: 'identifyAbsoluteValue',
+        direction: 'graphToEquation',
+        question: 'What is the equation of the absolute value function shown?',
+        displayPoints: [vertex, leftPoint, rightPoint],
+        vertex: vertex,
+        correctEquation: equation,
+        mode: 'text-input'
+    };
+}
+
+// ============================================================================
 // MILESTONE 16: Enhanced Graph Component (Canvas-Based)
 // ============================================================================
 
