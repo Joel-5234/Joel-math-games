@@ -1712,8 +1712,8 @@ function displayChallengeQuestion() {
                 // Auto-advance after 1 second
                 console.log('[Graph Challenge] Setting timeout for auto-advance...');
                 setTimeout(() => {
-                    console.log('[Graph Challenge] Timeout fired, calling navigateChallenge...');
-                    navigateChallenge('next');
+                    console.log('[Graph Challenge] Timeout fired, calling navigateChallengeQuestion...');
+                    navigateChallengeQuestion('next');
                 }, 1000);
             });
             
