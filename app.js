@@ -1687,9 +1687,37 @@ function displayChallengeQuestion() {
                 const isCorrect = graph.validateSelection();
                 graph.showFeedback(isCorrect);
                 
+                // Issue #034: Record question end time BEFORE stopping timer
+                const questionEndTime = Date.now();
+                
+                // Stop timer when answer is submitted
+                stopQuestionTimer();
+                
                 // Update challenge state
                 challengeState.questionStates[challengeState.currentQuestionIndex] = 'answered';
                 challengeState.answers[challengeState.currentQuestionIndex] = isCorrect ? 'correct' : 'incorrect';
+                // Issue #034: CRITICAL - Store boolean result for completion screen
+                challengeState.correctAnswers[challengeState.currentQuestionIndex] = isCorrect;
+                
+                // Issue #034: Track question time for statistics
+                if (gameState.questionStartTime) {
+                    const duration = Math.floor((questionEndTime - gameState.questionStartTime) / 1000);
+                    challengeState.questionTimes.push({
+                        questionIndex: challengeState.currentQuestionIndex,
+                        startTime: gameState.questionStartTime,
+                        endTime: questionEndTime,
+                        duration: duration
+                    });
+                    
+                    // Check for speed achievements
+                    if (isCorrect && duration < 10) {
+                        unlockAchievement('lightningFast');
+                        gameState.quickAnswersCount++;
+                        if (gameState.quickAnswersCount >= 5) {
+                            unlockAchievement('speedRunner');
+                        }
+                    }
+                }
                 
                 // Update stats
                 updateStats(question.type, isCorrect);
