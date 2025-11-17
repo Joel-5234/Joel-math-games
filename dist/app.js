@@ -44,7 +44,9 @@ let gameState = {
         intercept: { correct: 0, total: 0, times: [] },
         rateOfChange: { correct: 0, total: 0, times: [] },
         linearFunction: { correct: 0, total: 0, times: [] },
-        standardForm: { correct: 0, total: 0, times: [] }
+        standardForm: { correct: 0, total: 0, times: [] },
+        pointSlope: { correct: 0, total: 0, times: [] },
+        absoluteValue: { correct: 0, total: 0, times: [] }
     }
 };
 

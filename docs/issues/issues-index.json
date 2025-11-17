@@ -166,9 +166,16 @@
     {
       "id": "025",
       "description": "Challenge Mode Not Auto-Advancing After Answer Submission - Browser Caching Suspected",
-      "status": "investigating",
+      "status": "resolved_as_026",
       "filename": "issue-025-20251116-193000.md",
       "date": "2025-11-16T19:30:00"
+    },
+    {
+      "id": "026",
+      "description": "Point-Slope & Absolute Value Auto-Advance Broken - Missing Stats Entries (REAL BUG)",
+      "status": "fixed",
+      "filename": "issue-026-20251116-194500.md",
+      "date": "2025-11-16T19:45:00"
     }
   ]
 }
