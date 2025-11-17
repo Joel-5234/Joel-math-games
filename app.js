@@ -46,7 +46,13 @@ let gameState = {
         linearFunction: { correct: 0, total: 0, times: [] },
         standardForm: { correct: 0, total: 0, times: [] },
         pointSlope: { correct: 0, total: 0, times: [] },
-        absoluteValue: { correct: 0, total: 0, times: [] }
+        absoluteValue: { correct: 0, total: 0, times: [] },
+        // MILESTONE 19: Interactive Graphing Stats
+        graphSlopeIntercept: { correct: 0, total: 0, times: [] },
+        graphPointSlope: { correct: 0, total: 0, times: [] },
+        graphParallel: { correct: 0, total: 0, times: [] },
+        graphPerpendicular: { correct: 0, total: 0, times: [] },
+        graphAbsoluteValue: { correct: 0, total: 0, times: [] }
     }
 };
 
@@ -5117,6 +5123,405 @@ function generateIdentifyAbsoluteValueQuestion() {
 }
 
 // ============================================================================
+// MILESTONE 19: Interactive Graphing - Practice Mode Handlers
+// ============================================================================
+
+// Storage for current interactive graph instances
+let interactiveGraphs = {};
+let currentGraphQuestion = null;
+
+/**
+ * Initialize an interactive graph for a given canvas
+ */
+function initializeInteractiveGraph(canvasId, questionData) {
+    const graph = new InteractiveGraph(canvasId, {
+        availablePoints: questionData.availablePoints || [],
+        correctPoints: questionData.correctPoints || [],
+        xMin: -9,
+        xMax: 9,
+        yMin: -9,
+        yMax: 9
+    });
+    
+    interactiveGraphs[canvasId] = graph;
+    return graph;
+}
+
+/**
+ * Handle Graph Slope-Intercept - Generate Question
+ */
+function handleGraphSlopeInterceptGenerate() {
+    // Generate question
+    const question = generateGraphSlopeInterceptQuestion();
+    currentGraphQuestion = question;
+    
+    // Display question
+    const questionEl = document.getElementById('graphSlopeInterceptQuestion');
+    if (questionEl) {
+        questionEl.textContent = question.question;
+    }
+    
+    // Initialize interactive graph
+    const graph = initializeInteractiveGraph('graphSlopeInterceptCanvas', question);
+    
+    // Clear result
+    const resultEl = document.getElementById('graphSlopeInterceptResult');
+    if (resultEl) {
+        resultEl.textContent = '';
+        resultEl.className = 'result-area';
+    }
+    
+    console.log('Graph Slope-Intercept question generated:', question);
+}
+
+/**
+ * Handle Graph Slope-Intercept - Submit Answer
+ */
+function handleGraphSlopeInterceptSubmit() {
+    if (!currentGraphQuestion) return;
+    
+    const graph = interactiveGraphs['graphSlopeInterceptCanvas'];
+    if (!graph) return;
+    
+    // Validate selection
+    const isCorrect = graph.validateSelection();
+    
+    // Show feedback
+    graph.showFeedback(isCorrect);
+    
+    // Display result
+    const resultEl = document.getElementById('graphSlopeInterceptResult');
+    if (resultEl) {
+        if (isCorrect) {
+            resultEl.textContent = '✓ Correct! You selected the right points on the line.';
+            resultEl.className = 'result-area success';
+            updateStats('graphSlopeIntercept', true);
+        } else {
+            resultEl.textContent = `✗ Incorrect. The correct points are shown in green with a dashed line.`;
+            resultEl.className = 'result-area error';
+            updateStats('graphSlopeIntercept', false);
+        }
+    }
+    
+    // Show Next button
+    const nextBtn = document.getElementById('graphSlopeInterceptNext');
+    if (nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+/**
+ * Handle Graph Point-Slope - Generate Question
+ */
+function handleGraphPointSlopeGenerate() {
+    const question = generateGraphPointSlopeQuestion();
+    currentGraphQuestion = question;
+    
+    const questionEl = document.getElementById('graphPointSlopeQuestion');
+    if (questionEl) {
+        questionEl.textContent = question.question;
+    }
+    
+    initializeInteractiveGraph('graphPointSlopeCanvas', question);
+    
+    const resultEl = document.getElementById('graphPointSlopeResult');
+    if (resultEl) {
+        resultEl.textContent = '';
+        resultEl.className = 'result-area';
+    }
+}
+
+/**
+ * Handle Graph Point-Slope - Submit Answer
+ */
+function handleGraphPointSlopeSubmit() {
+    if (!currentGraphQuestion) return;
+    
+    const graph = interactiveGraphs['graphPointSlopeCanvas'];
+    if (!graph) return;
+    
+    const isCorrect = graph.validateSelection();
+    graph.showFeedback(isCorrect);
+    
+    const resultEl = document.getElementById('graphPointSlopeResult');
+    if (resultEl) {
+        if (isCorrect) {
+            resultEl.textContent = '✓ Correct! You selected the right points on the line.';
+            resultEl.className = 'result-area success';
+            updateStats('graphPointSlope', true);
+        } else {
+            resultEl.textContent = `✗ Incorrect. The correct points are shown in green with a dashed line.`;
+            resultEl.className = 'result-area error';
+            updateStats('graphPointSlope', false);
+        }
+    }
+    
+    const nextBtn = document.getElementById('graphPointSlopeNext');
+    if (nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+/**
+ * Handle Graph Parallel - Generate Question
+ */
+function handleGraphParallelGenerate() {
+    const question = generateGraphParallelQuestion();
+    currentGraphQuestion = question;
+    currentGraphQuestion.currentStep = 0;  // Track which step we're on
+    
+    const questionEl = document.getElementById('graphParallelQuestion');
+    if (questionEl) {
+        questionEl.textContent = question.question;
+    }
+    
+    // Show step 1
+    const stepEl = document.getElementById('graphParallelStep');
+    if (stepEl) {
+        stepEl.textContent = question.steps[0].instruction;
+    }
+    
+    // Initialize with step 1 points
+    initializeInteractiveGraph('graphParallelCanvas', question.steps[0]);
+    
+    const resultEl = document.getElementById('graphParallelResult');
+    if (resultEl) {
+        resultEl.textContent = '';
+        resultEl.className = 'result-area';
+    }
+}
+
+/**
+ * Handle Graph Parallel - Submit Answer
+ */
+function handleGraphParallelSubmit() {
+    if (!currentGraphQuestion) return;
+    
+    const graph = interactiveGraphs['graphParallelCanvas'];
+    if (!graph) return;
+    
+    const currentStep = currentGraphQuestion.currentStep || 0;
+    const isCorrect = graph.validateSelection();
+    
+    if (isCorrect && currentStep === 0) {
+        // Step 1 correct, move to step 2
+        currentGraphQuestion.currentStep = 1;
+        
+        const resultEl = document.getElementById('graphParallelResult');
+        if (resultEl) {
+            resultEl.textContent = '✓ Step 1 complete! Now draw the parallel line.';
+            resultEl.className = 'result-area success';
+        }
+        
+        // Show step 2 instruction
+        const stepEl = document.getElementById('graphParallelStep');
+        if (stepEl) {
+            stepEl.textContent = currentGraphQuestion.steps[1].instruction;
+        }
+        
+        // Keep step 1 line, add step 2 points
+        const step1Line = { kind: 'slope', m: currentGraphQuestion.steps[0].correctPoints[0].x !== currentGraphQuestion.steps[0].correctPoints[1].x ? 
+            (currentGraphQuestion.steps[0].correctPoints[1].y - currentGraphQuestion.steps[0].correctPoints[0].y) / 
+            (currentGraphQuestion.steps[0].correctPoints[1].x - currentGraphQuestion.steps[0].correctPoints[0].x) : Infinity,
+            b: currentGraphQuestion.steps[0].correctPoints[0].y
+        };
+        graph.addLine(step1Line);
+        
+        // Reset for step 2
+        graph.setAvailablePoints(currentGraphQuestion.steps[1].availablePoints);
+        graph.setCorrectPoints(currentGraphQuestion.steps[1].correctPoints);
+        graph.resetSelection();
+        
+    } else if (currentStep === 1) {
+        // Final validation
+        graph.showFeedback(isCorrect);
+        
+        const resultEl = document.getElementById('graphParallelResult');
+        if (resultEl) {
+            if (isCorrect) {
+                resultEl.textContent = '✓ Excellent! Both lines are correct and parallel.';
+                resultEl.className = 'result-area success';
+                updateStats('graphParallel', true);
+            } else {
+                resultEl.textContent = '✗ Incorrect. The correct parallel line is shown in green.';
+                resultEl.className = 'result-area error';
+                updateStats('graphParallel', false);
+            }
+        }
+        
+        const nextBtn = document.getElementById('graphParallelNext');
+        if (nextBtn) nextBtn.style.display = 'inline-block';
+    } else {
+        // Step 1 incorrect
+        graph.showFeedback(false);
+        const resultEl = document.getElementById('graphParallelResult');
+        if (resultEl) {
+            resultEl.textContent = '✗ Incorrect. Try again or click Next for a new question.';
+            resultEl.className = 'result-area error';
+        }
+    }
+}
+
+/**
+ * Handle Graph Perpendicular - Generate Question
+ */
+function handleGraphPerpendicularGenerate() {
+    const question = generateGraphPerpendicularQuestion();
+    currentGraphQuestion = question;
+    currentGraphQuestion.currentStep = 0;
+    
+    const questionEl = document.getElementById('graphPerpendicularQuestion');
+    if (questionEl) {
+        questionEl.textContent = question.question;
+    }
+    
+    const stepEl = document.getElementById('graphPerpendicularStep');
+    if (stepEl) {
+        stepEl.textContent = question.steps[0].instruction;
+    }
+    
+    initializeInteractiveGraph('graphPerpendicularCanvas', question.steps[0]);
+    
+    const resultEl = document.getElementById('graphPerpendicularResult');
+    if (resultEl) {
+        resultEl.textContent = '';
+        resultEl.className = 'result-area';
+    }
+}
+
+/**
+ * Handle Graph Perpendicular - Submit Answer
+ */
+function handleGraphPerpendicularSubmit() {
+    if (!currentGraphQuestion) return;
+    
+    const graph = interactiveGraphs['graphPerpendicularCanvas'];
+    if (!graph) return;
+    
+    const currentStep = currentGraphQuestion.currentStep || 0;
+    const isCorrect = graph.validateSelection();
+    
+    if (isCorrect && currentStep === 0) {
+        // Step 1 correct, move to step 2
+        currentGraphQuestion.currentStep = 1;
+        
+        const resultEl = document.getElementById('graphPerpendicularResult');
+        if (resultEl) {
+            resultEl.textContent = '✓ Step 1 complete! Now draw the perpendicular line.';
+            resultEl.className = 'result-area success';
+        }
+        
+        const stepEl = document.getElementById('graphPerpendicularStep');
+        if (stepEl) {
+            stepEl.textContent = currentGraphQuestion.steps[1].instruction;
+        }
+        
+        // Add step 1 line
+        const step1Line = { kind: 'slope', m: currentGraphQuestion.steps[0].correctPoints[0].x !== currentGraphQuestion.steps[0].correctPoints[1].x ? 
+            (currentGraphQuestion.steps[0].correctPoints[1].y - currentGraphQuestion.steps[0].correctPoints[0].y) / 
+            (currentGraphQuestion.steps[0].correctPoints[1].x - currentGraphQuestion.steps[0].correctPoints[0].x) : Infinity,
+            b: currentGraphQuestion.steps[0].correctPoints[0].y
+        };
+        graph.addLine(step1Line);
+        
+        // Reset for step 2
+        graph.setAvailablePoints(currentGraphQuestion.steps[1].availablePoints);
+        graph.setCorrectPoints(currentGraphQuestion.steps[1].correctPoints);
+        graph.resetSelection();
+        
+    } else if (currentStep === 1) {
+        graph.showFeedback(isCorrect);
+        
+        const resultEl = document.getElementById('graphPerpendicularResult');
+        if (resultEl) {
+            if (isCorrect) {
+                resultEl.textContent = '✓ Excellent! Both lines are correct and perpendicular.';
+                resultEl.className = 'result-area success';
+                updateStats('graphPerpendicular', true);
+            } else {
+                resultEl.textContent = '✗ Incorrect. The correct perpendicular line is shown in green.';
+                resultEl.className = 'result-area error';
+                updateStats('graphPerpendicular', false);
+            }
+        }
+        
+        const nextBtn = document.getElementById('graphPerpendicularNext');
+        if (nextBtn) nextBtn.style.display = 'inline-block';
+    } else {
+        graph.showFeedback(false);
+        const resultEl = document.getElementById('graphPerpendicularResult');
+        if (resultEl) {
+            resultEl.textContent = '✗ Incorrect. Try again or click Next for a new question.';
+            resultEl.className = 'result-area error';
+        }
+    }
+}
+
+/**
+ * Handle Graph Absolute Value - Generate Question
+ */
+function handleGraphAbsoluteValueGenerate() {
+    const question = generateGraphAbsoluteValueQuestion();
+    currentGraphQuestion = question;
+    
+    const questionEl = document.getElementById('graphAbsoluteValueQuestion');
+    if (questionEl) {
+        questionEl.textContent = question.question;
+    }
+    
+    // Initialize graph - note: absolute value needs 3 points, not 2
+    const graph = initializeInteractiveGraph('graphAbsoluteValueCanvas', question);
+    // Modify the graph to allow 3 points instead of 2
+    graph.maxPoints = 3;
+    
+    const resultEl = document.getElementById('graphAbsoluteValueResult');
+    if (resultEl) {
+        resultEl.textContent = '';
+        resultEl.className = 'result-area';
+    }
+}
+
+/**
+ * Handle Graph Absolute Value - Submit Answer
+ */
+function handleGraphAbsoluteValueSubmit() {
+    if (!currentGraphQuestion) return;
+    
+    const graph = interactiveGraphs['graphAbsoluteValueCanvas'];
+    if (!graph) return;
+    
+    // Check if 3 points selected
+    const selectedPoints = graph.getSelectedPoints();
+    if (selectedPoints.length !== 3) {
+        const resultEl = document.getElementById('graphAbsoluteValueResult');
+        if (resultEl) {
+            resultEl.textContent = '⚠️ Please select exactly 3 points (vertex and 2 side points).';
+            resultEl.className = 'result-area';
+        }
+        return;
+    }
+    
+    // Validate: all 3 selected points must be in the correct points
+    const isCorrect = selectedPoints.every(sp => 
+        currentGraphQuestion.correctPoints.some(cp => cp.x === sp.x && cp.y === sp.y)
+    );
+    
+    graph.showFeedback(isCorrect);
+    
+    const resultEl = document.getElementById('graphAbsoluteValueResult');
+    if (resultEl) {
+        if (isCorrect) {
+            resultEl.textContent = '✓ Correct! You selected the vertex and correct side points.';
+            resultEl.className = 'result-area success';
+            updateStats('graphAbsoluteValue', true);
+        } else {
+            resultEl.textContent = `✗ Incorrect. The correct points are shown in green.`;
+            resultEl.className = 'result-area error';
+            updateStats('graphAbsoluteValue', false);
+        }
+    }
+    
+    const nextBtn = document.getElementById('graphAbsoluteValueNext');
+    if (nextBtn) nextBtn.style.display = 'inline-block';
+}
+
+// ============================================================================
 // MILESTONE 16: Enhanced Graph Component (Canvas-Based)
 // ============================================================================
 
@@ -7179,6 +7584,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 r.className = 'result-area';
             });
             
+            // MILESTONE 19: Initialize interactive graphing tabs when opened
+            if (tab === 'graph-slopeintercept') {
+                handleGraphSlopeInterceptGenerate();
+            } else if (tab === 'graph-pointslope') {
+                handleGraphPointSlopeGenerate();
+            } else if (tab === 'graph-parallel') {
+                handleGraphParallelGenerate();
+            } else if (tab === 'graph-perpendicular') {
+                handleGraphPerpendicularGenerate();
+            } else if (tab === 'graph-absolutevalue') {
+                handleGraphAbsoluteValueGenerate();
+            }
+            
             // Hide all hint panels when switching tabs
             hideHints();
             
@@ -7471,6 +7889,68 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('absoluteValueSubmit')?.addEventListener('click', () => {
         handleAbsoluteValueSubmit();
+    });
+    
+    // MILESTONE 19: Interactive Graphing - Event Listeners
+    
+    // Graph: Slope-Intercept
+    document.getElementById('graphSlopeInterceptSubmit')?.addEventListener('click', () => {
+        handleGraphSlopeInterceptSubmit();
+    });
+    document.getElementById('graphSlopeInterceptNext')?.addEventListener('click', () => {
+        handleGraphSlopeInterceptGenerate();
+        document.getElementById('graphSlopeInterceptNext').style.display = 'none';
+    });
+    document.getElementById('graphSlopeInterceptHint')?.addEventListener('click', () => {
+        alert('Hint: Find the y-intercept (where x=0), then use the slope to find another point.');
+    });
+    
+    // Graph: Point-Slope
+    document.getElementById('graphPointSlopeSubmit')?.addEventListener('click', () => {
+        handleGraphPointSlopeSubmit();
+    });
+    document.getElementById('graphPointSlopeNext')?.addEventListener('click', () => {
+        handleGraphPointSlopeGenerate();
+        document.getElementById('graphPointSlopeNext').style.display = 'none';
+    });
+    document.getElementById('graphPointSlopeHint')?.addEventListener('click', () => {
+        alert('Hint: The given point from the equation must be one of your selected points.');
+    });
+    
+    // Graph: Parallel
+    document.getElementById('graphParallelSubmit')?.addEventListener('click', () => {
+        handleGraphParallelSubmit();
+    });
+    document.getElementById('graphParallelNext')?.addEventListener('click', () => {
+        handleGraphParallelGenerate();
+        document.getElementById('graphParallelNext').style.display = 'none';
+    });
+    document.getElementById('graphParallelHint')?.addEventListener('click', () => {
+        alert('Hint: Parallel lines have the same slope. First draw the base line, then find points with the same slope through the given point.');
+    });
+    
+    // Graph: Perpendicular
+    document.getElementById('graphPerpendicularSubmit')?.addEventListener('click', () => {
+        handleGraphPerpendicularSubmit();
+    });
+    document.getElementById('graphPerpendicularNext')?.addEventListener('click', () => {
+        handleGraphPerpendicularGenerate();
+        document.getElementById('graphPerpendicularNext').style.display = 'none';
+    });
+    document.getElementById('graphPerpendicularHint')?.addEventListener('click', () => {
+        alert('Hint: Perpendicular lines have negative reciprocal slopes. If m=2, perpendicular slope is -1/2.');
+    });
+    
+    // Graph: Absolute Value
+    document.getElementById('graphAbsoluteValueSubmit')?.addEventListener('click', () => {
+        handleGraphAbsoluteValueSubmit();
+    });
+    document.getElementById('graphAbsoluteValueNext')?.addEventListener('click', () => {
+        handleGraphAbsoluteValueGenerate();
+        document.getElementById('graphAbsoluteValueNext').style.display = 'none';
+    });
+    document.getElementById('graphAbsoluteValueHint')?.addEventListener('click', () => {
+        alert('Hint: Find the vertex first (the V point), then select one point on each side of the V.');
     });
     
     // Start timer on input and reset question answered flag when input changes
