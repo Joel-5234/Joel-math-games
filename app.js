@@ -1390,12 +1390,11 @@ function displayChallengeQuestion() {
                 const relationship = question.data.relationship;
                 const relationshipDistractors = generateRelationshipDistractors(relationship);
                 question.options = [
-                    { label: 'A', value: relationship, correct: true },
-                    { label: 'B', value: relationshipDistractors[0], correct: false },
-                    { label: 'C', value: relationshipDistractors[1], correct: false },
-                    { label: 'D', value: relationshipDistractors[2], correct: false }
+                    { value: relationship, correct: true },
+                    { value: relationshipDistractors[0], correct: false },
+                    { value: relationshipDistractors[1], correct: false },
+                    { value: relationshipDistractors[2], correct: false }
                 ].sort(() => Math.random() - 0.5);
-                question.correctAnswerLabel = question.options.find(opt => opt.correct).label;
             }
             
             renderRadioOptions('challengeRelationshipOptions', question.options, 'challengeRelationship', null);
@@ -1423,12 +1422,11 @@ function displayChallengeQuestion() {
                 const equationDistractors = generateEquationDistractors(resultLine, question.data.baseLine, question.data.point, true);
                 const correctEq = formatEquation(resultLine);
                 question.options = [
-                    { label: 'A', value: correctEq, correct: true },
-                    { label: 'B', value: equationDistractors[0], correct: false },
-                    { label: 'C', value: equationDistractors[1], correct: false },
-                    { label: 'D', value: equationDistractors[2], correct: false }
+                    { value: correctEq, correct: true },
+                    { value: equationDistractors[0], correct: false },
+                    { value: equationDistractors[1], correct: false },
+                    { value: equationDistractors[2], correct: false }
                 ].sort(() => Math.random() - 0.5);
-                question.correctAnswerLabel = question.options.find(opt => opt.correct).label;
             }
             
             renderRadioOptions('challengeParallelOptions', question.options, 'challengeParallel', null);
@@ -1456,12 +1454,11 @@ function displayChallengeQuestion() {
                 const equationDistractors = generateEquationDistractors(resultLine, question.data.baseLine, question.data.point, false);
                 const correctEq = formatEquation(resultLine);
                 question.options = [
-                    { label: 'A', value: correctEq, correct: true },
-                    { label: 'B', value: equationDistractors[0], correct: false },
-                    { label: 'C', value: equationDistractors[1], correct: false },
-                    { label: 'D', value: equationDistractors[2], correct: false }
+                    { value: correctEq, correct: true },
+                    { value: equationDistractors[0], correct: false },
+                    { value: equationDistractors[1], correct: false },
+                    { value: equationDistractors[2], correct: false }
                 ].sort(() => Math.random() - 0.5);
-                question.correctAnswerLabel = question.options.find(opt => opt.correct).label;
             }
             
             renderRadioOptions('challengePerpendicularOptions', question.options, 'challengePerpendicular', null);
@@ -3661,19 +3658,16 @@ function handleRelationshipCalculate() {
         // Generate multiple choice options
         const relationshipDistractors = generateRelationshipDistractors(relationship);
         const options = [
-            { label: 'A', value: relationship, correct: true },
-            { label: 'B', value: relationshipDistractors[0], correct: false },
-            { label: 'C', value: relationshipDistractors[1], correct: false },
-            { label: 'D', value: relationshipDistractors[2], correct: false }
+            { value: relationship, correct: true },
+            { value: relationshipDistractors[0], correct: false },
+            { value: relationshipDistractors[1], correct: false },
+            { value: relationshipDistractors[2], correct: false }
         ].sort(() => Math.random() - 0.5);
-        
-        const correctLabel = options.find(opt => opt.correct).label;
         
         // Store question data
         currentQuestionData = {
             type: 'relationship',
-            options: options,
-            correctLabel: correctLabel
+            options: options
         };
         
         // Validate required elements exist
@@ -3723,19 +3717,31 @@ function handleRelationshipSubmit() {
         return;
     }
     
-    // Process answer using PracticeMode utility
-    const selectedAnswers = { relationship: selected.value };
-    const correctAnswers = { relationship: currentQuestionData.correctLabel };
-    const optionContainerIds = ['relationshipOptions'];
-    const answerResult = PracticeMode.processAnswer('relationship', selectedAnswers, correctAnswers, optionContainerIds);
+    // Check if answer is correct using dataset.correct
+    const isCorrect = String(selected.dataset.correct) === 'true';
+    
+    // Disable all radio buttons
+    document.querySelectorAll('input[name="relationship"]').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    // Highlight correct/incorrect options
+    document.querySelectorAll('#relationshipOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio && radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio && radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
     
     // Generate feedback
-    if (answerResult.isCorrect) {
+    if (isCorrect) {
         showResult('Correct! ✓', 'success');
         updateStats('relationship', true);
     } else {
         const correctOption = currentQuestionData.options.find(opt => opt.correct);
-        showResult(`Incorrect. Correct answer: ${correctOption.value} (${correctOption.label})`, 'error');
+        showResult(`Incorrect. Correct answer: ${correctOption.value}`, 'error');
         updateStats('relationship', false);
     }
     
@@ -3772,19 +3778,16 @@ function handleParallelCalculate() {
         const correctEq = formatEquation(resultLine);
         
         const options = [
-            { label: 'A', value: correctEq, correct: true },
-            { label: 'B', value: equationDistractors[0], correct: false },
-            { label: 'C', value: equationDistractors[1], correct: false },
-            { label: 'D', value: equationDistractors[2], correct: false }
+            { value: correctEq, correct: true },
+            { value: equationDistractors[0], correct: false },
+            { value: equationDistractors[1], correct: false },
+            { value: equationDistractors[2], correct: false }
         ].sort(() => Math.random() - 0.5);
-        
-        const correctLabel = options.find(opt => opt.correct).label;
         
         // Store question data
         currentQuestionData = {
             type: 'parallel',
-            options: options,
-            correctLabel: correctLabel
+            options: options
         };
         
         // Validate required elements exist
@@ -3834,19 +3837,31 @@ function handleParallelSubmit() {
         return;
     }
     
-    // Process answer using PracticeMode utility
-    const selectedAnswers = { parallel: selected.value };
-    const correctAnswers = { parallel: currentQuestionData.correctLabel };
-    const optionContainerIds = ['parallelOptions'];
-    const answerResult = PracticeMode.processAnswer('parallel', selectedAnswers, correctAnswers, optionContainerIds);
+    // Check if answer is correct using dataset.correct
+    const isCorrect = String(selected.dataset.correct) === 'true';
+    
+    // Disable all radio buttons
+    document.querySelectorAll('input[name="parallel"]').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    // Highlight correct/incorrect options
+    document.querySelectorAll('#parallelOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio && radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio && radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
     
     // Generate feedback
-    if (answerResult.isCorrect) {
+    if (isCorrect) {
         showResult('Correct! ✓', 'success');
         updateStats('parallel', true);
     } else {
         const correctOption = currentQuestionData.options.find(opt => opt.correct);
-        showResult(`Incorrect. Correct answer: ${correctOption.value} (${correctOption.label})`, 'error');
+        showResult(`Incorrect. Correct answer: ${correctOption.value}`, 'error');
         updateStats('parallel', false);
     }
     
@@ -3883,19 +3898,16 @@ function handlePerpendicularCalculate() {
         const correctEq = formatEquation(resultLine);
         
         const options = [
-            { label: 'A', value: correctEq, correct: true },
-            { label: 'B', value: equationDistractors[0], correct: false },
-            { label: 'C', value: equationDistractors[1], correct: false },
-            { label: 'D', value: equationDistractors[2], correct: false }
+            { value: correctEq, correct: true },
+            { value: equationDistractors[0], correct: false },
+            { value: equationDistractors[1], correct: false },
+            { value: equationDistractors[2], correct: false }
         ].sort(() => Math.random() - 0.5);
-        
-        const correctLabel = options.find(opt => opt.correct).label;
         
         // Store question data
         currentQuestionData = {
             type: 'perpendicular',
-            options: options,
-            correctLabel: correctLabel
+            options: options
         };
         
         // Validate required elements exist
@@ -3945,19 +3957,31 @@ function handlePerpendicularSubmit() {
         return;
     }
     
-    // Process answer using PracticeMode utility
-    const selectedAnswers = { perpendicular: selected.value };
-    const correctAnswers = { perpendicular: currentQuestionData.correctLabel };
-    const optionContainerIds = ['perpendicularOptions'];
-    const answerResult = PracticeMode.processAnswer('perpendicular', selectedAnswers, correctAnswers, optionContainerIds);
+    // Check if answer is correct using dataset.correct
+    const isCorrect = String(selected.dataset.correct) === 'true';
+    
+    // Disable all radio buttons
+    document.querySelectorAll('input[name="perpendicular"]').forEach(radio => {
+        radio.disabled = true;
+    });
+    
+    // Highlight correct/incorrect options
+    document.querySelectorAll('#perpendicularOptions .radio-option').forEach(opt => {
+        const radio = opt.querySelector('input');
+        if (radio && radio.dataset.correct === 'true') {
+            opt.classList.add('correct');
+        } else if (radio && radio.checked && radio.dataset.correct === 'false') {
+            opt.classList.add('incorrect');
+        }
+    });
     
     // Generate feedback
-    if (answerResult.isCorrect) {
+    if (isCorrect) {
         showResult('Correct! ✓', 'success');
         updateStats('perpendicular', true);
     } else {
         const correctOption = currentQuestionData.options.find(opt => opt.correct);
-        showResult(`Incorrect. Correct answer: ${correctOption.value} (${correctOption.label})`, 'error');
+        showResult(`Incorrect. Correct answer: ${correctOption.value}`, 'error');
         updateStats('perpendicular', false);
     }
     
@@ -4770,14 +4794,12 @@ function handleInterceptCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: currentInterceptData.correctAnswer, correct: true },
-            { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
-            { label: 'C', value: distractors[1] || '(1, 0)', correct: false },
-            { label: 'D', value: distractors[2] || '(0, 1)', correct: false }
+            { value: currentInterceptData.correctAnswer, correct: true },
+            { value: distractors[0] || '(0, 0)', correct: false },
+            { value: distractors[1] || '(1, 0)', correct: false },
+            { value: distractors[2] || '(0, 1)', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        currentInterceptData.correctLabel = options[correctIndex].label;
         currentInterceptData.options = options;
         
         // Display question
@@ -4856,14 +4878,12 @@ function handleRateOfChangeCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: formatSlopeValue(targetRate.rate), correct: true },
-            { label: 'B', value: distractors[0] || formatSlopeValue(0), correct: false },
-            { label: 'C', value: distractors[1] || formatSlopeValue(1), correct: false },
-            { label: 'D', value: distractors[2] || formatSlopeValue(-1), correct: false }
+            { value: formatSlopeValue(targetRate.rate), correct: true },
+            { value: distractors[0] || formatSlopeValue(0), correct: false },
+            { value: distractors[1] || formatSlopeValue(1), correct: false },
+            { value: distractors[2] || formatSlopeValue(-1), correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        currentRateOfChangeData.correctLabel = options[correctIndex].label;
         currentRateOfChangeData.options = options;
         
         // Display question
@@ -4940,14 +4960,12 @@ function handleLinearFunctionCalculate() {
         // Create options
         const correctAnswer = result.isLinear ? `Yes - ${result.explanation}` : `No - ${result.explanation}`;
         const options = [
-            { label: 'A', value: correctAnswer, correct: true },
-            { label: 'B', value: distractors[0] || 'No', correct: false },
-            { label: 'C', value: distractors[1] || 'Yes', correct: false },
-            { label: 'D', value: distractors[2] || 'Maybe', correct: false }
+            { value: correctAnswer, correct: true },
+            { value: distractors[0] || 'No', correct: false },
+            { value: distractors[1] || 'Yes', correct: false },
+            { value: distractors[2] || 'Maybe', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        currentLinearFunctionData.correctLabel = options[correctIndex].label;
         currentLinearFunctionData.options = options;
         currentLinearFunctionData.correctAnswer = correctAnswer;
         
@@ -5031,16 +5049,13 @@ function handleSlopeInterceptMBCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: correctEq, correct: true },
-            { label: 'B', value: distractors[0] || 'y = x', correct: false },
-            { label: 'C', value: distractors[1] || 'y = -x', correct: false },
-            { label: 'D', value: distractors[2] || 'y = 2x + 1', correct: false }
+            { value: correctEq, correct: true },
+            { value: distractors[0] || 'y = x', correct: false },
+            { value: distractors[1] || 'y = -x', correct: false },
+            { value: distractors[2] || 'y = 2x + 1', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        const correctLabel = options[correctIndex].label;
-        
-        currentSlopeInterceptMBData = { m, b, correctEq, correctLabel, options };
+        currentSlopeInterceptMBData = { m, b, correctEq, options };
         
         // Display question
         PracticeMode.showContainer('slopeInterceptMBQuestionContainer', 'slopeInterceptMBSubmit');
@@ -5141,16 +5156,13 @@ function handleSlopeInterceptMPointCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: correctEq, correct: true },
-            { label: 'B', value: distractors[0] || 'y = x', correct: false },
-            { label: 'C', value: distractors[1] || 'y = -x', correct: false },
-            { label: 'D', value: distractors[2] || 'y = 2x + 1', correct: false }
+            { value: correctEq, correct: true },
+            { value: distractors[0] || 'y = x', correct: false },
+            { value: distractors[1] || 'y = -x', correct: false },
+            { value: distractors[2] || 'y = 2x + 1', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        const correctLabel = options[correctIndex].label;
-        
-        currentSlopeInterceptMPointData = { m, point, correctEq, correctLabel, options, line };
+        currentSlopeInterceptMPointData = { m, point, correctEq, options, line };
         
         // Display question
         PracticeMode.showContainer('slopeInterceptMPointQuestionContainer', 'slopeInterceptMPointSubmit');
@@ -5235,16 +5247,13 @@ function handleTwoPointCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: correctEq, correct: true },
-            { label: 'B', value: distractors[0] || 'y = x', correct: false },
-            { label: 'C', value: distractors[1] || 'y = -x', correct: false },
-            { label: 'D', value: distractors[2] || 'y = 2x + 1', correct: false }
+            { value: correctEq, correct: true },
+            { value: distractors[0] || 'y = x', correct: false },
+            { value: distractors[1] || 'y = -x', correct: false },
+            { value: distractors[2] || 'y = 2x + 1', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        const correctLabel = options[correctIndex].label;
-        
-        currentTwoPointData = { p1, p2, line, correctEq, correctLabel, options };
+        currentTwoPointData = { p1, p2, line, correctEq, options };
         
         // Display question
         PracticeMode.showContainer('twoPointQuestionContainer', 'twoPointSubmit');
@@ -5321,16 +5330,13 @@ function handlePointSlopeBuildCalculate() {
         
         // Create options
         const options = [
-            { label: 'A', value: correctEq, correct: true },
-            { label: 'B', value: distractors[0] || 'y - 1 = 2(x - 1)', correct: false },
-            { label: 'C', value: distractors[1] || 'y + 1 = 2(x + 1)', correct: false },
-            { label: 'D', value: distractors[2] || 'y - 2 = 2(x - 2)', correct: false }
+            { value: correctEq, correct: true },
+            { value: distractors[0] || 'y - 1 = 2(x - 1)', correct: false },
+            { value: distractors[1] || 'y + 1 = 2(x + 1)', correct: false },
+            { value: distractors[2] || 'y - 2 = 2(x - 2)', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        const correctLabel = options[correctIndex].label;
-        
-        currentPointSlopeData = { m, point, correctEq, correctLabel, options };
+        currentPointSlopeData = { m, point, correctEq, options };
         
         // Display question
         PracticeMode.showContainer('pointSlopeQuestionContainer', 'pointSlopeSubmit');
@@ -5403,16 +5409,13 @@ function handleAbsoluteValueCalculate() {
             // What is the vertex
             const distractors = generateAbsoluteValueDistractors(vertex, direction);
             const options = [
-                { label: 'A', value: `(${vertex.x}, ${vertex.y})`, correct: true },
-                { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
-                { label: 'C', value: distractors[1] || '(1, 1)', correct: false },
-                { label: 'D', value: distractors[2] || '(-1, -1)', correct: false }
+                { value: `(${vertex.x}, ${vertex.y})`, correct: true },
+                { value: distractors[0] || '(0, 0)', correct: false },
+                { value: distractors[1] || '(1, 1)', correct: false },
+                { value: distractors[2] || '(-1, -1)', correct: false }
             ].sort(() => Math.random() - 0.5);
             
-            const correctIndex = options.findIndex(opt => opt.correct);
-            const correctLabel = options[correctIndex].label;
-            
-            currentAbsoluteValueData = { a, b, c, d, vertex, direction, questionType: 2, correctLabel, options };
+            currentAbsoluteValueData = { a, b, c, d, vertex, direction, questionType: 2, options };
             
             // Draw graph
             const canvas = document.getElementById('absoluteValueGraph');
@@ -5431,16 +5434,13 @@ function handleAbsoluteValueCalculate() {
             // Is graph opening up or down
             const distractors = generateAbsoluteValueDirectionDistractors(direction);
             const options = [
-                { label: 'A', value: direction, correct: true },
-                { label: 'B', value: distractors[0] || 'up', correct: false },
-                { label: 'C', value: distractors[1] || 'down', correct: false },
-                { label: 'D', value: distractors[2] || 'neither', correct: false }
+                { value: direction, correct: true },
+                { value: distractors[0] || 'up', correct: false },
+                { value: distractors[1] || 'down', correct: false },
+                { value: distractors[2] || 'neither', correct: false }
             ].sort(() => Math.random() - 0.5);
             
-            const correctIndex = options.findIndex(opt => opt.correct);
-            const correctLabel = options[correctIndex].label;
-            
-            currentAbsoluteValueData = { a, b, c, d, vertex, direction, questionType: 3, correctLabel, options };
+            currentAbsoluteValueData = { a, b, c, d, vertex, direction, questionType: 3, options };
             
             // Draw graph
             const canvas = document.getElementById('absoluteValueGraph');
@@ -5517,14 +5517,12 @@ function handleStandardFormCalculate() {
         
         // Create options for equation
         const options = [
-            { label: 'A', value: result.equation, correct: true },
-            { label: 'B', value: distractors[0] || 'x + y = 0', correct: false },
-            { label: 'C', value: distractors[1] || 'x - y = 0', correct: false },
-            { label: 'D', value: distractors[2] || 'y = x', correct: false }
+            { value: result.equation, correct: true },
+            { value: distractors[0] || 'x + y = 0', correct: false },
+            { value: distractors[1] || 'x - y = 0', correct: false },
+            { value: distractors[2] || 'y = x', correct: false }
         ].sort(() => Math.random() - 0.5);
         
-        const correctIndex = options.findIndex(opt => opt.correct);
-        currentStandardFormData.correctLabel = options[correctIndex].label;
         currentStandardFormData.options = options;
         
         // Display question
@@ -5792,20 +5790,16 @@ function generatePointSlopeQuestion() {
     const distractors = generatePointSlopeDistractors(correctEq, m, point);
     
     const options = [
-        { label: 'A', value: correctEq, correct: true },
-        { label: 'B', value: distractors[0] || 'y - 1 = 2(x - 1)', correct: false },
-        { label: 'C', value: distractors[1] || 'y + 1 = 2(x + 1)', correct: false },
-        { label: 'D', value: distractors[2] || 'y - 2 = 2(x - 2)', correct: false }
+        { value: correctEq, correct: true },
+        { value: distractors[0] || 'y - 1 = 2(x - 1)', correct: false },
+        { value: distractors[1] || 'y + 1 = 2(x + 1)', correct: false },
+        { value: distractors[2] || 'y - 2 = 2(x - 2)', correct: false }
     ].sort(() => Math.random() - 0.5);
-    
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
     
     return {
         type: 'pointSlope',
         question: `What is the point-slope form of the line with slope ${formatSlopeValue(m)} that passes through point (${point.x}, ${point.y})?`,
         options: options,
-        correctAnswerLabel: correctLabel,
         correctAnswer: correctEq
     };
 }
@@ -5826,39 +5820,31 @@ function generateAbsoluteValueQuestion() {
     if (questionType === 2) {
         const distractors = generateAbsoluteValueDistractors(vertex, direction);
         const options = [
-            { label: 'A', value: `(${vertex.x}, ${vertex.y})`, correct: true },
-            { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
-            { label: 'C', value: distractors[1] || '(1, 1)', correct: false },
-            { label: 'D', value: distractors[2] || '(-1, -1)', correct: false }
+            { value: `(${vertex.x}, ${vertex.y})`, correct: true },
+            { value: distractors[0] || '(0, 0)', correct: false },
+            { value: distractors[1] || '(1, 1)', correct: false },
+            { value: distractors[2] || '(-1, -1)', correct: false }
         ].sort(() => Math.random() - 0.5);
-        
-        const correctIndex = options.findIndex(opt => opt.correct);
-        const correctLabel = options[correctIndex].label;
         
         return {
             type: 'absoluteValue',
             question: `What is the vertex of the graph of ${eqStr}?`,
             options: options,
-            correctAnswerLabel: correctLabel,
             correctAnswer: `(${vertex.x}, ${vertex.y})`
         };
     } else {
         const distractors = generateAbsoluteValueDirectionDistractors(direction);
         const options = [
-            { label: 'A', value: direction, correct: true },
-            { label: 'B', value: distractors[0] || 'up', correct: false },
-            { label: 'C', value: distractors[1] || 'down', correct: false },
-            { label: 'D', value: distractors[2] || 'neither', correct: false }
+            { value: direction, correct: true },
+            { value: distractors[0] || 'up', correct: false },
+            { value: distractors[1] || 'down', correct: false },
+            { value: distractors[2] || 'neither', correct: false }
         ].sort(() => Math.random() - 0.5);
-        
-        const correctIndex = options.findIndex(opt => opt.correct);
-        const correctLabel = options[correctIndex].label;
         
         return {
             type: 'absoluteValue',
             question: `Is the graph of ${eqStr} opening up or down?`,
             options: options,
-            correctAnswerLabel: correctLabel,
             correctAnswer: direction
         };
     }
@@ -5896,23 +5882,19 @@ function generateInterceptQuestion() {
     const distractors = generateInterceptDistractors(xIntercept, yIntercept, line);
     
     const options = [
-        { label: 'A', value: correctAnswer, correct: true },
-        { label: 'B', value: distractors[0] || '(0, 0)', correct: false },
-        { label: 'C', value: distractors[1] || '(1, 0)', correct: false },
-        { label: 'D', value: distractors[2] || '(0, 1)', correct: false }
+        { value: correctAnswer, correct: true },
+        { value: distractors[0] || '(0, 0)', correct: false },
+        { value: distractors[1] || '(1, 0)', correct: false },
+        { value: distractors[2] || '(0, 1)', correct: false }
     ].sort(() => Math.random() - 0.5);
-    
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
     
     return {
         type: 'intercept',
         question: `What is the ${askForX ? 'x' : 'y'}-intercept of the line ${eqStr}?`,
         display: eqStr,
-        correctAnswer: `${correctAnswer} (${correctLabel})`,
+        correctAnswer: correctAnswer,
         data: { line, xIntercept, yIntercept },
-        options: options,
-        correctAnswerLabel: correctLabel
+        options: options
     };
 }
 
@@ -5938,23 +5920,19 @@ function generateRateOfChangeQuestion() {
     
     const distractors = generateRateOfChangeDistractors(targetRate.rate, rates);
     const options = [
-        { label: 'A', value: formatSlopeValue(targetRate.rate), correct: true },
-        { label: 'B', value: distractors[0] || formatSlopeValue(0), correct: false },
-        { label: 'C', value: distractors[1] || formatSlopeValue(1), correct: false },
-        { label: 'D', value: distractors[2] || formatSlopeValue(-1), correct: false }
+        { value: formatSlopeValue(targetRate.rate), correct: true },
+        { value: distractors[0] || formatSlopeValue(0), correct: false },
+        { value: distractors[1] || formatSlopeValue(1), correct: false },
+        { value: distractors[2] || formatSlopeValue(-1), correct: false }
     ].sort(() => Math.random() - 0.5);
-    
-    const correctIndex = options.findIndex(opt => opt.correct);
-    const correctLabel = options[correctIndex].label;
     
     return {
         type: 'rateOfChange',
         question: `During which time interval did the volume ${askForGreatest ? 'increase' : 'decrease'} at the greatest rate?`,
         display: table,
-        correctAnswer: `${targetRate.rate} (${correctLabel})`,
+        correctAnswer: formatSlopeValue(targetRate.rate),
         data: { table, rates, targetRate },
-        options: options,
-        correctAnswerLabel: correctLabel
+        options: options
     };
 }
 
