@@ -1285,12 +1285,12 @@ function mapTabToProblemType(tabName) {
         'rateofchange': 'rateOfChange',
         'linearfunction': 'linearFunction',
         'standardform': 'standardForm',
-        // MILESTONE 19: Interactive Graphing Practice
-        'graph-slopeintercept': 'graphSlopeIntercept',
-        'graph-pointslope': 'graphPointSlope',
-        'graph-parallel': 'graphParallel',
-        'graph-perpendicular': 'graphPerpendicular',
-        'graph-absolutevalue': 'graphAbsoluteValue'
+        // MILESTONE 19: Interactive Graphing Practice - MUST MATCH KEYS IN generateChallengeQuestions
+        'graph-slopeintercept': 'graph-slopeintercept',
+        'graph-pointslope': 'graph-pointslope',
+        'graph-parallel': 'graph-parallel',
+        'graph-perpendicular': 'graph-perpendicular',
+        'graph-absolutevalue': 'graph-absolutevalue'
     };
     return mapping[tabName] || 'slope';
 }
