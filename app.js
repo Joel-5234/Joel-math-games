@@ -1284,7 +1284,13 @@ function mapTabToProblemType(tabName) {
         'intercepts': 'intercept',
         'rateofchange': 'rateOfChange',
         'linearfunction': 'linearFunction',
-        'standardform': 'standardForm'
+        'standardform': 'standardForm',
+        // MILESTONE 19: Interactive Graphing Practice
+        'graph-slopeintercept': 'graphSlopeIntercept',
+        'graph-pointslope': 'graphPointSlope',
+        'graph-parallel': 'graphParallel',
+        'graph-perpendicular': 'graphPerpendicular',
+        'graph-absolutevalue': 'graphAbsoluteValue'
     };
     return mapping[tabName] || 'slope';
 }
