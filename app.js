@@ -47,12 +47,12 @@ let gameState = {
         standardForm: { correct: 0, total: 0, times: [] },
         pointSlope: { correct: 0, total: 0, times: [] },
         absoluteValue: { correct: 0, total: 0, times: [] },
-        // MILESTONE 19: Interactive Graphing Stats
-        graphSlopeIntercept: { correct: 0, total: 0, times: [] },
-        graphPointSlope: { correct: 0, total: 0, times: [] },
-        graphParallel: { correct: 0, total: 0, times: [] },
-        graphPerpendicular: { correct: 0, total: 0, times: [] },
-        graphAbsoluteValue: { correct: 0, total: 0, times: [] }
+        // MILESTONE 19: Interactive Graphing Stats (Issue #032: Use hyphenated keys to match question types)
+        'graph-slopeintercept': { correct: 0, total: 0, times: [] },
+        'graph-pointslope': { correct: 0, total: 0, times: [] },
+        'graph-parallel': { correct: 0, total: 0, times: [] },
+        'graph-perpendicular': { correct: 0, total: 0, times: [] },
+        'graph-absolutevalue': { correct: 0, total: 0, times: [] }
     }
 };
 
