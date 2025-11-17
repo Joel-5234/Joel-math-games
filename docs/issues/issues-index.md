@@ -8,6 +8,34 @@ None currently.
 
 ## Resolved Issues
 
+### Issue #032: Auto-Advance Not Working in Graphing Challenge Mode
+- **Date**: 2025-11-17 00:00:00
+- **Status**: ✅ RESOLVED
+- **Priority**: CRITICAL
+- **Severity**: High
+- **Reporter**: User
+- **Resolution Time**: 15 minutes
+- **Description**: After submitting an answer in Interactive Graphing Challenge mode, the question did not auto-advance to the next question. User had to manually navigate.
+- **Root Cause**: The `gameState.stats` object used camelCase keys (`graphPerpendicular`) but question types were hyphenated (`graph-perpendicular`), causing `updateStats()` to fail with TypeError and preventing setTimeout from executing.
+- **Fix**: Changed all graphing stats keys from camelCase to hyphenated format to match question types: `graphSlopeIntercept` → `'graph-slopeintercept'`, etc.
+- **Files Modified**: `app.js`
+- **Commits**: 1 commit (dec4776)
+- **Details**: [issue-032-20251117-000000.md](./issue-032-20251117-000000.md)
+
+### Issue #031: ReferenceError - nextChallengeQuestion Not Defined
+- **Date**: 2025-11-16 23:30:00
+- **Status**: ✅ RESOLVED
+- **Priority**: HIGH
+- **Severity**: Medium
+- **Reporter**: User
+- **Resolution Time**: 5 minutes
+- **Description**: After submitting an answer in graphing Challenge mode, a JavaScript error occurred: `ReferenceError: Can't find variable: nextChallengeQuestion`.
+- **Root Cause**: Code was calling non-existent function `nextChallengeQuestion()` instead of the correct `navigateChallenge('next')`.
+- **Fix**: Changed function call from `nextChallengeQuestion()` to `navigateChallenge('next')` at line 1714.
+- **Files Modified**: `app.js`
+- **Commits**: 1 commit (2a398d8)
+- **Details**: [issue-031-20251116-233000.md](./issue-031-20251116-233000.md)
+
 ### Issue #030: No Points Displaying in Interactive Graphing Challenge Mode
 - **Date**: 2025-11-16 22:30:00
 - **Status**: ✅ RESOLVED
@@ -204,6 +232,6 @@ None currently.
 
 ---
 
-**Total Issues**: 30 (30 resolved, 0 open)
-**Last Updated**: 2025-11-16 22:35:00
+**Total Issues**: 32 (32 resolved, 0 open)
+**Last Updated**: 2025-11-17 00:00:00
 
