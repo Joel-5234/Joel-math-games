@@ -4111,6 +4111,524 @@ function drawGraph(canvasId, line, xIntercept, yIntercept) {
 }
 
 // ============================================================================
+// MILESTONE 19: Interactive Graphing Practice
+// ============================================================================
+
+/**
+ * InteractiveGraph - Canvas-based interactive graphing component
+ * Features: Click to select points, auto-draw lines, visual feedback
+ */
+class InteractiveGraph {
+    constructor(canvasId, options = {}) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) {
+            console.error(`InteractiveGraph: Canvas not found: ${canvasId}`);
+            return;
+        }
+        
+        this.ctx = this.canvas.getContext('2d');
+        this.canvasId = canvasId;
+        
+        // Graph configuration
+        this.width = this.canvas.width || 500;
+        this.height = this.canvas.height || 500;
+        this.padding = 40;
+        this.graphWidth = this.width - 2 * this.padding;
+        this.graphHeight = this.height - 2 * this.padding;
+        
+        // Coordinate system bounds
+        this.xMin = options.xMin || -9;
+        this.xMax = options.xMax || 9;
+        this.yMin = options.yMin || -9;
+        this.yMax = options.yMax || 9;
+        this.xRange = this.xMax - this.xMin;
+        this.yRange = this.yMax - this.yMin;
+        
+        // State
+        this.availablePoints = options.availablePoints || [];  // Array of {x, y} points
+        this.correctPoints = options.correctPoints || [];      // Array of correct point objects
+        this.selectedPoints = [];                               // User's selected points (max 2)
+        this.lines = [];                                        // Lines to draw
+        this.isAnswered = false;
+        this.hitThreshold = 15;  // Pixels for hit detection
+        
+        // Callbacks
+        this.onPointSelected = options.onPointSelected || null;
+        this.onPointDeselected = options.onPointDeselected || null;
+        this.onLineDrawn = options.onLineDrawn || null;
+        
+        // Visual styles
+        this.styles = {
+            unselected: { fill: '#666', radius: 6 },
+            selected: { fill: '#0066cc', radius: 8 },
+            correct: { fill: '#00cc00', radius: 8 },
+            incorrect: { fill: '#cc0000', radius: 8 }
+        };
+        
+        // Bind event listeners
+        this.canvas.addEventListener('click', this.handleClick.bind(this));
+        this.canvas.addEventListener('dblclick', this.handleDoubleClick.bind(this));
+        
+        // Initial draw
+        this.draw();
+    }
+    
+    /**
+     * Convert graph coordinates to canvas coordinates
+     */
+    toCanvasX(x) {
+        return this.padding + ((x - this.xMin) / this.xRange) * this.graphWidth;
+    }
+    
+    toCanvasY(y) {
+        return this.padding + this.graphHeight - ((y - this.yMin) / this.yRange) * this.graphHeight;
+    }
+    
+    /**
+     * Convert canvas coordinates to graph coordinates
+     */
+    toGraphX(canvasX) {
+        return this.xMin + ((canvasX - this.padding) / this.graphWidth) * this.xRange;
+    }
+    
+    toGraphY(canvasY) {
+        return this.yMin + ((this.padding + this.graphHeight - canvasY) / this.graphHeight) * this.yRange;
+    }
+    
+    /**
+     * Handle canvas click - select point
+     */
+    handleClick(event) {
+        if (this.isAnswered) return;  // Don't allow selection after answer submitted
+        if (this.selectedPoints.length >= 2) return;  // Max 2 points
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+        
+        // Find nearest available point
+        const clickedPoint = this.findNearestPoint(canvasX, canvasY);
+        
+        if (clickedPoint && !this.isPointSelected(clickedPoint)) {
+            this.selectedPoints.push(clickedPoint);
+            this.draw();
+            
+            // Callback
+            if (this.onPointSelected) {
+                this.onPointSelected(clickedPoint, this.selectedPoints.length);
+            }
+            
+            // Auto-draw line when 2 points selected
+            if (this.selectedPoints.length === 2) {
+                this.drawUserLine();
+                if (this.onLineDrawn) {
+                    this.onLineDrawn(this.selectedPoints);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Handle double-click - deselect point
+     */
+    handleDoubleClick(event) {
+        if (this.isAnswered) return;
+        
+        const rect = this.canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+        
+        // Find if double-clicked on a selected point
+        const clickedPoint = this.findNearestPoint(canvasX, canvasY);
+        
+        if (clickedPoint && this.isPointSelected(clickedPoint)) {
+            // Remove from selected
+            this.selectedPoints = this.selectedPoints.filter(p => 
+                !(p.x === clickedPoint.x && p.y === clickedPoint.y)
+            );
+            this.draw();
+            
+            // Callback
+            if (this.onPointDeselected) {
+                this.onPointDeselected(clickedPoint, this.selectedPoints.length);
+            }
+        }
+    }
+    
+    /**
+     * Find nearest available point to canvas coordinates
+     */
+    findNearestPoint(canvasX, canvasY) {
+        let nearest = null;
+        let minDistance = this.hitThreshold;
+        
+        for (const point of this.availablePoints) {
+            const px = this.toCanvasX(point.x);
+            const py = this.toCanvasY(point.y);
+            const distance = Math.sqrt((canvasX - px) ** 2 + (canvasY - py) ** 2);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearest = point;
+            }
+        }
+        
+        return nearest;
+    }
+    
+    /**
+     * Check if point is already selected
+     */
+    isPointSelected(point) {
+        return this.selectedPoints.some(p => p.x === point.x && p.y === point.y);
+    }
+    
+    /**
+     * Draw user's line through 2 selected points
+     */
+    drawUserLine() {
+        if (this.selectedPoints.length !== 2) return;
+        
+        const [p1, p2] = this.selectedPoints;
+        
+        this.ctx.strokeStyle = '#0066cc';
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([]);
+        this.ctx.beginPath();
+        
+        // Calculate line parameters
+        if (p1.x === p2.x) {
+            // Vertical line
+            const x = this.toCanvasX(p1.x);
+            this.ctx.moveTo(x, this.padding);
+            this.ctx.lineTo(x, this.height - this.padding);
+        } else {
+            // Slope-intercept form
+            const m = (p2.y - p1.y) / (p2.x - p1.x);
+            const b = p1.y - m * p1.x;
+            
+            // Draw across graph bounds
+            for (let x = this.xMin; x <= this.xMax; x += 0.1) {
+                const y = m * x + b;
+                if (y >= this.yMin && y <= this.yMax) {
+                    const cx = this.toCanvasX(x);
+                    const cy = this.toCanvasY(y);
+                    if (x === this.xMin || (Math.abs(x - this.xMin) < 0.15)) {
+                        this.ctx.moveTo(cx, cy);
+                    } else {
+                        this.ctx.lineTo(cx, cy);
+                    }
+                }
+            }
+        }
+        
+        this.ctx.stroke();
+    }
+    
+    /**
+     * Main draw function
+     */
+    draw() {
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        
+        // Draw grid and axes
+        this.drawGrid();
+        this.drawAxes();
+        
+        // Draw any additional lines
+        for (const line of this.lines) {
+            this.drawLine(line);
+        }
+        
+        // Draw user line if 2 points selected
+        if (this.selectedPoints.length === 2) {
+            this.drawUserLine();
+        }
+        
+        // Draw available points
+        for (const point of this.availablePoints) {
+            const isSelected = this.isPointSelected(point);
+            const style = isSelected ? this.styles.selected : this.styles.unselected;
+            this.drawPoint(point, style);
+        }
+    }
+    
+    /**
+     * Draw grid lines
+     */
+    drawGrid() {
+        this.ctx.strokeStyle = '#ddd';
+        this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([]);
+        
+        // Vertical grid lines
+        for (let x = this.xMin; x <= this.xMax; x++) {
+            if (x !== 0) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.toCanvasX(x), this.padding);
+                this.ctx.lineTo(this.toCanvasX(x), this.height - this.padding);
+                this.ctx.stroke();
+            }
+        }
+        
+        // Horizontal grid lines
+        for (let y = this.yMin; y <= this.yMax; y++) {
+            if (y !== 0) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.padding, this.toCanvasY(y));
+                this.ctx.lineTo(this.width - this.padding, this.toCanvasY(y));
+                this.ctx.stroke();
+            }
+        }
+    }
+    
+    /**
+     * Draw coordinate axes
+     */
+    drawAxes() {
+        this.ctx.strokeStyle = '#333';
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([]);
+        
+        // X-axis
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.padding, this.toCanvasY(0));
+        this.ctx.lineTo(this.width - this.padding, this.toCanvasY(0));
+        this.ctx.stroke();
+        
+        // Y-axis
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.toCanvasX(0), this.padding);
+        this.ctx.lineTo(this.toCanvasX(0), this.height - this.padding);
+        this.ctx.stroke();
+        
+        // Axis labels
+        this.ctx.fillStyle = '#000';
+        this.ctx.font = '14px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('x', this.width - this.padding + 15, this.toCanvasY(0) + 5);
+        this.ctx.textAlign = 'left';
+        this.ctx.fillText('y', this.toCanvasX(0) + 5, this.padding - 10);
+    }
+    
+    /**
+     * Draw a single point
+     */
+    drawPoint(point, style) {
+        this.ctx.fillStyle = style.fill;
+        this.ctx.beginPath();
+        this.ctx.arc(this.toCanvasX(point.x), this.toCanvasY(point.y), style.radius, 0, 2 * Math.PI);
+        this.ctx.fill();
+        
+        // Draw point label
+        this.ctx.fillStyle = '#000';
+        this.ctx.font = '11px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(`(${point.x},${point.y})`, this.toCanvasX(point.x), this.toCanvasY(point.y) - 12);
+    }
+    
+    /**
+     * Draw a line (equation or two points)
+     */
+    drawLine(line) {
+        this.ctx.strokeStyle = line.color || '#0066cc';
+        this.ctx.lineWidth = line.width || 2;
+        this.ctx.setLineDash(line.dashed ? [5, 5] : []);
+        this.ctx.beginPath();
+        
+        if (line.kind === 'vertical') {
+            const x = this.toCanvasX(line.x0);
+            this.ctx.moveTo(x, this.padding);
+            this.ctx.lineTo(x, this.height - this.padding);
+        } else {
+            // Slope-intercept: y = mx + b
+            const m = line.m;
+            const b = line.b;
+            
+            let firstPoint = true;
+            for (let x = this.xMin; x <= this.xMax; x += 0.1) {
+                const y = m * x + b;
+                if (y >= this.yMin && y <= this.yMax) {
+                    const cx = this.toCanvasX(x);
+                    const cy = this.toCanvasY(y);
+                    if (firstPoint) {
+                        this.ctx.moveTo(cx, cy);
+                        firstPoint = false;
+                    } else {
+                        this.ctx.lineTo(cx, cy);
+                    }
+                }
+            }
+        }
+        
+        this.ctx.stroke();
+    }
+    
+    /**
+     * Set available points for selection
+     */
+    setAvailablePoints(points) {
+        this.availablePoints = points;
+        this.draw();
+    }
+    
+    /**
+     * Set correct points (for validation)
+     */
+    setCorrectPoints(points) {
+        this.correctPoints = points;
+    }
+    
+    /**
+     * Add a line to display
+     */
+    addLine(line) {
+        this.lines.push(line);
+        this.draw();
+    }
+    
+    /**
+     * Clear all lines
+     */
+    clearLines() {
+        this.lines = [];
+        this.draw();
+    }
+    
+    /**
+     * Reset selection
+     */
+    resetSelection() {
+        this.selectedPoints = [];
+        this.isAnswered = false;
+        this.draw();
+    }
+    
+    /**
+     * Mark as answered and show feedback
+     */
+    showFeedback(isCorrect) {
+        this.isAnswered = true;
+        
+        // Update point styles based on correctness
+        for (const point of this.selectedPoints) {
+            const isCorrectPoint = this.correctPoints.some(cp => cp.x === point.x && cp.y === point.y);
+            point.feedbackStyle = isCorrectPoint ? this.styles.correct : this.styles.incorrect;
+        }
+        
+        // Redraw with feedback styles
+        this.drawWithFeedback();
+        
+        // If incorrect, show correct answer overlay
+        if (!isCorrect && this.correctPoints.length === 2) {
+            this.drawCorrectAnswerOverlay();
+        }
+    }
+    
+    /**
+     * Draw with feedback styles
+     */
+    drawWithFeedback() {
+        // Clear and redraw base
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.drawGrid();
+        this.drawAxes();
+        
+        // Draw lines
+        for (const line of this.lines) {
+            this.drawLine(line);
+        }
+        
+        // Draw user line
+        if (this.selectedPoints.length === 2) {
+            this.drawUserLine();
+        }
+        
+        // Draw points with feedback styles
+        for (const point of this.availablePoints) {
+            const selected = this.selectedPoints.find(p => p.x === point.x && p.y === point.y);
+            let style = this.styles.unselected;
+            
+            if (selected && selected.feedbackStyle) {
+                style = selected.feedbackStyle;
+            } else if (selected) {
+                style = this.styles.selected;
+            }
+            
+            this.drawPoint(point, style);
+        }
+    }
+    
+    /**
+     * Draw correct answer overlay (dashed green line)
+     */
+    drawCorrectAnswerOverlay() {
+        const [p1, p2] = this.correctPoints;
+        
+        this.ctx.strokeStyle = '#00cc00';
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([8, 4]);
+        this.ctx.beginPath();
+        
+        if (p1.x === p2.x) {
+            // Vertical line
+            const x = this.toCanvasX(p1.x);
+            this.ctx.moveTo(x, this.padding);
+            this.ctx.lineTo(x, this.height - this.padding);
+        } else {
+            // Slope-intercept
+            const m = (p2.y - p1.y) / (p2.x - p1.x);
+            const b = p1.y - m * p1.x;
+            
+            let firstPoint = true;
+            for (let x = this.xMin; x <= this.xMax; x += 0.1) {
+                const y = m * x + b;
+                if (y >= this.yMin && y <= this.yMax) {
+                    const cx = this.toCanvasX(x);
+                    const cy = this.toCanvasY(y);
+                    if (firstPoint) {
+                        this.ctx.moveTo(cx, cy);
+                        firstPoint = false;
+                    } else {
+                        this.ctx.lineTo(cx, cy);
+                    }
+                }
+            }
+        }
+        
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+    }
+    
+    /**
+     * Get selected points
+     */
+    getSelectedPoints() {
+        return this.selectedPoints;
+    }
+    
+    /**
+     * Check if selection is correct
+     */
+    validateSelection() {
+        if (this.selectedPoints.length !== 2 || this.correctPoints.length !== 2) {
+            return false;
+        }
+        
+        // Check if both selected points match correct points (in any order)
+        const selected1Correct = this.correctPoints.some(cp => 
+            cp.x === this.selectedPoints[0].x && cp.y === this.selectedPoints[0].y
+        );
+        const selected2Correct = this.correctPoints.some(cp => 
+            cp.x === this.selectedPoints[1].x && cp.y === this.selectedPoints[1].y
+        );
+        
+        return selected1Correct && selected2Correct;
+    }
+}
+
+// ============================================================================
 // MILESTONE 16: Enhanced Graph Component (Canvas-Based)
 // ============================================================================
 
