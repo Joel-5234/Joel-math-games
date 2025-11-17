@@ -8,6 +8,21 @@ None currently.
 
 ## Resolved Issues
 
+### Issue #033: Auto-Advance Still Not Working After Stats Fix
+- **Date**: 2025-11-17 00:15:00
+- **Status**: ✅ RESOLVED
+- **Priority**: CRITICAL
+- **Severity**: Critical
+- **Reporter**: User
+- **Resolution Time**: 10 minutes
+- **Description**: After fixing Issue #032 (stats key mismatch), auto-advance was still broken. When users got an answer correct, the "✓ Correct!" message displayed but the question did not advance.
+- **Root Cause**: Code was calling non-existent function `navigateChallenge('next')`. The correct function name is `navigateChallengeQuestion('next')`.
+- **Fix**: Changed function call from `navigateChallenge('next')` to `navigateChallengeQuestion('next')` at line 1716.
+- **Files Modified**: `app.js`
+- **Commits**: 1 commit (d2ebeed)
+- **Details**: [issue-033-20251117-001500.md](./issue-033-20251117-001500.md)
+- **Note**: This was a follow-up to Issue #031, which had the same root cause but the fix was incorrect. Issue #031 changed `nextChallengeQuestion()` to `navigateChallenge()`, but the correct function name is `navigateChallengeQuestion()`.
+
 ### Issue #032: Auto-Advance Not Working in Graphing Challenge Mode
 - **Date**: 2025-11-17 00:00:00
 - **Status**: ✅ RESOLVED
@@ -232,6 +247,6 @@ None currently.
 
 ---
 
-**Total Issues**: 32 (32 resolved, 0 open)
-**Last Updated**: 2025-11-17 00:00:00
+**Total Issues**: 33 (33 resolved, 0 open)
+**Last Updated**: 2025-11-17 00:15:00
 
