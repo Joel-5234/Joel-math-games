@@ -8,6 +8,20 @@ None currently.
 
 ## Resolved Issues
 
+### Issue #028: Button Styling Inconsistent in Interactive Graphing Tabs
+- **Date**: 2025-11-16 21:47:00
+- **Status**: ✅ RESOLVED
+- **Priority**: LOW
+- **Severity**: Minor (Visual)
+- **Reporter**: User
+- **Resolution Time**: 8 minutes
+- **Description**: Submit and Next buttons in interactive graphing tabs had different styling than other buttons in the app.
+- **Root Cause**: Used non-existent CSS classes (`primary-button`, `secondary-button`) instead of standard `submit-button` class.
+- **Fix**: Updated all 10 buttons across 5 graphing sections to use `submit-button` class.
+- **Files Modified**: `index.html`
+- **Commits**: 1 commit
+- **Details**: [issue-028-20251116-214700.md](./issue-028-20251116-214700.md)
+
 ### Issue #027: Interactive Graphing Tabs Not Displaying Content
 - **Date**: 2025-11-16 21:15:00
 - **Status**: ✅ RESOLVED
