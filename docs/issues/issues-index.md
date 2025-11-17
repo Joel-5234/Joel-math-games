@@ -8,6 +8,20 @@ None currently.
 
 ## Resolved Issues
 
+### Issue #030: No Points Displaying in Interactive Graphing Challenge Mode
+- **Date**: 2025-11-16 22:30:00
+- **Status**: ✅ RESOLVED
+- **Priority**: CRITICAL
+- **Severity**: High
+- **Reporter**: User
+- **Resolution Time**: 15 minutes
+- **Description**: After fixing Issue #029, graphing Challenge mode displayed the correct canvas but no clickable points were visible, making questions impossible to answer.
+- **Root Cause**: The `displayChallengeQuestion()` function was checking for camelCase question types (`'graphParallel'`) but questions now have hyphenated types (`'graph-parallel'`), so the condition never matched and InteractiveGraph was never initialized.
+- **Fix**: Updated condition in `displayChallengeQuestion()` to check for hyphenated types: `question.type === 'graph-slopeintercept'` instead of `question.type === 'graphSlopeIntercept'`.
+- **Files Modified**: `app.js`
+- **Commits**: 1 commit
+- **Details**: [issue-030-20251116-223000.md](./issue-030-20251116-223000.md)
+
 ### Issue #029: Challenge Mode from Graphing Tabs Shows Wrong Questions
 - **Date**: 2025-11-16 22:00:00
 - **Status**: ✅ RESOLVED
@@ -190,6 +204,6 @@ None currently.
 
 ---
 
-**Total Issues**: 29 (29 resolved, 0 open)
-**Last Updated**: 2025-11-16 22:05:00
+**Total Issues**: 30 (30 resolved, 0 open)
+**Last Updated**: 2025-11-16 22:35:00
 
