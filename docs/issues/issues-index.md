@@ -8,6 +8,21 @@ None currently.
 
 ## Resolved Issues
 
+### Issue #034: Graphing Challenge Completion Screen Shows Incorrect Stats
+- **Date**: 2025-11-17 00:30:00
+- **Status**: ✅ RESOLVED
+- **Priority**: HIGH
+- **Severity**: High
+- **Reporter**: User
+- **Resolution Time**: 15 minutes
+- **Description**: After completing a graphing Challenge, the completion screen showed incorrect statistics. Even when user answered correctly, screen showed "Correct: 0, Incorrect: 5" and all time statistics were "0s" despite total time being 3m 57s.
+- **Root Cause**: Graphing challenge submit handler was missing critical data recording: (1) `challengeState.correctAnswers[index]` was never set, and (2) `challengeState.questionTimes[]` was never populated. Completion screen reads from these to display stats.
+- **Fix**: Added complete data tracking to graphing submit handler: record question end time, stop timer, store boolean result in `correctAnswers`, track timing data in `questionTimes`, and check for speed achievements. Now matches logic in `submitChallengeAnswer()`.
+- **Files Modified**: `app.js`
+- **Commits**: 1 commit (8a8c6af)
+- **Details**: [issue-034-20251117-003000.md](./issue-034-20251117-003000.md)
+- **Note**: This completes the 8-issue chain for Interactive Graphing Challenge Mode. All graphing features now fully functional!
+
 ### Issue #033: Auto-Advance Still Not Working After Stats Fix
 - **Date**: 2025-11-17 00:15:00
 - **Status**: ✅ RESOLVED
@@ -247,6 +262,6 @@ None currently.
 
 ---
 
-**Total Issues**: 33 (33 resolved, 0 open)
-**Last Updated**: 2025-11-17 00:15:00
+**Total Issues**: 34 (34 resolved, 0 open)
+**Last Updated**: 2025-11-17 00:30:00
 
