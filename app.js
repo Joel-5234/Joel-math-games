@@ -1662,9 +1662,9 @@ function displayChallengeQuestion() {
                 if (radio) radio.checked = true;
                 document.querySelectorAll('#challengeAbsoluteValueOptions input').forEach(r => r.disabled = true);
             }
-        } else if (question.type === 'graphSlopeIntercept' || question.type === 'graphPointSlope' || 
-                   question.type === 'graphParallel' || question.type === 'graphPerpendicular' || 
-                   question.type === 'graphAbsoluteValue') {
+        } else if (question.type === 'graph-slopeintercept' || question.type === 'graph-pointslope' || 
+                   question.type === 'graph-parallel' || question.type === 'graph-perpendicular' || 
+                   question.type === 'graph-absolutevalue') {
             // MILESTONE 19: Interactive Graphing in Challenge Mode
             questionDisplay.innerHTML = `<p class="challenge-question-text">${question.question}</p>`;
             
