@@ -560,6 +560,7 @@
                             <button id="challengeBackBtn" class="nav-button">← Back</button>
                             <button id="challengeSkipBtn" class="nav-button skip-btn">Skip</button>
                             <button id="challengeGiveUpBtn" class="nav-button give-up-btn">Give Up</button>
+                            <button id="challengeRestartBtn" class="nav-button restart-btn">🔄 Restart</button>
                             <button id="challengeSubmitBtn" class="nav-button submit-btn">Submit Answer</button>
                         </div>
                     </div>
@@ -943,6 +944,21 @@
             <div class="completion-actions">
                 <button id="restartChallenge" class="action-button">Start New Challenge</button>
                 <button id="returnToPractice" class="action-button">Return to Practice</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestone 20: Restart Challenge Confirmation Modal -->
+    <div id="restartChallengeModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-modal" id="closeRestartModal">&times;</span>
+            <h2 style="color: #667eea; margin-bottom: 15px;">🔄 Restart Challenge?</h2>
+            <p style="margin-bottom: 25px; line-height: 1.6; font-size: 1.1rem;">
+                Are you sure you want to restart? All current progress will be lost.
+            </p>
+            <div class="modal-actions" style="display: flex; gap: 15px; justify-content: center;">
+                <button id="confirmRestartBtn" class="action-button destructive-button">Yes, Restart</button>
+                <button id="cancelRestartBtn" class="action-button secondary-button">Cancel</button>
             </div>
         </div>
     </div>

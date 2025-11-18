@@ -1334,6 +1334,78 @@ function hideChallengeInterface() {
     }
 }
 
+// Milestone 20: Restart Challenge Functions
+function showRestartConfirmationModal() {
+    console.log('[Restart] Showing confirmation modal...');
+    const modal = document.getElementById('restartChallengeModal');
+    if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+    }
+}
+
+function hideRestartConfirmationModal() {
+    console.log('[Restart] Hiding confirmation modal...');
+    const modal = document.getElementById('restartChallengeModal');
+    if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+    }
+}
+
+function restartChallengeWithNewQuestions() {
+    if (!challengeState.active) {
+        console.error('[Restart] Cannot restart - challenge not active');
+        return;
+    }
+    
+    console.log('[Restart] Starting challenge restart...');
+    
+    // Store current challenge settings
+    const problemType = challengeState.currentProblemType;
+    const setSize = challengeState.setSize;
+    
+    console.log(`[Restart] Problem Type: ${problemType}, Set Size: ${setSize}`);
+    
+    // Generate new questions
+    const newQuestions = generateChallengeQuestions(problemType, setSize);
+    console.log(`[Restart] Generated ${newQuestions.length} new questions`);
+    
+    // Reset challenge state completely
+    challengeState.questions = newQuestions;
+    challengeState.currentQuestionIndex = 0;
+    challengeState.answers = {};
+    challengeState.questionStates = {};
+    challengeState.correctAnswers = {};
+    challengeState.hintsUsed = 0;
+    challengeState.hintsUsedPerQuestion = {};
+    challengeState.questionTimes = [];
+    challengeState.progressMilestones = {
+        fifty: false,
+        eightyFive: false,
+        hundred: false
+    };
+    
+    console.log('[Restart] Challenge state reset');
+    
+    // Reset timers
+    stopChallengeTimer();
+    stopQuestionTimer();
+    challengeState.challengeStartTime = Date.now();
+    challengeState.totalChallengeTime = 0;
+    startChallengeTimer();
+    
+    console.log('[Restart] Timers reset and restarted');
+    
+    // Display first question
+    displayChallengeQuestion();
+    
+    // Start question timer for first question
+    startQuestionTimer();
+    
+    console.log('[Restart] Challenge restarted successfully! Displaying question 1');
+}
+
 function displayChallengeQuestion() {
     if (!challengeState.active || challengeState.questions.length === 0) return;
     
@@ -7867,6 +7939,12 @@ document.addEventListener('DOMContentLoaded', () => {
         giveUpChallengeQuestion();
     });
     
+    // Milestone 20: Restart challenge button
+    document.getElementById('challengeRestartBtn')?.addEventListener('click', () => {
+        console.log('[Restart] Restart button clicked');
+        showRestartConfirmationModal();
+    });
+    
     document.getElementById('challengeSubmitBtn')?.addEventListener('click', () => {
         submitChallengeAnswer();
     });
@@ -7895,6 +7973,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         resetChallenge();
         showChallengeSetupModal();
+    });
+    
+    // Milestone 20: Restart confirmation modal listeners
+    document.getElementById('confirmRestartBtn')?.addEventListener('click', () => {
+        console.log('[Restart] Restart confirmed by user');
+        hideRestartConfirmationModal();
+        restartChallengeWithNewQuestions();
+    });
+    
+    document.getElementById('cancelRestartBtn')?.addEventListener('click', () => {
+        console.log('[Restart] Restart cancelled by user');
+        hideRestartConfirmationModal();
+    });
+    
+    document.getElementById('closeRestartModal')?.addEventListener('click', () => {
+        console.log('[Restart] Restart modal closed via X button');
+        hideRestartConfirmationModal();
     });
     
     document.getElementById('returnToPractice')?.addEventListener('click', () => {
