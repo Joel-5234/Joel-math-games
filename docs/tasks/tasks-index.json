@@ -124,12 +124,15 @@
     {
       "id": "milestone-20",
       "name": "Mid-Challenge Restart Button",
-      "status": "pending",
+      "status": "completed",
       "priority": "medium",
       "estimatedDays": "0.5",
+      "actualDays": "0.25",
+      "completionDate": "2024-11-17",
       "description": "Add a restart button to Challenge Mode navigation bar that allows users to restart mid-challenge with new questions (same type, same count). Includes confirmation dialog and complete state reset.",
       "features": ["Restart button in navigation", "Confirmation dialog", "Generate new questions", "Complete state reset", "Grey button styling", "Works for all 15 problem types"],
-      "blockers": []
+      "totalLinesAdded": "~200",
+      "commits": 3
     }
   ]
 }
